@@ -1,8 +1,6 @@
-mednafen-stella-libretro
+stella-libretro
 ========================
 
-Port of Mednafen Stella to libretro.
+Port of Stella to libretro.
 
-WIP - sound and input not set up - core can sometimes crash on load
-
-**Mednafen wrapper will be removed and proper libretro port will be done**
+**WIP - sound and input not set up**
