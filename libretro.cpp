@@ -87,11 +87,12 @@ static retro_video_refresh_t video_cb;
 static retro_input_poll_t input_poll_cb;
 static retro_input_state_t input_state_cb;
 static retro_environment_t environ_cb;
+static retro_audio_sample_t audio_cb;
 static retro_audio_sample_batch_t audio_batch_cb;
 
 void retro_set_environment(retro_environment_t cb) { environ_cb = cb; }
 void retro_set_video_refresh(retro_video_refresh_t cb) { video_cb = cb; }
-void retro_set_audio_sample(retro_audio_sample_t cb) { (void)cb; }
+void retro_set_audio_sample(retro_audio_sample_t cb) { audio_cb = cb; }
 void retro_set_audio_sample_batch(retro_audio_sample_batch_t cb) { audio_batch_cb = cb; }
 void retro_set_input_poll(retro_input_poll_t cb) { input_poll_cb = cb; }
 void retro_set_input_state(retro_input_state_t cb) { input_state_cb = cb; }
@@ -307,7 +308,8 @@ void retro_run(void)
         int16_t sample = (samplebuffer[i] << 8) - 32768;
         int16_t frame[2] = {sample, sample};
         //Resampler::Fill(frame, 2);
+        audio_cb(frame[0], frame[1]);
     }
     //TODO: fix
-    audio_batch_cb(NULL, NULL);
+    //audio_batch_cb(NULL, NULL);
 }
