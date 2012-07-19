@@ -28,9 +28,6 @@
 #include "MD5.hxx"
 #include "SoundSDL.hxx"
 
-//extern MDFNGI EmulatedStella;
-
-//static bool failed_init;
 struct					Stella
 {
 	Console*			GameConsole;
@@ -44,6 +41,26 @@ struct					Stella
 	~Stella()	{delete GameConsole;}
 };
 Stella*				stella;
+
+static uint16_t frame_buffer[256*160];
+
+struct bind_conv
+{
+    int retro;
+    int atari;
+};
+/*
+static struct bind_conv binds[] = {
+    { RETRO_DEVICE_ID_JOYPAD_B, JoystickZeroFire1 },
+    { RETRO_DEVICE_ID_JOYPAD_A, JoystickZeroFire2 },
+    { RETRO_DEVICE_ID_JOYPAD_X, JoystickZeroFire3 },
+    { RETRO_DEVICE_ID_JOYPAD_UP, JoystickZeroUp },
+    { RETRO_DEVICE_ID_JOYPAD_DOWN, JoystickZeroDown },
+    { RETRO_DEVICE_ID_JOYPAD_LEFT, JoystickZeroLeft },
+    { RETRO_DEVICE_ID_JOYPAD_RIGHT, JoystickZeroRight },
+    { RETRO_DEVICE_ID_JOYPAD_SELECT, ConsoleSelect },
+};
+*/
 
 //Set the palette for the current stella instance
 void stellaMDFNSetPalette (const uInt32* palette)
@@ -98,12 +115,12 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
 {
     memset(info, 0, sizeof(*info));
     // Just assume NTSC for now. TODO: Verify FPS.
-    info->timing.fps            = stella->GameConsole->getFramerate(); //60?
-    info->timing.sample_rate    = 44100;
+    info->timing.fps            = stella->GameConsole->getFramerate();
+    info->timing.sample_rate    = 31400;
     info->geometry.base_width   = 160;
     info->geometry.base_height  = 210;
     info->geometry.max_width    = 160;
-    info->geometry.max_height   = 210;
+    info->geometry.max_height   = 256;
     info->geometry.aspect_ratio = 4.0 / 3.0;
 }
 
@@ -122,13 +139,13 @@ size_t retro_serialize_size(void)
 bool retro_serialize(void *data, size_t size)
 { 
    //if (size != STATE_SIZE)
-   //   return FALSE;
+   return false;
 }
 
 bool retro_unserialize(const void *data, size_t size)
 {
    //if (size != STATE_SIZE)
-   //   return FALSE;
+   return false;
 }
 
 void retro_cheat_reset(void)
@@ -144,12 +161,11 @@ void retro_cheat_set(unsigned index, bool enabled, const char *code)
 bool retro_load_game(const struct retro_game_info *info)
 {
     stella = new Stella();
-   const char *full_path;
+    const char *full_path;
     
-   full_path = info->path;
+    full_path = info->path;
     
 	//Get the game properties
-    //string MD5(const uInt8* buffer, uInt32 length)
     string cartMD5 = MD5((const uInt8*)info->data, info->size);
     PropertiesSet propslist(0);
     Properties gameProperties;
@@ -158,15 +174,13 @@ bool retro_load_game(const struct retro_game_info *info)
     //Load the cart
     string cartType = gameProperties.get(Cartridge_Type);
     string cartID = "";
-    //static Cartridge* create(const uInt8* image, uInt32 size, string& md5,
-    //                         string& dtype, string& id, Settings& settings);
     Cartridge* stellaCart = Cartridge::create((const uInt8*)info->data, info->size, cartMD5, cartType, cartID, stella->GameSettings);
     
-    //if(stellaCart == 0)
-    //{
-    //    printf("Stella: Failed to load cartridge.");
-    //    return false;
-    //}
+    if(stellaCart == 0)
+    {
+        printf("Stella: Failed to load cartridge.");
+        return false;
+    }
     
     //Create the console
     stella->GameConsole = new Console(stella->Sound, stellaCart, gameProperties);
@@ -174,36 +188,7 @@ bool retro_load_game(const struct retro_game_info *info)
     //Init sound
     stella->Sound.open();
     
-    //frame rate
-    //stella->GameConsole->getFramerate();
-    
     //stella->Palette = 0; //NTSC
-    
-    /*
-     //INPUT
-     //Update stella's event structure
-     for(int i = 0; i != 2; i ++)
-     {
-     //Get the base event id for this port
-     Event::Type baseEvent = (i == 0) ? Event::JoystickZeroUp : Event::JoystickOneUp;
-     
-     //Get the input data for this port and stuff it in the event structure
-     uint32_t inputState = Input::GetPort<3>(i);
-     for(int j = 0; j != 19; j ++, inputState >>= 1)
-     {
-     stella->GameConsole->event().set((Event::Type)(baseEvent + j), inputState & 1);
-     }
-     }
-     
-     //Update the reset and select events
-     uint32_t inputState = Input::GetPort<0, 3>() >> 19;
-     stella->GameConsole->event().set(Event::ConsoleSelect, inputState & 1);
-     stella->GameConsole->event().set(Event::ConsoleReset, inputState & 2);
-     */
-    //Tell all input devices to read their state from the event structure
-    stella->GameConsole->switches().update();
-    stella->GameConsole->controller(Controller::Left).update();
-    stella->GameConsole->controller(Controller::Right).update();
 
    return true;
 }
@@ -223,6 +208,7 @@ void retro_unload_game(void)
 
 unsigned retro_get_region(void)
 {
+    //stella->GameConsole->getFramerate();
     return RETRO_REGION_NTSC;
 }
 
@@ -251,7 +237,7 @@ void retro_deinit(void)
 {
     delete stella;
     stella = 0;
-	//free(videoBuffer);
+	//free(frame_buffer);
 }
 
 void retro_reset(void)
@@ -259,34 +245,69 @@ void retro_reset(void)
 	stella->GameConsole->system().reset();
 }
 
-void retro_run(void) 
+void retro_run(void)
 {
-	/*
-     Int32 frameWidth = stella->GameConsole->tia().width();
-     Int32 frameHeight = stella->GameConsole->tia().height();
-     
-     for(int i = 0; i != frameHeight; i ++)
-     {
-     for(int j = 0; j != frameWidth; j ++)
-     {
-     espec->surface->pixels[i * espec->surface->pitchinpix + j] = stella->Palette[stella->GameConsole->tia().currentFrameBuffer()[i * frameWidth + j] & 0xFF];
-     }
-     }*/
+    /*
+    //INPUT
+    //Update stella's event structure
+    for(int i = 0; i != 2; i ++)
+    {
+        //Get the base event id for this port
+        Event::Type baseEvent = (i == 0) ? Event::JoystickZeroUp : Event::JoystickOneUp;
+        
+        //Get the input data for this port and stuff it in the event structure
+        uint32_t inputState = Input::GetPort<3>(i);
+        for(int j = 0; j != 19; j ++, inputState >>= 1)
+        {
+            stella->GameConsole->event().set((Event::Type)(baseEvent j), inputState & 1);
+        }
+    }
+    
+    //Update the reset and select events
+    uint32_t inputState = Input::GetPort<0, 3>() >> 19;
+    stella->GameConsole->event().set(Event::ConsoleSelect, inputState & 1);
+    stella->GameConsole->event().set(Event::ConsoleReset, inputState & 2);
+    */
+    //Tell all input devices to read their state from the event structure
+    stella->GameConsole->switches().update();
+    stella->GameConsole->controller(Controller::Left).update();
+    stella->GameConsole->controller(Controller::Right).update();
     
     stella->GameConsole->tia().update();
-	
-	video_cb(stella->GameConsole->tia().currentFrameBuffer(), 160, 210, 320);
+    
+    Int32 frameWidth = stella->GameConsole->tia().width();
+    Int32 frameHeight = stella->GameConsole->tia().height();
+    
+    for(int i = 0; i != frameHeight; i ++)
+        {
+            for(int j = 0; j != frameWidth; j ++)
+                {
+                    Int32 pixel = stella->Palette[stella->GameConsole->tia().currentFrameBuffer()[i * frameWidth + j]];
+                    uint16_t color = (pixel & 0x0000F8) >> 3; // B
+                    color |= (pixel & 0x00F800) >> 6; // G
+                    color |= (pixel & 0xF80000) >> 9; // R
+                    frame_buffer[i * frameWidth + j] = color;
+                    }
+            }
+    
+    video_cb(frame_buffer, frameWidth, frameHeight, frameWidth * 2);
 
     //AUDIO
     //Get the number of samples in a frame
     uint32_t soundFrameSize = 34100.0f / stella->GameConsole->getFramerate();
+    //uint32_t soundFrameSize = 44100.0f / stella->GameConsole->getFramerate();
     
     //Process one frame of audio from stella
     uint8_t samplebuffer[2048];
     stella->Sound.processFragment(samplebuffer, soundFrameSize);
-
     
-	//TODO: setup audio
-	//audio_batch_cb(soundBuffer, BUFFER_LEN);
+    //Convert and stash it in the resampler...
+    for(int i = 0; i != soundFrameSize; i ++)
+    {
+        int16_t sample = (samplebuffer[i] << 8) - 32768;
+        int16_t frame[2] = {sample, sample};
+        //Resampler::Fill(frame, 2);
+    }
+    //TODO: fix
     audio_batch_cb(NULL, NULL);
 }
