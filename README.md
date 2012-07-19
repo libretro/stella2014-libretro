@@ -3,4 +3,4 @@ stella-libretro
 
 Port of Stella to libretro.
 
-**WIP - sound and input not set up**
+**WIP - input not set up**
