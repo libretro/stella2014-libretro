@@ -109,7 +109,7 @@ void retro_get_system_info(struct retro_system_info *info)
 	info->library_name = "Stella";
 	info->library_version = "3.4.1";
 	info->need_fullpath = false;
-	info->valid_extensions = "a26|A26";
+	info->valid_extensions = "a26|A26|bin|BIN";
 }
 
 void retro_get_system_av_info(struct retro_system_av_info *info)
