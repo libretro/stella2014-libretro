@@ -130,7 +130,7 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
     memset(info, 0, sizeof(*info));
     // Just assume NTSC for now. TODO: Verify FPS.
     info->timing.fps            = stella->GameConsole->getFramerate();
-    info->timing.sample_rate    = 34100;
+    info->timing.sample_rate    = 31400;
     info->geometry.base_width   = 320;
     info->geometry.base_height  = 210;
     info->geometry.max_width    = 320;
@@ -289,8 +289,7 @@ void retro_run(void)
 
     //AUDIO
     //Get the number of samples in a frame
-    uint32_t soundFrameSize = 34100.0f / stella->GameConsole->getFramerate();
-    //uint32_t soundFrameSize = 44100.0f / stella->GameConsole->getFramerate();
+    uint32_t soundFrameSize = 31400.0f / stella->GameConsole->getFramerate();
     
     //Process one frame of audio from stella
     uint8_t samplebuffer[2048];
