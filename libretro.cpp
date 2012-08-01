@@ -130,7 +130,7 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
     memset(info, 0, sizeof(*info));
     // Just assume NTSC for now. TODO: Verify FPS.
     info->timing.fps            = stella->GameConsole->getFramerate();
-    info->timing.sample_rate    = 31400;
+    info->timing.sample_rate    = 34100;
     info->geometry.base_width   = 320;
     info->geometry.base_height  = 210;
     info->geometry.max_width    = 320;
