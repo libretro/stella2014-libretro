@@ -17,15 +17,13 @@ ifeq ($(platform), unix)
    fpic := -fPIC
    SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
    ENDIANNESS_DEFINES := -DLSB_FIRST
-   LDFLAGS += -pthread
-   FLAGS += -pthread -DHAVE_MKDIR
+   FLAGS += -DHAVE_MKDIR
 else ifeq ($(platform), osx)
    TARGET := libretro.dylib
    fpic := -fPIC
    SHARED := -dynamiclib
    ENDIANNESS_DEFINES := -DLSB_FIRST
-   LDFLAGS += -pthread
-   FLAGS += -pthread -DHAVE_MKDIR
+   FLAGS += -DHAVE_MKDIR
 else
    TARGET := retro.dll
    CC = gcc
@@ -110,7 +108,7 @@ endif
 
 LDFLAGS += $(fpic) -lz $(SHARED)
 FLAGS += -msse -msse2 -Wall $(fpic) -fno-strict-overflow
-FLAGS += -I. -pthread -Istella -Istella/cart -Istella/input -Istella/system -Istella/utility -Istella/properties
+FLAGS += -I. -Istella -Istella/cart -Istella/input -Istella/system -Istella/utility -Istella/properties
 
 WARNINGS := -Wall \
 	-Wno-narrowing \
