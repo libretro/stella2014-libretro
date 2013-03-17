@@ -13,25 +13,26 @@ endif
 endif
 
 ifeq ($(platform), unix)
-   TARGET := libretro.so
+   TARGET := stella_libretro.so
    fpic := -fPIC
    SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
-   ENDIANNESS_DEFINES := -DLSB_FIRST
-   FLAGS += -DHAVE_MKDIR
 else ifeq ($(platform), osx)
-   TARGET := libretro.dylib
+   TARGET := stella_libretro.dylib
    fpic := -fPIC
    SHARED := -dynamiclib
-   ENDIANNESS_DEFINES := -DLSB_FIRST
-   FLAGS += -DHAVE_MKDIR
+else ifeq ($(platform), ios)
+   TARGET := stella_libretro.dylib
+   fpic := -fPIC
+   SHARED := -dynamiclib
+
+   CC = clang -arch armv7 -isysroot $(IOSSDK)
+   CXX = clang++ -arch armv7 -isysroot $(IOSSDK)
 else
-   TARGET := retro.dll
+   TARGET := stella_retro.dll
    CC = gcc
    CXX = g++
    SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
    LDFLAGS += -static-libgcc -static-libstdc++ -lwinmm
-   ENDIANNESS_DEFINES := -DLSB_FIRST
-   FLAGS += -DHAVE__MKDIR
 endif
 STELLA_DIR := stella
 
@@ -107,7 +108,7 @@ else
 endif
 
 LDFLAGS += $(fpic) -lz $(SHARED)
-FLAGS += -msse -msse2 -Wall $(fpic) -fno-strict-overflow
+FLAGS += -Wall $(fpic) -fno-strict-overflow
 FLAGS += -I. -Istella -Istella/cart -Istella/input -Istella/system -Istella/utility -Istella/properties
 
 WARNINGS := -Wall \
@@ -121,9 +122,9 @@ WARNINGS := -Wall \
 	-Wno-strict-aliasing \
 	-Wno-overflow
 
-FLAGS += -DLSB_FIRST -DHAVE_MKDIR -DSIZEOF_DOUBLE=8 $(WARNINGS)
+FLAGS += $(WARNINGS)
 
-CXXFLAGS += $(FLAGS) -DHAVE_INTTYPES -DKeyboard=StellaKeyboard
+CXXFLAGS += $(FLAGS) -DHAVE_INTTYPES
 CFLAGS += $(FLAGS) -std=gnu99
 
 $(TARGET): $(OBJECTS)
