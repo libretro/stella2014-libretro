@@ -12,23 +12,25 @@ else ifneq ($(findstring MINGW,$(shell uname -a)),)
 endif
 endif
 
+TARGET_NAME := stella
+
 ifeq ($(platform), unix)
-   TARGET := stella_libretro.so
+   TARGET := $(TARGET_NAME)_libretro.so
    fpic := -fPIC
    SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
 else ifeq ($(platform), osx)
-   TARGET := stella_libretro.dylib
+   TARGET := $(TARGET_NAME)_libretro.dylib
    fpic := -fPIC
    SHARED := -dynamiclib
 else ifeq ($(platform), ios)
-   TARGET := stella_libretro.dylib
+   TARGET := $(TARGET_NAME)_libretro.dylib
    fpic := -fPIC
    SHARED := -dynamiclib
 
    CC = clang -arch armv7 -isysroot $(IOSSDK)
    CXX = clang++ -arch armv7 -isysroot $(IOSSDK)
 else
-   TARGET := stella_retro.dll
+   TARGET := $(TARGET_NAME)_retro.dll
    CC = gcc
    CXX = g++
    SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
