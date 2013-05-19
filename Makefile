@@ -30,7 +30,7 @@ else ifeq ($(platform), ios)
    CC = clang -arch armv7 -isysroot $(IOSSDK)
    CXX = clang++ -arch armv7 -isysroot $(IOSSDK)
 else
-   TARGET := $(TARGET_NAME)_retro.dll
+   TARGET := $(TARGET_NAME)_libretro.dll
    CC = gcc
    CXX = g++
    SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
