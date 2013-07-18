@@ -88,23 +88,32 @@ static void update_input()
     input_poll_cb();
 
 	//Update stella's event structure
-    stella->GameConsole->event().set(Event::JoystickZeroUp, input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP));
-    stella->GameConsole->event().set(Event::JoystickZeroDown, input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN));
-    stella->GameConsole->event().set(Event::JoystickZeroLeft, input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT));
-    stella->GameConsole->event().set(Event::JoystickZeroRight, input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT));
-    stella->GameConsole->event().set(Event::JoystickZeroFire1, input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B));
-    stella->GameConsole->event().set(Event::JoystickZeroFire2, input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A));
-    stella->GameConsole->event().set(Event::JoystickZeroFire3, input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X));
-    stella->GameConsole->event().set(Event::ConsoleLeftDiffA, input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L));
-    stella->GameConsole->event().set(Event::ConsoleLeftDiffB, input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2));
-    stella->GameConsole->event().set(Event::ConsoleColor, input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L3));
-    stella->GameConsole->event().set(Event::ConsoleRightDiffA, input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R));
-    stella->GameConsole->event().set(Event::ConsoleRightDiffB, input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2));
-    stella->GameConsole->event().set(Event::ConsoleBlackWhite, input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R3));
-    stella->GameConsole->event().set(Event::ConsoleSelect, input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT));
-    stella->GameConsole->event().set(Event::ConsoleReset, input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START));
-    
-	//Tell all input devices to read their state from the event structure
+    stella->GameConsole->event().set(Event::JoystickZeroUp, input_state_cb(Controller::Left, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP));
+    stella->GameConsole->event().set(Event::JoystickZeroDown, input_state_cb(Controller::Left, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN));
+    stella->GameConsole->event().set(Event::JoystickZeroLeft, input_state_cb(Controller::Left, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT));
+    stella->GameConsole->event().set(Event::JoystickZeroRight, input_state_cb(Controller::Left, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT));
+    stella->GameConsole->event().set(Event::JoystickZeroFire1, input_state_cb(Controller::Left, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B));
+    stella->GameConsole->event().set(Event::JoystickZeroFire2, input_state_cb(Controller::Left, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A));
+    stella->GameConsole->event().set(Event::JoystickZeroFire3, input_state_cb(Controller::Left, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X));
+    stella->GameConsole->event().set(Event::ConsoleLeftDiffA, input_state_cb(Controller::Left, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L));
+    stella->GameConsole->event().set(Event::ConsoleLeftDiffB, input_state_cb(Controller::Left, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2));
+    stella->GameConsole->event().set(Event::ConsoleColor, input_state_cb(Controller::Left, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L3));
+    stella->GameConsole->event().set(Event::ConsoleRightDiffA, input_state_cb(Controller::Left, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R));
+    stella->GameConsole->event().set(Event::ConsoleRightDiffB, input_state_cb(Controller::Left, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2));
+    stella->GameConsole->event().set(Event::ConsoleBlackWhite, input_state_cb(Controller::Left, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R3));
+    stella->GameConsole->event().set(Event::ConsoleSelect, input_state_cb(Controller::Left, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT));
+    stella->GameConsole->event().set(Event::ConsoleReset, input_state_cb(Controller::Left, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START));
+   
+    //Events for right player's joystick 
+    stella->GameConsole->event().set(Event::JoystickOneUp, input_state_cb(Controller::Right, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP));
+    stella->GameConsole->event().set(Event::JoystickOneDown, input_state_cb(Controller::Right, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN));
+    stella->GameConsole->event().set(Event::JoystickOneLeft, input_state_cb(Controller::Right, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT));
+    stella->GameConsole->event().set(Event::JoystickOneRight, input_state_cb(Controller::Right, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT));
+    stella->GameConsole->event().set(Event::JoystickOneFire1, input_state_cb(Controller::Right, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B));
+    stella->GameConsole->event().set(Event::JoystickOneFire2, input_state_cb(Controller::Right, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A));
+    stella->GameConsole->event().set(Event::JoystickOneFire3, input_state_cb(Controller::Right, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X));
+	
+    //Tell all input devices to read their state from the event structure
     stella->GameConsole->switches().update();
     stella->GameConsole->controller(Controller::Left).update();
     stella->GameConsole->controller(Controller::Right).update();
