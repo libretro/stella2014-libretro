@@ -27,6 +27,7 @@
 #include "Switches.hxx"
 #include "MD5.hxx"
 #include "SoundSDL.hxx"
+#include "Paddles.hxx"
 
 struct					Stella
 {
@@ -183,6 +184,13 @@ void retro_cheat_set(unsigned index, bool enabled, const char *code)
 
 bool retro_load_game(const struct retro_game_info *info)
 {
+    /* This might not be the best place to call these. These two functions
+     * must be called before starting a game with paddles.
+     * The magic number 5 is "medium" paddle sensitivity (range 1-10)
+     */
+    Paddles::setDigitalSensitivity(5);
+    Paddles::setMouseSensitivity(5);
+
     stella = new Stella();
     const char *full_path;
     
