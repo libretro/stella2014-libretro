@@ -25,10 +25,10 @@ else ifeq ($(platform), osx)
 else ifeq ($(platform), ios)
    TARGET := $(TARGET_NAME)_libretro_ios.dylib
    fpic := -fPIC
-   SHARED := -dynamiclib
+   SHARED := -dynamiclib -miphoneos-version-min=5.0
 
-   CC = clang -arch armv7 -isysroot $(IOSSDK)
-   CXX = clang++ -arch armv7 -isysroot $(IOSSDK)
+   CC = clang -arch armv7 -isysroot $(IOSSDK) -miphoneos-version-min=5.0
+   CXX = clang++ -arch armv7 -isysroot $(IOSSDK) -miphoneos-version-min=5.0
 else
    TARGET := $(TARGET_NAME)_libretro.dll
    CC = gcc
