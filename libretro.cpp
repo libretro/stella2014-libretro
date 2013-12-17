@@ -66,6 +66,7 @@ Settings& stellaMDFNSettings ()
 	abort();
 }
 
+static retro_log_printf_t log_cb;
 static retro_video_refresh_t video_cb;
 static retro_input_poll_t input_poll_cb;
 static retro_input_state_t input_state_cb;
@@ -209,7 +210,8 @@ bool retro_load_game(const struct retro_game_info *info)
     
     if(stellaCart == 0)
     {
-        printf("Stella: Failed to load cartridge.");
+        if (log_cb)
+           log_cb(RETRO_LOG_ERROR, "Stella: Failed to load cartridge.");
         return false;
     }
     
@@ -260,8 +262,10 @@ size_t retro_get_memory_size(unsigned id)
 
 void retro_init(void)
 {
-    unsigned level = 3;
-    environ_cb(RETRO_ENVIRONMENT_SET_PERFORMANCE_LEVEL, &level);
+   struct retro_log_callback log;
+   environ_cb(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &log);
+   if (log.log)
+      log_cb = log.log;
 }
 
 void retro_deinit(void)
