@@ -211,7 +211,7 @@ bool retro_load_game(const struct retro_game_info *info)
     if(stellaCart == 0)
     {
         if (log_cb)
-           log_cb(RETRO_LOG_ERROR, "Stella: Failed to load cartridge.");
+           log_cb(RETRO_LOG_ERROR, "Stella: Failed to load cartridge.\n");
         return false;
     }
     
@@ -263,9 +263,10 @@ size_t retro_get_memory_size(unsigned id)
 void retro_init(void)
 {
    struct retro_log_callback log;
-   environ_cb(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &log);
-   if (log.log)
+   if (environ_cb(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &log))
       log_cb = log.log;
+   else
+      log_cb = NULL;
 }
 
 void retro_deinit(void)
