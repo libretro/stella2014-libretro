@@ -20,7 +20,7 @@ ifeq ($(platform), unix)
    SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
 else ifeq ($(platform), osx)
    TARGET := $(TARGET_NAME)_libretro.dylib
-   fpic := -fPIC
+   fpic := -fPIC -mmacosx-version-min=10.6
    SHARED := -dynamiclib
 else ifeq ($(platform), ios)
    TARGET := $(TARGET_NAME)_libretro_ios.dylib
