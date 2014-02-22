@@ -35,6 +35,13 @@ else ifeq ($(platform), qnx)
    SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
 	CC = qcc -Vgcc_ntoarmv7le
 	CXX = QCC -Vgcc_ntoarmv7le_cpp
+else ifeq ($(platform), psp1)
+   TARGET := $(TARGET_NAME)_libretro_psp1.a
+	CC = psp-gcc
+	CXX = psp-g++
+	AR = psp-ar
+   STATIC_LINKING = 1
+	FLAGS += -G0 -DLSB_FIRST
 else
    TARGET := $(TARGET_NAME)_libretro.dll
    CC = gcc
@@ -109,10 +116,12 @@ OBJECTS := $(SOURCES:.cpp=.o) $(SOURCES_C:.c=.o)
 
 all: $(TARGET)
 
-ifeq ($(DEBUG),0)
-   FLAGS += -O3 -ffast-math -funroll-loops 
-else
+ifeq ($(DEBUG),1)
    FLAGS += -O0 -g
+else ifeq ($(platform), psp1)
+	FLAGS += -O2 -ffast-math -funroll-loops 
+else
+   FLAGS += -O3 -ffast-math -funroll-loops 
 endif
 
 LDFLAGS += $(fpic) -lz $(SHARED)
@@ -136,7 +145,11 @@ CXXFLAGS += $(FLAGS) -DHAVE_INTTYPES
 CFLAGS += $(FLAGS) -std=gnu99
 
 $(TARGET): $(OBJECTS)
+ifeq ($(STATIC_LINKING), 1)
+	$(AR) rcs $@ $(OBJECTS)
+else
 	$(CXX) -o $@ $^ $(LDFLAGS)
+endif
 
 %.o: %.cpp
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
