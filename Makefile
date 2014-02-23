@@ -12,6 +12,17 @@ else ifneq ($(findstring MINGW,$(shell uname -a)),)
 endif
 endif
 
+# system platform
+system_platform = unix
+ifeq ($(shell uname -a),)
+EXE_EXT = .exe
+   system_platform = win
+else ifneq ($(findstring Darwin,$(shell uname -a)),)
+   system_platform = osx
+else ifneq ($(findstring MINGW,$(shell uname -a)),)
+   system_platform = win
+endif
+
 TARGET_NAME := stella
 
 ifeq ($(platform), unix)
@@ -35,11 +46,27 @@ else ifeq ($(platform), qnx)
    SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
 	CC = qcc -Vgcc_ntoarmv7le
 	CXX = QCC -Vgcc_ntoarmv7le_cpp
+else ifeq ($(platform), ps3)
+   TARGET := $(TARGET_NAME)_libretro_ps3.a
+   CC = $(CELL_SDK)/host-win32/ppu/bin/ppu-lv2-gcc.exe
+   CXX = $(CELL_SDK)/host-win32/ppu/bin/ppu-lv2-g++.exe
+   AR = $(CELL_SDK)/host-win32/ppu/bin/ppu-lv2-ar.exe
+   STATIC_LINKING = 1
+	FLAGS += -DMSB_FIRST
+	OLD_GCC = 1
+else ifeq ($(platform), sncps3)
+   TARGET := $(TARGET_NAME)_libretro_ps3.a
+   CC = $(CELL_SDK)/host-win32/sn/bin/ps3ppusnc.exe
+   CXX = $(CELL_SDK)/host-win32/sn/bin/ps3ppusnc.exe
+   AR = $(CELL_SDK)/host-win32/sn/bin/ps3snarl.exe
+   STATIC_LINKING = 1
+	FLAGS += -DMSB_FIRST
+	NO_GCC = 1
 else ifeq ($(platform), psp1)
    TARGET := $(TARGET_NAME)_libretro_psp1.a
-	CC = psp-gcc
-	CXX = psp-g++
-	AR = psp-ar
+	CC = psp-gcc$(EXE_EXT)
+	CXX = psp-g++$(EXE_EXT)
+	AR = psp-ar$(EXE_EXT)
    STATIC_LINKING = 1
 	FLAGS += -G0 -DLSB_FIRST
 else
@@ -118,16 +145,19 @@ all: $(TARGET)
 
 ifeq ($(DEBUG),1)
    FLAGS += -O0 -g
-else ifeq ($(platform), psp1)
-	FLAGS += -O2 -ffast-math -funroll-loops 
 else
-   FLAGS += -O3 -ffast-math -funroll-loops 
+	FLAGS += -O2 -ffast-math
 endif
 
 LDFLAGS += $(fpic) -lz $(SHARED)
-FLAGS += -Wall $(fpic) -fno-strict-overflow
+FLAGS += $(fpic) 
 FLAGS += -I. -Istella -Istella/cart -Istella/input -Istella/system -Istella/utility -Istella/properties
 
+ifeq ($(OLD_GCC), 1)
+WARNINGS := -Wall
+else ifeq ($(NO_GCC), 1)
+WARNINGS :=
+else
 WARNINGS := -Wall \
 	-Wno-narrowing \
 	-Wno-unused-but-set-variable \
@@ -137,7 +167,9 @@ WARNINGS := -Wall \
 	-Wno-uninitialized \
 	-Wno-unused-result \
 	-Wno-strict-aliasing \
-	-Wno-overflow
+	-Wno-overflow \
+	-fno-strict-overflow
+endif
 
 FLAGS += $(WARNINGS)
 
