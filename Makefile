@@ -1,4 +1,3 @@
-
 DEBUG = 0
 
 ifeq ($(platform),)
@@ -144,9 +143,9 @@ OBJECTS := $(SOURCES:.cpp=.o) $(SOURCES_C:.c=.o)
 all: $(TARGET)
 
 ifeq ($(DEBUG),1)
-   FLAGS += -O0 -g
+FLAGS += -O0 -g
 else
-	FLAGS += -O2 -ffast-math
+FLAGS += -O2 -ffast-math
 endif
 
 LDFLAGS += $(fpic) -lz $(SHARED)
