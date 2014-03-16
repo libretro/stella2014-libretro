@@ -54,6 +54,9 @@ char Serializer::getByte(void)
   //char buf;
   //smem_read(myStream, &buf, 1);
   //return buf;
+#ifdef _WIN32
+	return 0;
+#endif
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -62,6 +65,9 @@ int Serializer::getInt(void)
   //int32 value;
   //smem_read32le(myStream, (uint32*)&value);
   //return value;
+#ifdef _WIN32
+  return 0;
+#endif
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

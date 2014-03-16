@@ -28,8 +28,13 @@
   @version $Id: bspf.hxx 2232 2011-05-24 16:04:48Z stephena $
 */
 
+#ifdef _WIN32
+#define strcasecmp _stricmp
+#define strncasecmp _strnicmp
+#endif
+
 #ifdef HAVE_INTTYPES
-  #include <inttypes.h>
+  #include <stdint.h>
 
   // Types for 8-bit signed and unsigned integers
   typedef int8_t Int8;
