@@ -28,7 +28,7 @@
   @version $Id: bspf.hxx 2232 2011-05-24 16:04:48Z stephena $
 */
 
-#ifdef _WIN32
+#if defined(_WIN32) && defined(_MSC_VER)
 #define strcasecmp _stricmp
 #define strncasecmp _strnicmp
 #endif
