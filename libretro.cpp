@@ -182,6 +182,10 @@ void retro_cheat_set(unsigned index, bool enabled, const char *code)
 
 bool retro_load_game(const struct retro_game_info *info)
 {
+	if(info->size >= 96*1024) {
+		return false;
+	}
+
     /* This might not be the best place to call these. These two functions
      * must be called before starting a game with paddles.
      * The magic number 5 is "medium" paddle sensitivity (range 1-10)
