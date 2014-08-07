@@ -100,80 +100,92 @@ else
 endif
 STELLA_DIR := stella
 
-STELLA_SOURCES := $(STELLA_DIR)/Console.cpp \
-	$(STELLA_DIR)/Settings.cpp \
-	$(STELLA_DIR)/SoundSDL.cpp \
-	$(STELLA_DIR)/cart/Cart0840.cpp \
-	$(STELLA_DIR)/cart/Cart2K.cpp \
-	$(STELLA_DIR)/cart/Cart3E.cpp \
-	$(STELLA_DIR)/cart/Cart3F.cpp \
-	$(STELLA_DIR)/cart/Cart4A50.cpp \
-	$(STELLA_DIR)/cart/Cart4K.cpp \
-	$(STELLA_DIR)/cart/CartAR.cpp \
-	$(STELLA_DIR)/cart/Cart.cpp	 \
-	$(STELLA_DIR)/cart/CartCV.cpp \
-	$(STELLA_DIR)/cart/CartDPC.cpp \
-	$(STELLA_DIR)/cart/CartDPCPlus.cpp \
-	$(STELLA_DIR)/cart/CartE0.cpp \
-	$(STELLA_DIR)/cart/CartE7.cpp \
-	$(STELLA_DIR)/cart/CartEF.cpp \
-	$(STELLA_DIR)/cart/CartEFSC.cpp \
-	$(STELLA_DIR)/cart/CartF0.cpp \
-	$(STELLA_DIR)/cart/CartF4.cpp \
-	$(STELLA_DIR)/cart/CartF4SC.cpp \
-	$(STELLA_DIR)/cart/CartF6.cpp \
-	$(STELLA_DIR)/cart/CartF6SC.cpp \
-	$(STELLA_DIR)/cart/CartF8.cpp \
-	$(STELLA_DIR)/cart/CartF8SC.cpp \
-	$(STELLA_DIR)/cart/CartFA.cpp \
-	$(STELLA_DIR)/cart/CartFE.cpp \
-	$(STELLA_DIR)/cart/CartMC.cpp \
-	$(STELLA_DIR)/cart/CartSB.cpp \
-	$(STELLA_DIR)/cart/CartUA.cpp \
-	$(STELLA_DIR)/cart/CartX07.cpp \
-	$(STELLA_DIR)/cart/Thumbulator.cpp \
-	$(STELLA_DIR)/input/AtariVox.cpp \
-	$(STELLA_DIR)/input/Booster.cpp \
-	$(STELLA_DIR)/input/Control.cpp \
-	$(STELLA_DIR)/input/Driving.cpp \
-	$(STELLA_DIR)/input/Genesis.cpp \
-	$(STELLA_DIR)/input/Joystick.cpp \
-	$(STELLA_DIR)/input/Keyboard.cpp \
-	$(STELLA_DIR)/input/KidVid.cpp \
-	$(STELLA_DIR)/input/MT24LC256.cpp \
-	$(STELLA_DIR)/input/Paddles.cpp \
-	$(STELLA_DIR)/input/SaveKey.cpp \
-	$(STELLA_DIR)/input/Switches.cpp \
-	$(STELLA_DIR)/input/TrackBall.cpp \
-	$(STELLA_DIR)/system/M6502.cpp \
-	$(STELLA_DIR)/system/M6532.cpp \
-	$(STELLA_DIR)/system/NullDev.cpp \
-	$(STELLA_DIR)/system/System.cpp \
-	$(STELLA_DIR)/system/TIA.cpp \
-	$(STELLA_DIR)/system/TIASnd.cpp \
-	$(STELLA_DIR)/system/TIATables.cpp \
-	$(STELLA_DIR)/utility/MD5.cpp \
-	$(STELLA_DIR)/utility/Random.cpp \
-	$(STELLA_DIR)/utility/Serializer.cpp \
-	$(STELLA_DIR)/properties/Props.cpp \
-	$(STELLA_DIR)/properties/PropsSet.cpp
+STELLA_SOURCES := $(STELLA_DIR)/src/common/Base.cxx \
+	$(STELLA_DIR)/src/common/SoundSDL.cxx \
+	$(STELLA_DIR)/src/emucore/AtariVox.cxx \
+	$(STELLA_DIR)/src/emucore/Booster.cxx \
+	$(STELLA_DIR)/src/emucore/Cart.cxx \
+	$(STELLA_DIR)/src/emucore/Cart0840.cxx \
+	$(STELLA_DIR)/src/emucore/Cart2K.cxx \
+	$(STELLA_DIR)/src/emucore/Cart3E.cxx \
+	$(STELLA_DIR)/src/emucore/Cart3F.cxx \
+	$(STELLA_DIR)/src/emucore/Cart4A50.cxx \
+	$(STELLA_DIR)/src/emucore/Cart4K.cxx \
+	$(STELLA_DIR)/src/emucore/Cart4KSC.cxx \
+	$(STELLA_DIR)/src/emucore/CartAR.cxx \
+	$(STELLA_DIR)/src/emucore/CartBF.cxx \
+	$(STELLA_DIR)/src/emucore/CartBFSC.cxx \
+	$(STELLA_DIR)/src/emucore/CartCM.cxx \
+	$(STELLA_DIR)/src/emucore/CartCTY.cxx \
+	$(STELLA_DIR)/src/emucore/CartCV.cxx \
+	$(STELLA_DIR)/src/emucore/CartDF.cxx \
+	$(STELLA_DIR)/src/emucore/CartDFSC.cxx \
+	$(STELLA_DIR)/src/emucore/CartDPC.cxx \
+	$(STELLA_DIR)/src/emucore/CartDPCPlus.cxx \
+	$(STELLA_DIR)/src/emucore/CartE0.cxx \
+	$(STELLA_DIR)/src/emucore/CartE7.cxx \
+	$(STELLA_DIR)/src/emucore/CartEF.cxx \
+	$(STELLA_DIR)/src/emucore/CartEFSC.cxx \
+	$(STELLA_DIR)/src/emucore/CartF0.cxx \
+	$(STELLA_DIR)/src/emucore/CartF4.cxx \
+	$(STELLA_DIR)/src/emucore/CartF4SC.cxx \
+	$(STELLA_DIR)/src/emucore/CartF6.cxx \
+	$(STELLA_DIR)/src/emucore/CartF6SC.cxx \
+	$(STELLA_DIR)/src/emucore/CartF8.cxx \
+	$(STELLA_DIR)/src/emucore/CartF8SC.cxx \
+	$(STELLA_DIR)/src/emucore/CartFA.cxx \
+	$(STELLA_DIR)/src/emucore/CartFA2.cxx \
+	$(STELLA_DIR)/src/emucore/CartFE.cxx \
+	$(STELLA_DIR)/src/emucore/CartMC.cxx \
+	$(STELLA_DIR)/src/emucore/CartSB.cxx \
+	$(STELLA_DIR)/src/emucore/CartUA.cxx \
+	$(STELLA_DIR)/src/emucore/CartX07.cxx \
+	$(STELLA_DIR)/src/emucore/CompuMate.cxx \
+	$(STELLA_DIR)/src/emucore/Console.cxx \
+	$(STELLA_DIR)/src/emucore/Control.cxx \
+	$(STELLA_DIR)/src/emucore/Driving.cxx \
+	$(STELLA_DIR)/src/emucore/Genesis.cxx \
+	$(STELLA_DIR)/src/emucore/Joystick.cxx \
+	$(STELLA_DIR)/src/emucore/Keyboard.cxx \
+	$(STELLA_DIR)/src/emucore/KidVid.cxx \
+	$(STELLA_DIR)/src/emucore/M6502.cxx \
+	$(STELLA_DIR)/src/emucore/M6532.cxx \
+	$(STELLA_DIR)/src/emucore/MD5.cxx \
+	$(STELLA_DIR)/src/emucore/MindLink.cxx \
+	$(STELLA_DIR)/src/emucore/MT24LC256.cxx \
+	$(STELLA_DIR)/src/emucore/NullDev.cxx \
+	$(STELLA_DIR)/src/emucore/Paddles.cxx \
+	$(STELLA_DIR)/src/emucore/Props.cxx \
+	$(STELLA_DIR)/src/emucore/PropsSet.cxx \
+	$(STELLA_DIR)/src/emucore/Random.cxx \
+	$(STELLA_DIR)/src/emucore/SaveKey.cxx \
+	$(STELLA_DIR)/src/emucore/Serializer.cxx \
+	$(STELLA_DIR)/src/emucore/Settings.cxx \
+	$(STELLA_DIR)/src/emucore/StateManager.cxx \
+	$(STELLA_DIR)/src/emucore/Switches.cxx \
+	$(STELLA_DIR)/src/emucore/System.cxx \
+	$(STELLA_DIR)/src/emucore/Thumbulator.cxx \
+	$(STELLA_DIR)/src/emucore/TIA.cxx \
+	$(STELLA_DIR)/src/emucore/TIASnd.cxx \
+	$(STELLA_DIR)/src/emucore/TIATables.cxx \
+	$(STELLA_DIR)/src/emucore/TrackBall.cxx
 
-LIBRETRO_SOURCES := libretro.cpp
+LIBRETRO_SOURCES := libretro.cxx
 
 SOURCES := $(LIBRETRO_SOURCES) $(STELLA_SOURCES)
-OBJECTS := $(SOURCES:.cpp=.o) $(SOURCES_C:.c=.o)
+OBJECTS := $(SOURCES:.cxx=.o) $(SOURCES_C:.c=.o)
 
 all: $(TARGET)
 
 ifeq ($(DEBUG),1)
 FLAGS += -O0 -g
 else
-FLAGS += -O2 -ffast-math
+FLAGS += -O3 -ffast-math
 endif
 
 LDFLAGS += $(fpic) -lz $(SHARED)
 FLAGS += $(fpic) 
-FLAGS += -I. -Istella -Istella/cart -Istella/input -Istella/system -Istella/utility -Istella/properties
+FLAGS += -I. -Istella -Istella/src -Istella/stubs -Istella/src/emucore -Istella/src/common -Istella/src/common/tv_filters -Istella/src/gui
 
 ifeq ($(OLD_GCC), 1)
 WARNINGS := -Wall
@@ -182,7 +194,6 @@ WARNINGS :=
 else
 WARNINGS := -Wall \
 	-Wno-narrowing \
-	-Wno-unused-but-set-variable \
 	-Wno-sign-compare \
 	-Wno-unused-variable \
 	-Wno-unused-function \
@@ -193,9 +204,9 @@ WARNINGS := -Wall \
 	-fno-strict-overflow
 endif
 
-FLAGS += $(WARNINGS)
+FLAGS += -D__LIBRETRO__ $(WARNINGS)
 
-CXXFLAGS += $(FLAGS) -DHAVE_INTTYPES
+CXXFLAGS += $(FLAGS) -DHAVE_INTTYPES -DHAVE_GETTIMEOFDAY -DTHUMB_SUPPORT -DSOUND_SUPPORT -DBSPF_UNIX
 CFLAGS += $(FLAGS) -std=gnu99
 
 $(TARGET): $(OBJECTS)
@@ -204,6 +215,9 @@ ifeq ($(STATIC_LINKING), 1)
 else
 	$(CXX) -o $@ $^ $(LDFLAGS)
 endif
+
+%.o: %.cxx
+	$(CXX) -c -o $@ $< $(CXXFLAGS)
 
 %.o: %.cpp
 	$(CXX) -c -o $@ $< $(CXXFLAGS)

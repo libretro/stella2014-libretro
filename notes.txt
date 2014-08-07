@@ -1,9 +1,0 @@
-src/emulator/input/*:					No changes were made to any files
-src/emulator/cart/*:					No changes were made to any files
-src/emulator/system/*:					No changes were made to any files
-src/emulator/utility/Serializer.*:		Only support mednafen's StateMem streams as backend
-src/emulator/utility/Random.*:			Using OSystem for seeding is disabled, only the default time(0) is available (OSystem class is not used in mednafen module)
-src/emulator/utility/*:					No changes not specified above
-src/emulator/PropsSet.*:				Remove OSystem support, the OSystem class is only used to get the filename of the external properties file.
-										^This file needs updated to pull the file from the mednafen firmware folder, or maybe a mednafen setting.
-
