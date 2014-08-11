@@ -246,10 +246,14 @@ size_t retro_get_memory_size(unsigned id)
 void retro_init(void)
 {
    struct retro_log_callback log;
+   unsigned level = 4;
+
    if (environ_cb(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &log))
       log_cb = log.log;
    else
       log_cb = NULL;
+
+   environ_cb(RETRO_ENVIRONMENT_SET_PERFORMANCE_LEVEL, &level);
 }
 
 void retro_deinit(void)
