@@ -175,7 +175,7 @@ bool retro_load_game(const struct retro_game_info *info)
    if (!environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &fmt))
    {
       if (log_cb)
-         log_cb(RETRO_LOG_INFO, "[ProSystem]: XRGB8888 is not supported.\n");
+         log_cb(RETRO_LOG_INFO, "[Stella]: XRGB8888 is not supported.\n");
       return false;
    }
 
