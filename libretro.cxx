@@ -29,7 +29,7 @@
 static SoundSDL *vcsSound = 0;
 static uint32_t tiaSamplesPerFrame = 0;
 static int16_t *sampleBuffer[2048];
-static uint16_t frameBuffer[256*160];
+static uint32_t frameBuffer[256*160];
 #include "Stubs.hxx"
 
 static Console *console = 0;
@@ -171,6 +171,14 @@ void retro_cheat_set(unsigned index, bool enabled, const char *code)
 
 bool retro_load_game(const struct retro_game_info *info)
 {
+   enum retro_pixel_format fmt = RETRO_PIXEL_FORMAT_XRGB8888;
+   if (!environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &fmt))
+   {
+      if (log_cb)
+         log_cb(RETRO_LOG_INFO, "[ProSystem]: XRGB8888 is not supported.\n");
+      return false;
+   }
+
    if(info->size >= 96*1024){
       return false;
    }
@@ -283,23 +291,10 @@ void retro_run(void)
    videoHeight = tia.height();
 
    //Copy the frame from stella to libretro
-   for(int i = 0; i != videoHeight; i ++)
-   {
-      for(int j = 0; j != videoWidth; j ++)
-      {
-         Int32 pixel = Palette[tia.currentFrameBuffer()[i * videoWidth + j]];
-         uint16_t color = (pixel & 0x0000F8) >> 3; // B
-         color |= (pixel & 0x00F800) >> 6; // G
-         color |= (pixel & 0xF80000) >> 9; // R
-         frameBuffer[i * videoWidth + j] = color;
-      }
-   }
+   for (unsigned int i = 0; i < videoHeight * videoWidth; ++i)
+      frameBuffer[i] = Palette[tia.currentFrameBuffer()[i]];
 
-   //TODO: XRGB8888 option
-   //for (unsigned int i = 0; i < videoHeight * videoWidth; ++i)
-   //	videoBuffer[i] = Palette[tia.currentFrameBuffer()[i]];
-
-   video_cb(frameBuffer, videoWidth, videoHeight, videoWidth * 2);
+   video_cb(frameBuffer, videoWidth, videoHeight, videoWidth << 2);
 
    //AUDIO
    //Process one frame of audio from stella
