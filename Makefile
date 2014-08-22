@@ -183,7 +183,7 @@ else
 FLAGS += -O3 -ffast-math
 endif
 
-LDFLAGS += $(fpic) -lz $(SHARED)
+LDFLAGS += $(fpic) $(SHARED)
 FLAGS += $(fpic) 
 FLAGS += -I. -Istella -Istella/src -Istella/stubs -Istella/src/emucore -Istella/src/common -Istella/src/common/tv_filters -Istella/src/gui
 
