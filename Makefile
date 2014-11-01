@@ -104,82 +104,13 @@ else
    SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
    LDFLAGS += -static-libgcc -static-libstdc++ -lwinmm
 endif
-STELLA_DIR := stella
 
-STELLA_SOURCES := $(STELLA_DIR)/src/common/Base.cxx \
-	$(STELLA_DIR)/src/common/SoundSDL.cxx \
-	$(STELLA_DIR)/src/emucore/AtariVox.cxx \
-	$(STELLA_DIR)/src/emucore/Booster.cxx \
-	$(STELLA_DIR)/src/emucore/Cart.cxx \
-	$(STELLA_DIR)/src/emucore/Cart0840.cxx \
-	$(STELLA_DIR)/src/emucore/Cart2K.cxx \
-	$(STELLA_DIR)/src/emucore/Cart3E.cxx \
-	$(STELLA_DIR)/src/emucore/Cart3F.cxx \
-	$(STELLA_DIR)/src/emucore/Cart4A50.cxx \
-	$(STELLA_DIR)/src/emucore/Cart4K.cxx \
-	$(STELLA_DIR)/src/emucore/Cart4KSC.cxx \
-	$(STELLA_DIR)/src/emucore/CartAR.cxx \
-	$(STELLA_DIR)/src/emucore/CartBF.cxx \
-	$(STELLA_DIR)/src/emucore/CartBFSC.cxx \
-	$(STELLA_DIR)/src/emucore/CartCM.cxx \
-	$(STELLA_DIR)/src/emucore/CartCTY.cxx \
-	$(STELLA_DIR)/src/emucore/CartCV.cxx \
-	$(STELLA_DIR)/src/emucore/CartDF.cxx \
-	$(STELLA_DIR)/src/emucore/CartDFSC.cxx \
-	$(STELLA_DIR)/src/emucore/CartDPC.cxx \
-	$(STELLA_DIR)/src/emucore/CartDPCPlus.cxx \
-	$(STELLA_DIR)/src/emucore/CartE0.cxx \
-	$(STELLA_DIR)/src/emucore/CartE7.cxx \
-	$(STELLA_DIR)/src/emucore/CartEF.cxx \
-	$(STELLA_DIR)/src/emucore/CartEFSC.cxx \
-	$(STELLA_DIR)/src/emucore/CartF0.cxx \
-	$(STELLA_DIR)/src/emucore/CartF4.cxx \
-	$(STELLA_DIR)/src/emucore/CartF4SC.cxx \
-	$(STELLA_DIR)/src/emucore/CartF6.cxx \
-	$(STELLA_DIR)/src/emucore/CartF6SC.cxx \
-	$(STELLA_DIR)/src/emucore/CartF8.cxx \
-	$(STELLA_DIR)/src/emucore/CartF8SC.cxx \
-	$(STELLA_DIR)/src/emucore/CartFA.cxx \
-	$(STELLA_DIR)/src/emucore/CartFA2.cxx \
-	$(STELLA_DIR)/src/emucore/CartFE.cxx \
-	$(STELLA_DIR)/src/emucore/CartMC.cxx \
-	$(STELLA_DIR)/src/emucore/CartSB.cxx \
-	$(STELLA_DIR)/src/emucore/CartUA.cxx \
-	$(STELLA_DIR)/src/emucore/CartX07.cxx \
-	$(STELLA_DIR)/src/emucore/CompuMate.cxx \
-	$(STELLA_DIR)/src/emucore/Console.cxx \
-	$(STELLA_DIR)/src/emucore/Control.cxx \
-	$(STELLA_DIR)/src/emucore/Driving.cxx \
-	$(STELLA_DIR)/src/emucore/Genesis.cxx \
-	$(STELLA_DIR)/src/emucore/Joystick.cxx \
-	$(STELLA_DIR)/src/emucore/Keyboard.cxx \
-	$(STELLA_DIR)/src/emucore/KidVid.cxx \
-	$(STELLA_DIR)/src/emucore/M6502.cxx \
-	$(STELLA_DIR)/src/emucore/M6532.cxx \
-	$(STELLA_DIR)/src/emucore/MD5.cxx \
-	$(STELLA_DIR)/src/emucore/MindLink.cxx \
-	$(STELLA_DIR)/src/emucore/MT24LC256.cxx \
-	$(STELLA_DIR)/src/emucore/NullDev.cxx \
-	$(STELLA_DIR)/src/emucore/Paddles.cxx \
-	$(STELLA_DIR)/src/emucore/Props.cxx \
-	$(STELLA_DIR)/src/emucore/PropsSet.cxx \
-	$(STELLA_DIR)/src/emucore/Random.cxx \
-	$(STELLA_DIR)/src/emucore/SaveKey.cxx \
-	$(STELLA_DIR)/src/emucore/Serializer.cxx \
-	$(STELLA_DIR)/src/emucore/Settings.cxx \
-	$(STELLA_DIR)/src/emucore/StateManager.cxx \
-	$(STELLA_DIR)/src/emucore/Switches.cxx \
-	$(STELLA_DIR)/src/emucore/System.cxx \
-	$(STELLA_DIR)/src/emucore/Thumbulator.cxx \
-	$(STELLA_DIR)/src/emucore/TIA.cxx \
-	$(STELLA_DIR)/src/emucore/TIASnd.cxx \
-	$(STELLA_DIR)/src/emucore/TIATables.cxx \
-	$(STELLA_DIR)/src/emucore/TrackBall.cxx
+CORE_DIR     := stella
+LIBRETRO_DIR := .
 
-LIBRETRO_SOURCES := libretro.cxx
+include Makefile.common
 
-SOURCES := $(LIBRETRO_SOURCES) $(STELLA_SOURCES)
-OBJECTS := $(SOURCES:.cxx=.o) $(SOURCES_C:.c=.o)
+OBJECTS := $(SOURCES_CXX:.cxx=.o)
 
 all: $(TARGET)
 
@@ -191,7 +122,7 @@ endif
 
 LDFLAGS += $(fpic) $(SHARED)
 FLAGS += $(fpic) 
-FLAGS += -I. -Istella -Istella/src -Istella/stubs -Istella/src/emucore -Istella/src/common -Istella/src/common/tv_filters -Istella/src/gui
+FLAGS += $(INCFLAGS)
 
 ifeq ($(OLD_GCC), 1)
 WARNINGS := -Wall
