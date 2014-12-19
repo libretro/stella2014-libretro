@@ -21,11 +21,6 @@ OSystem::~OSystem()
     
 }
 
-void OSystem::logMessage(const string& message, uInt8 level)
-{
-    //logMsg("%s", message.c_str());
-}
-
 bool OSystem::create() { return 1; }
 
 void OSystem::mainLoop() { }

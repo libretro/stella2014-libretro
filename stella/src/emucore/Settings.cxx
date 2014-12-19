@@ -235,7 +235,6 @@ string Settings::loadCommandLine(int argc, char** argv)
       if(++i >= argc)
       {
         buf << "Missing argument for '" << key << "'" << endl;
-        myOSystem->logMessage(buf.str(), 0);
         return "";
       }
       string value = argv[i];
@@ -255,8 +254,6 @@ string Settings::loadCommandLine(int argc, char** argv)
         setExternal(key, value);
         buf << "(E)\n";
       }
-
-      myOSystem->logMessage(buf.str(), 2);
     }
     else
       return key;

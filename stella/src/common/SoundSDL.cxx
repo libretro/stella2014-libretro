@@ -43,7 +43,6 @@ SoundSDL::SoundSDL(OSystem* osystem)
     myIsMuted(true),
     myVolume(100)
 {
-  myOSystem->logMessage("SoundSDL::SoundSDL started ...", 2);
 
   // The sound system is opened only once per program run, to eliminate
   // issues with opening and closing it multiple times
@@ -88,8 +87,6 @@ SoundSDL::SoundSDL(OSystem* osystem)
 
   myIsInitializedFlag = true;
   //SDL_PauseAudio(1);
-
-  myOSystem->logMessage("SoundSDL::SoundSDL initialized", 2);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -101,28 +98,21 @@ SoundSDL::~SoundSDL()
     //SDL_CloseAudio();
     myIsEnabled = myIsInitializedFlag = false;
   }
-
-  myOSystem->logMessage("SoundSDL destroyed", 2);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SoundSDL::setEnabled(bool state)
 {
   myOSystem->settings().setValue("sound", state);
-
-  myOSystem->logMessage(state ? "SoundSDL::setEnabled(true)" : 
-                                "SoundSDL::setEnabled(false)", 2);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SoundSDL::open()
 {
-  myOSystem->logMessage("SoundSDL::open started ...", 2);
   myIsEnabled = false;
   mute(true);
   if(!myIsInitializedFlag || !myOSystem->settings().getBool("sound"))
   {
-    myOSystem->logMessage("Sound disabled\n", 1);
     return;
   }
 
@@ -144,14 +134,11 @@ void SoundSDL::open()
       << "  Channels:    " << (int)2
                            << " (" << chanResult << ")" << endl
       << endl;
-  myOSystem->logMessage(buf.str(), 1);
 
   // And start the SDL sound subsystem ...
   myIsEnabled = true;
   mute(false);
 
-  myOSystem->logMessage("SoundSDL::open finished", 2);
-    
     // Pre-compute fragment-related variables as much as possible
     myFragmentSizeLogBase2 = log((double)512) / log(2.0);
     myFragmentSizeLogDiv1 = myFragmentSizeLogBase2 / 60.0;
@@ -168,7 +155,6 @@ void SoundSDL::close()
     myLastRegisterSetCycle = 0;
     myTIASound.reset();
     myRegWriteQueue.clear();
-    myOSystem->logMessage("SoundSDL::close", 2);
   }
 }
 
@@ -477,7 +463,6 @@ bool SoundSDL::save(Serializer& out) const
   }
   catch(...)
   {
-    myOSystem->logMessage("ERROR: SoundSDL::save", 0);
     return false;
   }
 
@@ -518,7 +503,6 @@ bool SoundSDL::load(Serializer& in)
   }
   catch(...)
   {
-    myOSystem->logMessage("ERROR: SoundSDL::load", 0);
     return false;
   }
 
