@@ -87,11 +87,11 @@ static void update_input()
    ev.set(Event::Type(Event::ConsoleReset), input_state_cb(Controller::Left, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START));
 
    //Events for right player's joystick 
-   ev.set(Event::Type(Event::JoystickOneUp + 7), input_state_cb(Controller::Right, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP));
-   ev.set(Event::Type(Event::JoystickOneDown + 7), input_state_cb(Controller::Right, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN));
-   ev.set(Event::Type(Event::JoystickOneLeft + 7), input_state_cb(Controller::Right, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT));
-   ev.set(Event::Type(Event::JoystickOneRight + 7), input_state_cb(Controller::Right, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT));
-   ev.set(Event::Type(Event::JoystickOneFire + 7), input_state_cb(Controller::Right, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B));
+   ev.set(Event::Type(Event::JoystickOneUp), input_state_cb(Controller::Right, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP));
+   ev.set(Event::Type(Event::JoystickOneDown), input_state_cb(Controller::Right, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN));
+   ev.set(Event::Type(Event::JoystickOneLeft), input_state_cb(Controller::Right, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT));
+   ev.set(Event::Type(Event::JoystickOneRight), input_state_cb(Controller::Right, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT));
+   ev.set(Event::Type(Event::JoystickOneFire), input_state_cb(Controller::Right, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B));
 
    //Tell all input devices to read their state from the event structure
    console->controller(Controller::Left).update();
