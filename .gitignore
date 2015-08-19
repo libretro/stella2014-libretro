@@ -15,3 +15,8 @@
 xcuserdata
 profile
 *.moved-aside
+*.o
+*.bc
+*.js
+*.json
+.npmignore
