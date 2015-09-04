@@ -22,7 +22,6 @@
 #include <sstream>
 #include <cassert>
 #include <cmath>
-//#include <SDL.h>
 
 #include "TIASnd.hxx"
 #include "FrameBuffer.hxx"
@@ -139,7 +138,6 @@ void SoundSDL::reset()
 {
   if(myIsInitializedFlag)
   {
-    //SDL_PauseAudio(1);
     myLastRegisterSetCycle = 0;
     myTIASound.reset();
     myRegWriteQueue.clear();
@@ -153,10 +151,8 @@ void SoundSDL::setVolume(Int32 percent)
   if(myIsInitializedFlag && (percent >= 0) && (percent <= 100))
   {
     myOSystem->settings().setValue("volume", percent);
-    //SDL_LockAudio();
     myVolume = percent;
     myTIASound.volume(percent);
-    //SDL_UnlockAudio();
   }
 }
 
@@ -207,8 +203,6 @@ void SoundSDL::setFrameRate(float framerate)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SoundSDL::set(uInt16 addr, uInt8 value, Int32 cycle)
 {
-  //SDL_LockAudio();
-
   // First, calculate how many seconds would have past since the last
   // register write on a real 2600
   double delta = (((double)(cycle - myLastRegisterSetCycle)) / 
@@ -226,8 +220,6 @@ void SoundSDL::set(uInt16 addr, uInt8 value, Int32 cycle)
 
   // Update last cycle counter to the current cycle
   myLastRegisterSetCycle = cycle;
-
-  //SDL_UnlockAudio();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -434,7 +426,6 @@ bool SoundSDL::load(Serializer& in)
     // Make sure to empty the queue of previous sound fragments
     if(myIsInitializedFlag)
     {
-      //SDL_PauseAudio(1);
       myRegWriteQueue.clear();
       myTIASound.set(0x15, reg1);
       myTIASound.set(0x16, reg2);
@@ -442,7 +433,6 @@ bool SoundSDL::load(Serializer& in)
       myTIASound.set(0x18, reg4);
       myTIASound.set(0x19, reg5);
       myTIASound.set(0x1a, reg6);
-      //if(!myIsMuted) SDL_PauseAudio(0);
     }
   }
   catch(...)
