@@ -32,7 +32,6 @@ class GuiObject;
 #include "Array.hxx"
 #include "Device.hxx"
 #include "Settings.hxx"
-#include "Font.hxx"
 
 struct RamArea {
   uInt16 start;  uInt16 size;  uInt16 roffset;  uInt16 woffset;
@@ -201,15 +200,6 @@ class Cartridge : public Device
       @param name  The properties file name of the ROM
     */
     virtual void setRomName(const string& name) { }
-
-    /**
-      Get debugger widget responsible for accessing the inner workings
-      of the cart.  This will need to be overridden and implemented by
-      each specific cart type, since the bankswitching/inner workings
-      of each cart type can be very different from each other.
-    */
-    virtual CartDebugWidget* debugWidget(GuiObject* boss, const GUI::Font& lfont,
-        const GUI::Font& nfont, int x, int y, int w, int h) { return NULL; }
 
   protected:
     /**
