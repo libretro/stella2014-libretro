@@ -20,8 +20,6 @@
 //   Copyright (C) 2002-2004 The ScummVM project
 //============================================================================
 
-#include <zlib.h>
-
 #include "bspf.hxx"
 #include "SharedPtr.hxx"
 #include "FSNodeFactory.hxx"
@@ -43,11 +41,7 @@ FilesystemNode::FilesystemNode(const string& p)
 {
   AbstractFSNode* tmp = 0;
 
-  // Is this potentially a ZIP archive?
-  if(BSPF_containsIgnoreCase(p, ".zip"))
-    tmp = FilesystemNodeFactory::create(p, FilesystemNodeFactory::ZIP);
-  else
-    tmp = FilesystemNodeFactory::create(p, FilesystemNodeFactory::SYSTEM);
+  tmp = FilesystemNodeFactory::create(p, FilesystemNodeFactory::SYSTEM);
 
   _realNode = Common::SharedPtr<AbstractFSNode>(tmp);
 }
@@ -187,22 +181,4 @@ uInt32 FilesystemNode::read(uInt8*& image) const
   // File must actually exist
   if(!(exists() && isReadable()))
     throw "File not found/readable";
-
-  // Otherwise, assume the file is either gzip'ed or not compressed at all
-  gzFile f = gzopen(getPath().c_str(), "rb");
-  if(f)
-  {
-    image = new uInt8[512 * 1024];
-    size = gzread(f, image, 512 * 1024);
-    gzclose(f);
-
-    if(size == 0)
-    {
-      delete[] image;  image = 0;
-      throw "Zero-byte file";
-    }
-    return size;
-  }
-  else
-    throw "ZLIB open/read error";
 }
