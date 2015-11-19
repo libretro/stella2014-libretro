@@ -28,22 +28,9 @@
   @version $Id: bspf.hxx 2838 2014-01-17 23:34:03Z stephena $
 */
 
-#ifdef HAVE_INTTYPES
-  #include <inttypes.h>
+#include <stdint.h>
 
-  // Types for 8-bit signed and unsigned integers
-  typedef int8_t Int8;
-  typedef uint8_t uInt8;
-  // Types for 16-bit signed and unsigned integers
-  typedef int16_t Int16;
-  typedef uint16_t uInt16;
-  // Types for 32-bit signed and unsigned integers
-  typedef int32_t Int32;
-  typedef uint32_t uInt32;
-  // Types for 64-bit signed and unsigned integers
-  typedef int64_t Int64;
-  typedef uint64_t uInt64;
-#elif defined BSPF_WIN32
+#if defined(_MSC_VER)
   // Types for 8-bit signed and unsigned integers
   typedef signed char Int8;
   typedef unsigned char uInt8;
@@ -57,7 +44,18 @@
   typedef __int64 Int64;
   typedef unsigned __int64 uInt64;
 #else
-  #error Update src/common/bspf.hxx for datatypes
+  // Types for 8-bit signed and unsigned integers
+  typedef int8_t Int8;
+  typedef uint8_t uInt8;
+  // Types for 16-bit signed and unsigned integers
+  typedef int16_t Int16;
+  typedef uint16_t uInt16;
+  // Types for 32-bit signed and unsigned integers
+  typedef int32_t Int32;
+  typedef uint32_t uInt32;
+  // Types for 64-bit signed and unsigned integers
+  typedef int64_t Int64;
+  typedef uint64_t uInt64;
 #endif
 
 
@@ -74,12 +72,10 @@
 using namespace std;
 
 // Defines to help with path handling
-#if (defined(BSPF_UNIX) || defined(BSPF_MAC_OSX))
-  #define BSPF_PATH_SEPARATOR  "/"
-#elif (defined(BSPF_DOS) || defined(BSPF_WIN32) || defined(BSPF_OS2))
+#ifdef _MSC_VER
   #define BSPF_PATH_SEPARATOR  "\\"
 #else
-  #error Update src/common/bspf.hxx for path separator
+  #define BSPF_PATH_SEPARATOR  "/"
 #endif
 
 // CPU architecture type
@@ -95,11 +91,10 @@ using namespace std;
 #endif
 
 // I wish Windows had a complete POSIX layer
-#if defined BSPF_WIN32 && !defined __GNUG__
+#ifdef _MSC_VER
   #define BSPF_snprintf _snprintf
   #define BSPF_vsnprintf _vsnprintf
 #else
-  #define HAVE_UNISTD_H   // needed for building zlib
   #define BSPF_snprintf snprintf
   #define BSPF_vsnprintf vsnprintf
 #endif
@@ -124,7 +119,7 @@ static bool BSPF_equalsIgnoreCaseChar(char ch1, char ch2)
 // Compare two strings, ignoring case
 inline int BSPF_compareIgnoreCase(const string& s1, const string& s2)
 {
-#if defined WIN32 && !defined __GNUG__
+#ifdef _MSC_VER
   return _stricmp(s1.c_str(), s2.c_str());
 #else
   return strcasecmp(s1.c_str(), s2.c_str());
@@ -132,7 +127,7 @@ inline int BSPF_compareIgnoreCase(const string& s1, const string& s2)
 }
 inline int BSPF_compareIgnoreCase(const char* s1, const char* s2)
 {
-#if defined WIN32 && !defined __GNUG__
+#ifdef _MSC_VER
   return _stricmp(s1, s2);
 #else
   return strcasecmp(s1, s2);
@@ -142,7 +137,7 @@ inline int BSPF_compareIgnoreCase(const char* s1, const char* s2)
 // Test whether the first string starts with the second one (case insensitive)
 inline bool BSPF_startsWithIgnoreCase(const string& s1, const string& s2)
 {
-#if defined WIN32 && !defined __GNUG__
+#ifdef _MSC_VER
   return _strnicmp(s1.c_str(), s2.c_str(), s2.length()) == 0;
 #else
   return strncasecmp(s1.c_str(), s2.c_str(), s2.length()) == 0;
@@ -150,7 +145,7 @@ inline bool BSPF_startsWithIgnoreCase(const string& s1, const string& s2)
 }
 inline bool BSPF_startsWithIgnoreCase(const char* s1, const char* s2)
 {
-#if defined WIN32 && !defined __GNUG__
+#ifdef _MSC_VER
   return _strnicmp(s1, s2, strlen(s2)) == 0;
 #else
   return strncasecmp(s1, s2, strlen(s2)) == 0;
