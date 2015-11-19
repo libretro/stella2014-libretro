@@ -20,7 +20,6 @@
 #ifndef MD5_HXX
 #define MD5_HXX
 
-#include "FSNode.hxx"
 #include "bspf.hxx"
 
 /**
@@ -33,13 +32,5 @@
 */
 string MD5(const uInt8* buffer, uInt32 length);
 
-/**
-  Get the MD5 Message-Digest of the file contained in 'node'.
-  The digest consists of 32 hexadecimal digits.
-
-  @param node The file node to compute the digest of
-  @return The message-digest
-*/
-string MD5(const FilesystemNode& node);
 
 #endif

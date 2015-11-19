@@ -20,7 +20,6 @@
 #include <fstream>
 #include <sstream>
 
-#include "FSNode.hxx"
 #include "Serializer.hxx"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
