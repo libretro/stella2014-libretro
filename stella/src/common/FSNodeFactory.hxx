@@ -28,7 +28,6 @@ class AbstractFSNode;
 #else
   #error Unsupported platform in FSNodeFactory!
 #endif
-#include "FSNodeZIP.hxx"
 
 /**
   This class deals with creating the different FSNode implementations.
@@ -39,7 +38,7 @@ class AbstractFSNode;
 class FilesystemNodeFactory
 {
   public:
-    enum Type { SYSTEM, ZIP };
+    enum Type { SYSTEM };
 
   public:
     static AbstractFSNode* create(const string& path, Type type)
@@ -52,9 +51,6 @@ class FilesystemNodeFactory
       #elif defined(WIN32)
           return new FilesystemNodeWin32(path);
       #endif
-          break;
-        case ZIP:
-          return new FilesystemNodeZIP(path);
           break;
       }
       return 0;

@@ -159,7 +159,6 @@ OSystem::~OSystem()
 
   delete mySerialPort;
   delete myPNGLib;
-  delete myZipHandler;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -267,9 +266,6 @@ bool OSystem::create()
 
   // Create PNG handler
   myPNGLib = new PNGLibrary();
-
-  // Create ZIP handler
-  myZipHandler = new ZipHandler();
 
   return true;
 }
@@ -1107,6 +1103,3 @@ OSystem& OSystem::operator = (const OSystem&)
   assert(false);
   return *this;
 }
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-ZipHandler* OSystem::myZipHandler = 0;
