@@ -274,17 +274,6 @@ void Settings::validate()
   s = getString("timing");
   if(s != "sleep" && s != "busy")  setInternal("timing", "sleep");
 
-#ifdef DISPLAY_OPENGL
-  i = getInt("gl_aspectn");
-  if(i < 80 || i > 120)  setInternal("gl_aspectn", "100");
-  i = getInt("gl_aspectp");
-  if(i < 80 || i > 120)  setInternal("gl_aspectp", "100");
-
-  i = getInt("tv_filter");
-  if(i < 0 || i > 5)  setInternal("tv_filter", "0");
-
-#endif
-
 #ifdef SOUND_SUPPORT
   i = getInt("volume");
   if(i < 0 || i > 100)    setInternal("volume", "100");
@@ -343,32 +332,6 @@ void Settings::validate()
 //    << endl
 //    << "  -video        <type>         Type is one of the following:\n"
 //    << "                 soft            SDL software mode\n"
-//  #ifdef DISPLAY_OPENGL
-//    << "                 gl              SDL OpenGL mode\n"
-//    << endl
-//    << "  -gl_lib       <name>         Specify the OpenGL library\n"
-//    << "  -gl_inter     <1|0>          Enable interpolated (smooth) scaling\n"
-//    << "  -gl_aspectn   <number>       Scale the TIA width by the given percentage in NTSC mode\n"
-//    << "  -gl_aspectp   <number>       Scale the TIA width by the given percentage in PAL mode\n"
-//    << "  -gl_fsscale   <1|0>          Stretch GL image in fullscreen emulation mode to max/integer scale\n"
-//    << "  -gl_vsync     <1|0>          Enable 'synchronize to vertical blank interrupt'\n"
-//    << "  -gl_vbo       <1|0>          Enable 'vertex buffer objects'\n"
-//    << endl
-//    << "  -tv_filter    <0-5>          Set TV effects off (0) or to specified mode (1-5)\n"
-//    << "  -tv_scanlines <0-100>        Set scanline intensity to percentage (0 disables completely)\n"
-//    << "  -tv_scaninter <1|0>          Enable interpolated (smooth) scanlines\n"
-//    << "  -tv_contrast    <value>      Set TV effects custom contrast to value 1.0 - 1.0\n"
-//    << "  -tv_brightness  <value>      Set TV effects custom brightness to value 1.0 - 1.0\n"
-//    << "  -tv_hue         <value>      Set TV effects custom hue to value 1.0 - 1.0\n"
-//    << "  -tv_saturation  <value>      Set TV effects custom saturation to value 1.0 - 1.0\n"
-//    << "  -tv_gamma       <value>      Set TV effects custom gamma to value 1.0 - 1.0\n"
-//    << "  -tv_sharpness   <value>      Set TV effects custom sharpness to value 1.0 - 1.0\n"
-//    << "  -tv_resolution  <value>      Set TV effects custom resolution to value 1.0 - 1.0\n"
-//    << "  -tv_artifacts   <value>      Set TV effects custom artifacts to value 1.0 - 1.0\n"
-//    << "  -tv_fringing    <value>      Set TV effects custom fringing to value 1.0 - 1.0\n"
-//    << "  -tv_bleed       <value>      Set TV effects custom bleed to value 1.0 - 1.0\n"
-//    << endl
-//  #endif
 //    << "  -tia_filter   <filter>       Use the specified filter in emulation mode\n"
 //    << "  -fullscreen   <1|0|-1>       Use fullscreen mode (1 or 0), or disable switching to fullscreen entirely\n"
 //    << "  -fullres      <auto|WxH>     The resolution to use in fullscreen mode\n"

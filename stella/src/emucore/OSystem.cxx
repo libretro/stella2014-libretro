@@ -97,10 +97,6 @@ OSystem::OSystem()
   // Calculate startup time
   myMillisAtStart = (uInt32)(time(NULL) * 1000);
 
-  // Get built-in features
-  #ifdef DISPLAY_OPENGL
-    myFeatures += "OpenGL ";
-  #endif
   #ifdef SOUND_SUPPORT
     myFeatures += "Sound ";
   #endif

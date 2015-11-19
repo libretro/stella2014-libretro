@@ -29,9 +29,6 @@ class OSystem;
 //
 //#include "FrameBuffer.hxx"
 //#include "FrameBufferSoft.hxx"
-//#ifdef DISPLAY_OPENGL
-//  #include "FrameBufferGL.hxx"
-//#endif
 //
 //#include "Sound.hxx"
 //#ifdef SOUND_SUPPORT
@@ -58,14 +55,6 @@ class MediaFactory
 //      FrameBuffer* fb = (FrameBuffer*) NULL;
 //
 //      // OpenGL mode *may* fail, so we check for it first
-//    #ifdef DISPLAY_OPENGL
-//      if(osystem->settings().getString("video") == "gl")
-//      {
-//        const string& gl_lib = osystem->settings().getString("gl_lib");
-//        if(FrameBufferGL::loadLibrary(gl_lib))
-//          fb = new FrameBufferGL(osystem);
-//      }
-//    #endif
 //
 //      // If OpenGL failed, or if it wasn't requested, create the appropriate
 //      // software framebuffer
