@@ -35,7 +35,6 @@ class CompuMate;
 #include "TIATables.hxx"
 #include "FrameBuffer.hxx"
 #include "Serializable.hxx"
-#include "NTSCFilter.hxx"
 
 /**
   Contains detailed info about a console.

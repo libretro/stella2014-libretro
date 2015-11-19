@@ -434,8 +434,6 @@ FBInitStatus Console::initializeVideo(bool full)
   bool enable = myProperties.get(Display_Phosphor) == "YES";
   int blend = atoi(myProperties.get(Display_PPBlend).c_str());
   myOSystem->frameBuffer().enablePhosphor(enable, blend);
-//  myOSystem->frameBuffer().setNTSC(
-//    (NTSCFilter::Preset)myOSystem->settings().getInt("tv_filter"), false);
   setPalette(myOSystem->settings().getString("palette"));
 
   // Set the correct framerate based on the format of the ROM
