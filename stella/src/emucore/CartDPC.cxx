@@ -475,86 +475,70 @@ const uInt8* CartridgeDPC::getImage(int& size) const
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeDPC::save(Serializer& out) const
 {
-  try
-  {
-    out.putString(name());
+   out.putString(name());
 
-    // Indicates which bank is currently active
-    out.putShort(myCurrentBank);
+   // Indicates which bank is currently active
+   out.putShort(myCurrentBank);
 
-    // The top registers for the data fetchers
-    out.putByteArray(myTops, 8);
+   // The top registers for the data fetchers
+   out.putByteArray(myTops, 8);
 
-    // The bottom registers for the data fetchers
-    out.putByteArray(myBottoms, 8);
+   // The bottom registers for the data fetchers
+   out.putByteArray(myBottoms, 8);
 
-    // The counter registers for the data fetchers
-    out.putShortArray(myCounters, 8);
+   // The counter registers for the data fetchers
+   out.putShortArray(myCounters, 8);
 
-    // The flag registers for the data fetchers
-    out.putByteArray(myFlags, 8);
+   // The flag registers for the data fetchers
+   out.putByteArray(myFlags, 8);
 
-    // The music mode flags for the data fetchers
-    for(int i = 0; i < 3; ++i)
+   // The music mode flags for the data fetchers
+   for(int i = 0; i < 3; ++i)
       out.putBool(myMusicMode[i]);
 
-    // The random number generator register
-    out.putByte(myRandomNumber);
+   // The random number generator register
+   out.putByte(myRandomNumber);
 
-    out.putInt(mySystemCycles);
-    out.putInt((uInt32)(myFractionalClocks * 100000000.0));
-  }
-  catch(...)
-  {
-    cerr << "ERROR: CartridgeDPC::save" << endl;
-    return false;
-  }
+   out.putInt(mySystemCycles);
+   out.putInt((uInt32)(myFractionalClocks * 100000000.0));
 
-  return true;
+   return true;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeDPC::load(Serializer& in)
 {
-  try
-  {
-    if(in.getString() != name())
+   if(in.getString() != name())
       return false;
 
-    // Indicates which bank is currently active
-    myCurrentBank = in.getShort();
+   // Indicates which bank is currently active
+   myCurrentBank = in.getShort();
 
-    // The top registers for the data fetchers
-    in.getByteArray(myTops, 8);
+   // The top registers for the data fetchers
+   in.getByteArray(myTops, 8);
 
-    // The bottom registers for the data fetchers
-    in.getByteArray(myBottoms, 8);
+   // The bottom registers for the data fetchers
+   in.getByteArray(myBottoms, 8);
 
-    // The counter registers for the data fetchers
-    in.getShortArray(myCounters, 8);
+   // The counter registers for the data fetchers
+   in.getShortArray(myCounters, 8);
 
-    // The flag registers for the data fetchers
-    in.getByteArray(myFlags, 8);
+   // The flag registers for the data fetchers
+   in.getByteArray(myFlags, 8);
 
-    // The music mode flags for the data fetchers
-    for(int i = 0; i < 3; ++i)
+   // The music mode flags for the data fetchers
+   for(int i = 0; i < 3; ++i)
       myMusicMode[i] = in.getBool();
 
-    // The random number generator register
-    myRandomNumber = in.getByte();
+   // The random number generator register
+   myRandomNumber = in.getByte();
 
-    // Get system cycles and fractional clocks
-    mySystemCycles = (Int32)in.getInt();
-    myFractionalClocks = (double)in.getInt() / 100000000.0;
-  }
-  catch(...)
-  {
-    cerr << "ERROR: CartridgeDPC::load" << endl;
-    return false;
-  }
+   // Get system cycles and fractional clocks
+   mySystemCycles = (Int32)in.getInt();
+   myFractionalClocks = (double)in.getInt() / 100000000.0;
 
-  // Now, go to the current bank
-  bank(myCurrentBank);
+   // Now, go to the current bank
+   bank(myCurrentBank);
 
-  return true;
+   return true;
 }

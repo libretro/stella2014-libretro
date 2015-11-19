@@ -188,38 +188,22 @@ const uInt8* CartridgeF6::getImage(int& size) const
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeF6::save(Serializer& out) const
 {
-  try
-  {
-    out.putString(name());
-    out.putShort(myCurrentBank);
-  }
-  catch(...)
-  {
-    cerr << "ERROR: CartridgeF6::save" << endl;
-    return false;
-  }
+   out.putString(name());
+   out.putShort(myCurrentBank);
 
-  return true;
+   return true;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeF6::load(Serializer& in)
 {
-  try
-  {
-    if(in.getString() != name())
+   if(in.getString() != name())
       return false;
 
-    myCurrentBank = in.getShort();
-  }
-  catch(...)
-  {
-    cerr << "ERROR: CartridgeF6::load" << endl;
-    return false;
-  }
+   myCurrentBank = in.getShort();
 
-  // Remember what bank we were in
-  bank(myCurrentBank);
+   // Remember what bank we were in
+   bank(myCurrentBank);
 
-  return true;
+   return true;
 }

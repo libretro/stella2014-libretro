@@ -271,40 +271,24 @@ const uInt8* Cartridge3E::getImage(int& size) const
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool Cartridge3E::save(Serializer& out) const
 {
-  try
-  {
-    out.putString(name());
-    out.putShort(myCurrentBank);
-    out.putByteArray(myRAM, 32768);
-  }
-  catch(...)
-  {
-    cerr << "ERROR: Cartridge3E::save" << endl;
-    return false;
-  }
+   out.putString(name());
+   out.putShort(myCurrentBank);
+   out.putByteArray(myRAM, 32768);
 
-  return true;
+   return true;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool Cartridge3E::load(Serializer& in)
 {
-  try
-  {
-    if(in.getString() != name())
+   if(in.getString() != name())
       return false;
 
-    myCurrentBank = in.getShort();
-    in.getByteArray(myRAM, 32768);
-  }
-  catch(...)
-  {
-    cerr << "ERROR: Cartridge3E::load" << endl;
-    return false;
-  }
+   myCurrentBank = in.getShort();
+   in.getByteArray(myRAM, 32768);
 
-  // Now, go to the current bank
-  bank(myCurrentBank);
+   // Now, go to the current bank
+   bank(myCurrentBank);
 
-  return true;
+   return true;
 }

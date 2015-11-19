@@ -241,40 +241,24 @@ const uInt8* CartridgeFA::getImage(int& size) const
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeFA::save(Serializer& out) const
 {
-  try
-  {
-    out.putString(name());
-    out.putShort(myCurrentBank);
-    out.putByteArray(myRAM, 256);
-  }
-  catch(...)
-  {
-    cerr << "ERROR: CartridgeFA::save" << endl;
-    return false;
-  }
+   out.putString(name());
+   out.putShort(myCurrentBank);
+   out.putByteArray(myRAM, 256);
 
-  return true;
+   return true;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeFA::load(Serializer& in)
 {
-  try
-  {
-    if(in.getString() != name())
+   if(in.getString() != name())
       return false;
 
-    myCurrentBank = in.getShort();
-    in.getByteArray(myRAM, 256);
-  }
-  catch(...)
-  {
-    cerr << "ERROR: CartridgeFA::load" << endl;
-    return false;
-  }
+   myCurrentBank = in.getShort();
+   in.getByteArray(myRAM, 256);
 
-  // Remember what bank we were in
-  bank(myCurrentBank);
+   // Remember what bank we were in
+   bank(myCurrentBank);
 
-  return true;
+   return true;
 }

@@ -307,54 +307,38 @@ const uInt8* CartridgeCTY::getImage(int& size) const
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeCTY::save(Serializer& out) const
 {
-  try
-  {
-    out.putString(name());
-    out.putShort(bank());
-    out.putByteArray(myRAM, 64);
+   out.putString(name());
+   out.putShort(bank());
+   out.putByteArray(myRAM, 64);
 
-    out.putByte(myOperationType);
-    out.putShort(myCounter);
-    out.putBool(myLDAimmediate);
-    out.putInt(myRandomNumber);
-    out.putInt(mySystemCycles);
-    out.putInt((uInt32)(myFractionalClocks * 100000000.0));
+   out.putByte(myOperationType);
+   out.putShort(myCounter);
+   out.putBool(myLDAimmediate);
+   out.putInt(myRandomNumber);
+   out.putInt(mySystemCycles);
+   out.putInt((uInt32)(myFractionalClocks * 100000000.0));
 
-  }
-  catch(...)
-  {
-    cerr << "ERROR: CartridgeCTY::save" << endl;
-    return false;
-  }
-
-  return true;
+   return true;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeCTY::load(Serializer& in)
 {
-  try
-  {
-    if(in.getString() != name())
+   if(in.getString() != name())
       return false;
 
-    // Remember what bank we were in
-    bank(in.getShort());
-    in.getByteArray(myRAM, 64);
+   // Remember what bank we were in
+   bank(in.getShort());
+   in.getByteArray(myRAM, 64);
 
-    myOperationType = in.getByte();
-    myCounter = in.getShort();
-    myLDAimmediate = in.getBool();
-    myRandomNumber = in.getInt();
-    mySystemCycles = (Int32)in.getInt();
-    myFractionalClocks = (double)in.getInt() / 100000000.0;
-  }
-  catch(...)
-  {
-    cerr << "ERROR: CartridgeCTY::load" << endl;
-    return false;
-  }
-  return true;
+   myOperationType = in.getByte();
+   myCounter = in.getShort();
+   myLDAimmediate = in.getBool();
+   myRandomNumber = in.getInt();
+   mySystemCycles = (Int32)in.getInt();
+   myFractionalClocks = (double)in.getInt() / 100000000.0;
+
+   return true;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

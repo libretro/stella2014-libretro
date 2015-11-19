@@ -400,65 +400,49 @@ const uInt8* Cartridge4A50::getImage(int& size) const
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool Cartridge4A50::save(Serializer& out) const
 {
-  try
-  {
-    out.putString(name());
+   out.putString(name());
 
-    // The 32K bytes of RAM
-    out.putByteArray(myRAM, 32768);
+   // The 32K bytes of RAM
+   out.putByteArray(myRAM, 32768);
 
-    // Index pointers
-    out.putShort(mySliceLow);
-    out.putShort(mySliceMiddle);
-    out.putShort(mySliceHigh);
+   // Index pointers
+   out.putShort(mySliceLow);
+   out.putShort(mySliceMiddle);
+   out.putShort(mySliceHigh);
 
-    // Whether index pointers are for ROM or RAM
-    out.putBool(myIsRomLow);
-    out.putBool(myIsRomMiddle);
-    out.putBool(myIsRomHigh);
+   // Whether index pointers are for ROM or RAM
+   out.putBool(myIsRomLow);
+   out.putBool(myIsRomMiddle);
+   out.putBool(myIsRomHigh);
 
-    // Last address and data values
-    out.putByte(myLastData);
-    out.putShort(myLastAddress);
-  }
-  catch(...)
-  {
-    cerr << "ERROR: Cartridge4A40::save" << endl;
-    return false;
-  }
+   // Last address and data values
+   out.putByte(myLastData);
+   out.putShort(myLastAddress);
 
-  return true;
+   return true;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool Cartridge4A50::load(Serializer& in)
 {
-  try
-  {
-    if(in.getString() != name())
+   if(in.getString() != name())
       return false;
 
-    in.getByteArray(myRAM, 32768);
+   in.getByteArray(myRAM, 32768);
 
-    // Index pointers
-    mySliceLow = in.getShort();
-    mySliceMiddle = in.getShort();
-    mySliceHigh = in.getShort();
+   // Index pointers
+   mySliceLow = in.getShort();
+   mySliceMiddle = in.getShort();
+   mySliceHigh = in.getShort();
 
-    // Whether index pointers are for ROM or RAM
-    myIsRomLow = in.getBool();
-    myIsRomMiddle = in.getBool();
-    myIsRomHigh = in.getBool();
+   // Whether index pointers are for ROM or RAM
+   myIsRomLow = in.getBool();
+   myIsRomMiddle = in.getBool();
+   myIsRomHigh = in.getBool();
 
-    // Last address and data values
-    myLastData = in.getByte();
-    myLastAddress = in.getShort();
-  }
-  catch(...)
-  {
-    cerr << "ERROR: Cartridge4A50::load" << endl;
-    return false;
-  }
+   // Last address and data values
+   myLastData = in.getByte();
+   myLastAddress = in.getShort();
 
-  return true;
+   return true;
 }

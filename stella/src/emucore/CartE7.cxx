@@ -298,43 +298,27 @@ const uInt8* CartridgeE7::getImage(int& size) const
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeE7::save(Serializer& out) const
 {
-  try
-  {
-    out.putString(name());
-    out.putShortArray(myCurrentSlice, 2);
-    out.putShort(myCurrentRAM);
-    out.putByteArray(myRAM, 2048);
-  }
-  catch(...)
-  {
-    cerr << "ERROR: CartridgeE7::save" << endl;
-    return false;
-  }
+   out.putString(name());
+   out.putShortArray(myCurrentSlice, 2);
+   out.putShort(myCurrentRAM);
+   out.putByteArray(myRAM, 2048);
 
-  return true;
+   return true;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeE7::load(Serializer& in)
 {
-  try
-  {
-    if(in.getString() != name())
+   if(in.getString() != name())
       return false;
 
-    in.getShortArray(myCurrentSlice, 2);
-    myCurrentRAM = in.getShort();
-    in.getByteArray(myRAM, 2048);
-  }
-  catch(...)
-  {
-    cerr << "ERROR: CartridgeE7::load" << endl;
-    return false;
-  }
+   in.getShortArray(myCurrentSlice, 2);
+   myCurrentRAM = in.getShort();
+   in.getByteArray(myRAM, 2048);
 
-  // Set up the previously used banks for the RAM and segment
-  bankRAM(myCurrentRAM);
-  bank(myCurrentSlice[0]);
+   // Set up the previously used banks for the RAM and segment
+   bankRAM(myCurrentRAM);
+   bank(myCurrentSlice[0]);
 
-  return true;
+   return true;
 }

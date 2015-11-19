@@ -41,21 +41,6 @@ SoundSDL::SoundSDL(OSystem* osystem)
     myIsMuted(true),
     myVolume(100)
 {
-
-  // The sound system is opened only once per program run, to eliminate
-  // issues with opening and closing it multiple times
-  // This fixes a bug most prevalent with ATI video cards in Windows,
-  // whereby sound stopped working after the first video change
-  SDL_AudioSpec desired;
-  //desired.freq   = myOSystem->settings().getInt("freq");
-  desired.freq   = 31400;
-  //desired.format = AUDIO_S16SYS;
-  desired.channels = 2;
-  //desired.samples  = myOSystem->settings().getInt("fragsize");
-  desired.samples  = 512;
-  desired.callback = callback;
-  desired.userdata = (void*)this;
-
   myIsInitializedFlag = true;
 }
 
@@ -371,61 +356,52 @@ void SoundSDL::callback(void* udata, uInt8* stream, int len)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool SoundSDL::save(Serializer& out) const
 {
-  try
-  {
-    out.putString(name());
+   out.putString(name());
 
-    uInt8 reg1 = 0, reg2 = 0, reg3 = 0, reg4 = 0, reg5 = 0, reg6 = 0;
+   uInt8 reg1 = 0, reg2 = 0, reg3 = 0, reg4 = 0, reg5 = 0, reg6 = 0;
 
-    // Only get the TIA sound registers if sound is enabled
-    if(myIsInitializedFlag)
-    {
+   // Only get the TIA sound registers if sound is enabled
+   if(myIsInitializedFlag)
+   {
       reg1 = myTIASound.get(0x15);
       reg2 = myTIASound.get(0x16);
       reg3 = myTIASound.get(0x17);
       reg4 = myTIASound.get(0x18);
       reg5 = myTIASound.get(0x19);
       reg6 = myTIASound.get(0x1a);
-    }
+   }
 
-    out.putByte(reg1);
-    out.putByte(reg2);
-    out.putByte(reg3);
-    out.putByte(reg4);
-    out.putByte(reg5);
-    out.putByte(reg6);
+   out.putByte(reg1);
+   out.putByte(reg2);
+   out.putByte(reg3);
+   out.putByte(reg4);
+   out.putByte(reg5);
+   out.putByte(reg6);
 
-    out.putInt(myLastRegisterSetCycle);
-  }
-  catch(...)
-  {
-    return false;
-  }
+   out.putInt(myLastRegisterSetCycle);
 
-  return true;
+   return true;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool SoundSDL::load(Serializer& in)
 {
-  try
-  {
-    if(in.getString() != name())
+   if(in.getString() != name())
       return false;
 
-    uInt8 reg1 = in.getByte(),
-          reg2 = in.getByte(),
-          reg3 = in.getByte(),
-          reg4 = in.getByte(),
-          reg5 = in.getByte(),
-          reg6 = in.getByte();
+   uInt8 reg1 = in.getByte(),
+         reg2 = in.getByte(),
+         reg3 = in.getByte(),
+         reg4 = in.getByte(),
+         reg5 = in.getByte(),
+         reg6 = in.getByte();
 
-    myLastRegisterSetCycle = (Int32) in.getInt();
+   myLastRegisterSetCycle = (Int32) in.getInt();
 
-    // Only update the TIA sound registers if sound is enabled
-    // Make sure to empty the queue of previous sound fragments
-    if(myIsInitializedFlag)
-    {
+   // Only update the TIA sound registers if sound is enabled
+   // Make sure to empty the queue of previous sound fragments
+   if(myIsInitializedFlag)
+   {
       myRegWriteQueue.clear();
       myTIASound.set(0x15, reg1);
       myTIASound.set(0x16, reg2);
@@ -433,14 +409,9 @@ bool SoundSDL::load(Serializer& in)
       myTIASound.set(0x18, reg4);
       myTIASound.set(0x19, reg5);
       myTIASound.set(0x1a, reg6);
-    }
-  }
-  catch(...)
-  {
-    return false;
-  }
+   }
 
-  return true;
+   return true;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

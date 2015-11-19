@@ -171,40 +171,24 @@ const uInt8* Cartridge4KSC::getImage(int& size) const
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool Cartridge4KSC::save(Serializer& out) const
 {
-  try
-  {
-    out.putString(name());
-    out.putShort(myCurrentBank);
-    out.putByteArray(myRAM, 128);
-  }
-  catch(...)
-  {
-    cerr << "ERROR: Cartridge4KSC::save" << endl;
-    return false;
-  }
+   out.putString(name());
+   out.putShort(myCurrentBank);
+   out.putByteArray(myRAM, 128);
 
-  return true;
+   return true;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool Cartridge4KSC::load(Serializer& in)
 {
-  try
-  {
-    if(in.getString() != name())
+   if(in.getString() != name())
       return false;
 
-    myCurrentBank = in.getShort();
-    in.getByteArray(myRAM, 128);
-  }
-  catch(...)
-  {
-    cerr << "ERROR: Cartridge4KSC::load" << endl;
-    return false;
-  }
+   myCurrentBank = in.getShort();
+   in.getByteArray(myRAM, 128);
 
-  // Remember what bank we were in
-  bank(myCurrentBank);
+   // Remember what bank we were in
+   bank(myCurrentBank);
 
-  return true;
+   return true;
 }

@@ -208,40 +208,24 @@ const uInt8* CartridgeF4SC::getImage(int& size) const
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeF4SC::save(Serializer& out) const
 {
-  try
-  {
-    out.putString(name());
-    out.putShort(myCurrentBank);
-    out.putByteArray(myRAM, 128);
-  }
-  catch(...)
-  {
-    cerr << "ERROR: CartridgeF4SC::save" << endl;
-    return false;
-  }
+   out.putString(name());
+   out.putShort(myCurrentBank);
+   out.putByteArray(myRAM, 128);
 
-  return true;
+   return true;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeF4SC::load(Serializer& in)
 {
-  try
-  {
-    if(in.getString() != name())
+   if(in.getString() != name())
       return false;
 
-    myCurrentBank = in.getShort();
-    in.getByteArray(myRAM, 128);
-  }
-  catch(...)
-  {
-    cerr << "ERROR: CartridgeF4SC::load" << endl;
-    return false;
-  }
+   myCurrentBank = in.getShort();
+   in.getByteArray(myRAM, 128);
 
-  // Remember what bank we were in
-  bank(myCurrentBank);
+   // Remember what bank we were in
+   bank(myCurrentBank);
 
-  return true;
+   return true;
 }

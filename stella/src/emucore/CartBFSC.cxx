@@ -205,40 +205,24 @@ const uInt8* CartridgeBFSC::getImage(int& size) const
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeBFSC::save(Serializer& out) const
 {
-  try
-  {
-    out.putString(name());
-    out.putShort(myCurrentBank);
-    out.putByteArray(myRAM, 128);
-  }
-  catch(...)
-  {
-    cerr << "ERROR: CartridgeBFSC::save" << endl;
-    return false;
-  }
+   out.putString(name());
+   out.putShort(myCurrentBank);
+   out.putByteArray(myRAM, 128);
 
-  return true;
+   return true;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeBFSC::load(Serializer& in)
 {
-  try
-  {
-    if(in.getString() != name())
+   if(in.getString() != name())
       return false;
 
-    myCurrentBank = in.getShort();
-    in.getByteArray(myRAM, 128);
-  }
-  catch(...)
-  {
-    cerr << "ERROR: CartridgeBFSC::load" << endl;
-    return false;
-  }
+   myCurrentBank = in.getShort();
+   in.getByteArray(myRAM, 128);
 
-  // Remember what bank we were in
-  bank(myCurrentBank);
+   // Remember what bank we were in
+   bank(myCurrentBank);
 
-  return true;
+   return true;
 }

@@ -467,102 +467,86 @@ const uInt8* CartridgeAR::getImage(int& size) const
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeAR::save(Serializer& out) const
 {
-  try
-  {
-    out.putString(name());
+   out.putString(name());
 
-    // Indicates the offest within the image for the corresponding bank
-    out.putIntArray(myImageOffset, 2);
+   // Indicates the offest within the image for the corresponding bank
+   out.putIntArray(myImageOffset, 2);
 
-    // The 6K of RAM and 2K of ROM contained in the Supercharger
-    out.putByteArray(myImage, 8192);
+   // The 6K of RAM and 2K of ROM contained in the Supercharger
+   out.putByteArray(myImage, 8192);
 
-    // The 256 byte header for the current 8448 byte load
-    out.putByteArray(myHeader, 256);
+   // The 256 byte header for the current 8448 byte load
+   out.putByteArray(myHeader, 256);
 
-    // All of the 8448 byte loads associated with the game 
-    // Note that the size of this array is myNumberOfLoadImages * 8448
-    out.putByteArray(myLoadImages, myNumberOfLoadImages * 8448);
+   // All of the 8448 byte loads associated with the game 
+   // Note that the size of this array is myNumberOfLoadImages * 8448
+   out.putByteArray(myLoadImages, myNumberOfLoadImages * 8448);
 
-    // Indicates how many 8448 loads there are
-    out.putByte(myNumberOfLoadImages);
+   // Indicates how many 8448 loads there are
+   out.putByte(myNumberOfLoadImages);
 
-    // Indicates if the RAM is write enabled
-    out.putBool(myWriteEnabled);
+   // Indicates if the RAM is write enabled
+   out.putBool(myWriteEnabled);
 
-    // Indicates if the ROM's power is on or off
-    out.putBool(myPower);
+   // Indicates if the ROM's power is on or off
+   out.putBool(myPower);
 
-    // Indicates when the power was last turned on
-    out.putInt(myPowerRomCycle);
+   // Indicates when the power was last turned on
+   out.putInt(myPowerRomCycle);
 
-    // Data hold register used for writing
-    out.putByte(myDataHoldRegister);
+   // Data hold register used for writing
+   out.putByte(myDataHoldRegister);
 
-    // Indicates number of distinct accesses when data hold register was set
-    out.putInt(myNumberOfDistinctAccesses);
+   // Indicates number of distinct accesses when data hold register was set
+   out.putInt(myNumberOfDistinctAccesses);
 
-    // Indicates if a write is pending or not
-    out.putBool(myWritePending);
-  }
-  catch(...)
-  {
-    cerr << "ERROR: CartridgeAR::save" << endl;
-    return false;
-  }
+   // Indicates if a write is pending or not
+   out.putBool(myWritePending);
 
-  return true;
+   return true;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeAR::load(Serializer& in)
 {
-  try
-  {
-    if(in.getString() != name())
+   if(in.getString() != name())
       return false;
 
-    // Indicates the offest within the image for the corresponding bank
-    in.getIntArray(myImageOffset, 2);
+   // Indicates the offest within the image for the corresponding bank
+   in.getIntArray(myImageOffset, 2);
 
-    // The 6K of RAM and 2K of ROM contained in the Supercharger
-    in.getByteArray(myImage, 8192);
+   // The 6K of RAM and 2K of ROM contained in the Supercharger
+   in.getByteArray(myImage, 8192);
 
-    // The 256 byte header for the current 8448 byte load
-    in.getByteArray(myHeader, 256);
+   // The 256 byte header for the current 8448 byte load
+   in.getByteArray(myHeader, 256);
 
-    // All of the 8448 byte loads associated with the game 
-    // Note that the size of this array is myNumberOfLoadImages * 8448
-    in.getByteArray(myLoadImages, myNumberOfLoadImages * 8448);
+   // All of the 8448 byte loads associated with the game 
+   // Note that the size of this array is myNumberOfLoadImages * 8448
+   in.getByteArray(myLoadImages, myNumberOfLoadImages * 8448);
 
-    // Indicates how many 8448 loads there are
-    myNumberOfLoadImages = in.getByte();
+   // Indicates how many 8448 loads there are
+   myNumberOfLoadImages = in.getByte();
 
-    // Indicates if the RAM is write enabled
-    myWriteEnabled = in.getBool();
+   // Indicates if the RAM is write enabled
+   myWriteEnabled = in.getBool();
 
-    // Indicates if the ROM's power is on or off
-    myPower = in.getBool();
+   // Indicates if the ROM's power is on or off
+   myPower = in.getBool();
 
-    // Indicates when the power was last turned on
-    myPowerRomCycle = (Int32) in.getInt();
+   // Indicates when the power was last turned on
+   myPowerRomCycle = (Int32) in.getInt();
 
-    // Data hold register used for writing
-    myDataHoldRegister = in.getByte();
+   // Data hold register used for writing
+   myDataHoldRegister = in.getByte();
 
-    // Indicates number of distinct accesses when data hold register was set
-    myNumberOfDistinctAccesses = in.getInt();
+   // Indicates number of distinct accesses when data hold register was set
+   myNumberOfDistinctAccesses = in.getInt();
 
-    // Indicates if a write is pending or not
-    myWritePending = in.getBool();
-  }
-  catch(...)
-  {
-    cerr << "ERROR: CartridgeAR::load" << endl;
-    return false;
-  }
+   // Indicates if a write is pending or not
+   myWritePending = in.getBool();
 
-  return true;
+   return true;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

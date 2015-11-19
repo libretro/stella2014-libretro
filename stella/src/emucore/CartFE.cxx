@@ -158,37 +158,21 @@ const uInt8* CartridgeFE::getImage(int& size) const
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeFE::save(Serializer& out) const
 {
-  try
-  {
-    out.putString(name());
-    out.putShort(myLastAddress1);
-    out.putShort(myLastAddress2);
-  }
-  catch(...)
-  {
-    cerr << "ERROR: CartridgeFE::save" << endl;
-    return false;
-  }
+   out.putString(name());
+   out.putShort(myLastAddress1);
+   out.putShort(myLastAddress2);
 
-  return true;
+   return true;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeFE::load(Serializer& in)
 {
-  try
-  {
-    if(in.getString() != name())
+   if(in.getString() != name())
       return false;
 
-    myLastAddress1 = in.getShort();
-    myLastAddress2 = in.getShort();
-  }
-  catch(...)
-  {
-    cerr << "ERROR: CartridgeF8SC::load" << endl;
-    return false;
-  }
+   myLastAddress1 = in.getShort();
+   myLastAddress2 = in.getShort();
 
-  return true;
+   return true;
 }

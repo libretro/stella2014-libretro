@@ -201,35 +201,19 @@ const uInt8* CartridgeCV::getImage(int& size) const
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeCV::save(Serializer& out) const
 {
-  try
-  {
-    out.putString(name());
-    out.putByteArray(myRAM, 1024);
-  }
-  catch(...)
-  {
-    cerr << "ERROR: CartridgeCV::save" << endl;
-    return false;
-  }
+   out.putString(name());
+   out.putByteArray(myRAM, 1024);
 
-  return true;
+   return true;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeCV::load(Serializer& in)
 {
-  try
-  {
-    if(in.getString() != name())
+   if(in.getString() != name())
       return false;
 
-    in.getByteArray(myRAM, 1024);
-  }
-  catch(...)
-  {
-    cerr << "ERROR: CartridgeCV::load" << endl;
-    return false;
-  }
+   in.getByteArray(myRAM, 1024);
 
-  return true;
+   return true;
 }

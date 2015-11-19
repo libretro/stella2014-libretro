@@ -199,44 +199,28 @@ const uInt8* CartridgeCM::getImage(int& size) const
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeCM::save(Serializer& out) const
 {
-  try
-  {
-    out.putString(name());
-    out.putShort(myCurrentBank);
-    out.putByte(mySWCHA);
-    out.putByte(myColumn);
-    out.putByteArray(myRAM, 2048);
-  }
-  catch(...)
-  {
-    cerr << "ERROR: CartridgeCM::save" << endl;
-    return false;
-  }
+   out.putString(name());
+   out.putShort(myCurrentBank);
+   out.putByte(mySWCHA);
+   out.putByte(myColumn);
+   out.putByteArray(myRAM, 2048);
 
-  return true;
+   return true;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeCM::load(Serializer& in)
 {
-  try
-  {
-    if(in.getString() != name())
+   if(in.getString() != name())
       return false;
 
-    myCurrentBank = in.getShort();
-    mySWCHA = in.getByte();
-    myColumn = in.getByte();
-    in.getByteArray(myRAM, 2048);
-  }
-  catch(...)
-  {
-    cerr << "ERROR: CartridgeCM::load" << endl;
-    return false;
-  }
+   myCurrentBank = in.getShort();
+   mySWCHA = in.getByte();
+   myColumn = in.getByte();
+   in.getByteArray(myRAM, 2048);
 
-  // Remember what bank we were in
-  bank(myCurrentBank);
+   // Remember what bank we were in
+   bank(myCurrentBank);
 
-  return true;
+   return true;
 }

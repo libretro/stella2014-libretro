@@ -658,122 +658,106 @@ const uInt8* CartridgeDPCPlus::getImage(int& size) const
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeDPCPlus::save(Serializer& out) const
 {
-  try
-  {
-    out.putString(name());
+   out.putString(name());
 
-    // Indicates which bank is currently active
-    out.putShort(myCurrentBank);
+   // Indicates which bank is currently active
+   out.putShort(myCurrentBank);
 
-    // Harmony RAM
-    out.putByteArray(myDPCRAM, 8192);
+   // Harmony RAM
+   out.putByteArray(myDPCRAM, 8192);
 
-    // The top registers for the data fetchers
-    out.putByteArray(myTops, 8);
+   // The top registers for the data fetchers
+   out.putByteArray(myTops, 8);
 
-    // The bottom registers for the data fetchers
-    out.putByteArray(myBottoms, 8);
+   // The bottom registers for the data fetchers
+   out.putByteArray(myBottoms, 8);
 
-    // The counter registers for the data fetchers
-    out.putShortArray(myCounters, 8);
+   // The counter registers for the data fetchers
+   out.putShortArray(myCounters, 8);
 
-    // The counter registers for the fractional data fetchers
-    out.putIntArray(myFractionalCounters, 8);
+   // The counter registers for the fractional data fetchers
+   out.putIntArray(myFractionalCounters, 8);
 
-    // The fractional registers for the data fetchers
-    out.putByteArray(myFractionalIncrements, 8);
+   // The fractional registers for the data fetchers
+   out.putByteArray(myFractionalIncrements, 8);
 
-    // The Fast Fetcher Enabled flag
-    out.putBool(myFastFetch);
-    out.putBool(myLDAimmediate);
+   // The Fast Fetcher Enabled flag
+   out.putBool(myFastFetch);
+   out.putBool(myLDAimmediate);
 
-    // Control Byte to update
-    out.putByteArray(myParameter, 8);
+   // Control Byte to update
+   out.putByteArray(myParameter, 8);
 
-    // The music counters
-    out.putIntArray(myMusicCounters, 3);
+   // The music counters
+   out.putIntArray(myMusicCounters, 3);
 
-    // The music frequencies
-    out.putIntArray(myMusicFrequencies, 3);
+   // The music frequencies
+   out.putIntArray(myMusicFrequencies, 3);
 
-    // The music waveforms
-    out.putShortArray(myMusicWaveforms, 3);
+   // The music waveforms
+   out.putShortArray(myMusicWaveforms, 3);
 
-    // The random number generator register
-    out.putInt(myRandomNumber);
+   // The random number generator register
+   out.putInt(myRandomNumber);
 
-    out.putInt(mySystemCycles);
-    out.putInt((uInt32)(myFractionalClocks * 100000000.0));
-  }
-  catch(...)
-  {
-    cerr << "ERROR: CartridgeDPCPlus::save" << endl;
-    return false;
-  }
+   out.putInt(mySystemCycles);
+   out.putInt((uInt32)(myFractionalClocks * 100000000.0));
 
-  return true;
+   return true;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeDPCPlus::load(Serializer& in)
 {
-  try
-  {
-    if(in.getString() != name())
+   if(in.getString() != name())
       return false;
 
-    // Indicates which bank is currently active
-    myCurrentBank = in.getShort();
+   // Indicates which bank is currently active
+   myCurrentBank = in.getShort();
 
-    // Harmony RAM
-    in.getByteArray(myDPCRAM, 8192);
+   // Harmony RAM
+   in.getByteArray(myDPCRAM, 8192);
 
-    // The top registers for the data fetchers
-    in.getByteArray(myTops, 8);
+   // The top registers for the data fetchers
+   in.getByteArray(myTops, 8);
 
-    // The bottom registers for the data fetchers
-    in.getByteArray(myBottoms, 8);
+   // The bottom registers for the data fetchers
+   in.getByteArray(myBottoms, 8);
 
-    // The counter registers for the data fetchers
-    in.getShortArray(myCounters, 8);
+   // The counter registers for the data fetchers
+   in.getShortArray(myCounters, 8);
 
-    // The counter registers for the fractional data fetchers
-    in.getIntArray(myFractionalCounters, 8);
+   // The counter registers for the fractional data fetchers
+   in.getIntArray(myFractionalCounters, 8);
 
-    // The fractional registers for the data fetchers
-    in.getByteArray(myFractionalIncrements, 8);
+   // The fractional registers for the data fetchers
+   in.getByteArray(myFractionalIncrements, 8);
 
-    // The Fast Fetcher Enabled flag
-    myFastFetch = in.getBool();
-    myLDAimmediate = in.getBool();
+   // The Fast Fetcher Enabled flag
+   myFastFetch = in.getBool();
+   myLDAimmediate = in.getBool();
 
-    // Control Byte to update
-    in.getByteArray(myParameter, 8);
+   // Control Byte to update
+   in.getByteArray(myParameter, 8);
 
-    // The music mode counters for the data fetchers
-    in.getIntArray(myMusicCounters, 3);
+   // The music mode counters for the data fetchers
+   in.getIntArray(myMusicCounters, 3);
 
-    // The music mode frequency addends for the data fetchers
-    in.getIntArray(myMusicFrequencies, 3);
+   // The music mode frequency addends for the data fetchers
+   in.getIntArray(myMusicFrequencies, 3);
 
-    // The music waveforms
-    in.getShortArray(myMusicWaveforms, 3);
+   // The music waveforms
+   in.getShortArray(myMusicWaveforms, 3);
 
-    // The random number generator register
-    myRandomNumber = in.getInt();
+   // The random number generator register
+   myRandomNumber = in.getInt();
 
-    // Get system cycles and fractional clocks
-    mySystemCycles = (Int32)in.getInt();
-    myFractionalClocks = (double)in.getInt() / 100000000.0;
-  }
-  catch(...)
-  {
-    cerr << "ERROR: CartridgeDPCPlus::load" << endl;
-    return false;
-  }
+   // Get system cycles and fractional clocks
+   mySystemCycles = (Int32)in.getInt();
+   myFractionalClocks = (double)in.getInt() / 100000000.0;
 
-  // Now, go to the current bank
-  bank(myCurrentBank);
+   // Now, go to the current bank
+   bank(myCurrentBank);
 
-  return true;
+   return true;
 }
