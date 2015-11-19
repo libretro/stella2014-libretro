@@ -136,34 +136,6 @@ class OSystem
     */
     SerialPort& serialPort() const { return *mySerialPort; }
 
-    /**
-      Get the settings menu of the system.
-
-      @return The settings menu object
-    */
-    //Menu& menu() const { return *myMenu; }
-
-    /**
-      Get the command menu of the system.
-
-      @return The command menu object
-    */
-    //CommandMenu& commandMenu() const { return *myCommandMenu; }
-
-    /**
-      Get the ROM launcher of the system.
-
-      @return The launcher object
-    */
-    //Launcher& launcher() const { return *myLauncher; }
-
-    /**
-      Get the state manager of the system.
-
-      @return The statemanager object
-    */
-    //StateManager& state() const { return *myStateManager; }
-
 #ifdef DEBUGGER_SUPPORT
     /**
       Create all child objects which belong to this OSystem
@@ -205,17 +177,6 @@ class OSystem
     */
     void setUIPalette();
 
-    /**
-      Get the current framerate for the video system.
-
-      @return  The video framerate currently in use
-    */
-    //float frameRate() const { return myDisplayFrameRate; }
-
-    /**
-      Get the maximum dimensions of a window for the video hardware.
-    */
-    //uInt32 desktopWidth() const  { return myDesktopWidth; }
     uInt32 desktopHeight() const { return 512; }
 
     /**
@@ -236,22 +197,6 @@ class OSystem
       @return String representing the full path of the properties filename.
     */
     const string& paletteFile() const { return myPaletteFile; }
-
-    /**
-      This method should be called to get the full path of the
-      properties file (stella.pro).
-
-      @return String representing the full path of the properties filename.
-    */
-    //const string& propertiesFile() const { return myPropertiesFile; }
-
-    /**
-      This method should be called to get the full path of the currently
-      loaded ROM.
-
-      @return String representing the full path of the ROM file.
-    */
-    //const string& romFile() const { return myRomFile; }
 
     /**
       Creates a new game console from the specified romfile, and correctly
@@ -290,30 +235,11 @@ class OSystem
     string getROMInfo(const string& romfile);
 
     /**
-      The features which are conditionally compiled into Stella.
-
-      @return  The supported features
-    */
-    //const string& features() const { return myFeatures; }
-
-    /**
-      The build information for Stella (SDL version, architecture, etc).
-
-      @return  The build info
-    */
-    //const string& buildInfo() const { return myBuildInfo; }
-
-    /**
       Calculate the MD5sum of the given file.
 
       @param filename  Filename of potential ROM file
     */
     string MD5FromFile(const string& filename);
-
-    /**
-      Issue a quit event to the OSystem.
-    */
-    //void quit() { myQuitLoop = true; }
 
     /**
       Append a message to the internal log.
@@ -436,52 +362,8 @@ class OSystem
     SerialPort* mySerialPort;
 
   private:
-    /*enum { kNumUIPalettes = 2 };
-    string myBaseDir;
-    string myStateDir;
-    string mySnapshotDir;*/
     string myNVRamDir;
-    /*string myCfgDir;
-
-    string myCheatFile;
-    string myConfigFile;*/
     string myPaletteFile;
-    /*string myPropertiesFile;
-
-    string myRomFile;
-    string myRomMD5;
-
-    string myFeatures;
-    string myBuildInfo;
-
-    // The font object to use for the normal in-game GUI
-    GUI::Font* myFont;
-
-    // The info font object to use for the normal in-game GUI
-    GUI::Font* myInfoFont;
-
-    // The font object to use when space is very limited
-    GUI::Font* mySmallFont;
-
-    // The font object to use for the ROM launcher
-    GUI::Font* myLauncherFont;
-
-    // The font object to use for the console/debugger 
-    GUI::Font* myConsoleFont;
-
-    // Indicates whether the main processing loop should proceed
-    struct TimingInfo {
-      uInt64 start;
-      uInt64 current;
-      uInt64 virt;
-      uInt64 totalTime;
-      uInt64 totalFrames;
-    };
-    TimingInfo myTimingInfo;
-
-    // Table of RGB values for GUI elements
-    static uInt32 ourGUIColors[kNumUIPalettes][kNumColors-256];
-    */
 
   private:
     /**
