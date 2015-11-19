@@ -265,19 +265,6 @@ class SoundSDL : public Sound
     // Current volume as a percentage (0 - 100)
     uInt32 myVolume;
 
-    // Audio specification structure
-    typedef struct{
-        int freq;
-        uInt16 format;
-        uInt8 channels;
-        uInt8 silence;
-        uInt16 samples;
-        uInt32 size;
-        void (*callback)(void *userdata, uInt8 *stream, int len);
-        void *userdata;
-    } SDL_AudioSpec;
-    SDL_AudioSpec myHardwareSpec;
-
     // Queue of TIA register writes
     RegWriteQueue myRegWriteQueue;
 
