@@ -20,8 +20,6 @@
 #ifndef STELLA_KEYS_HXX
 #define STELLA_KEYS_HXX
 
-#include <SDL.h>
-
 /**
   This class implements a thin wrapper around the SDL keysym enumerations,
   such that SDL-specific code doesn't have to go into the internal parts of
