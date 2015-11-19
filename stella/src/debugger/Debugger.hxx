@@ -289,9 +289,6 @@ class Debugger : public DialogContainer
     void reset();
     void clearAllBreakPoints();
 
-    void saveState(int state);
-    void loadState(int state);
-
   private:
     Console& myConsole;
     System&  mySystem;

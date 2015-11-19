@@ -299,26 +299,6 @@ string Debugger::setRAM(IntArray& args)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Debugger::saveState(int state)
-{
-  mySystem.clearDirtyPages();
-
-  unlockBankswitchState();
-  myOSystem->state().saveState(state);
-  lockBankswitchState();
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Debugger::loadState(int state)
-{
-  mySystem.clearDirtyPages();
-
-  unlockBankswitchState();
-  myOSystem->state().loadState(state);
-  lockBankswitchState();
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int Debugger::step()
 {
   saveOldState();

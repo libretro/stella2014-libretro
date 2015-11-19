@@ -60,25 +60,6 @@ class StateManager
     void update();
 
     /**
-      Load a state into the current system
-
-      @param slot  The state 'slot' to load state from
-    */
-    void loadState(int slot = -1);
-
-    /**
-      Save the current state from the system
-
-      @param slot  The state 'slot' to save into
-    */
-    void saveState(int slot = -1);
-
-    /**
-      Switches to the next higher state slot (circular queue style)
-    */
-    void changeState();
-
-    /**
       Load a state into the current system from the given Serializer.
       No messages are printed to the screen.
 
