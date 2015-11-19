@@ -271,11 +271,6 @@ class OSystem
     const string& stateDir() const { static string dir("."); return dir; }
 
     /**
-      Return the full/complete directory name for storing PNG snapshots.
-    */
-    //const string& snapshotDir() const { return mySnapshotDir; }
-
-    /**
      Return the full/complete directory name for storing nvram
      (flash/EEPROM) files.
      */

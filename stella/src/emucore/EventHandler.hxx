@@ -21,7 +21,6 @@
 #define EVENTHANDLER_HXX
 
 #include <map>
-//#include <SDL.h>
 
 class Console;
 class OSystem;
@@ -198,7 +197,6 @@ class EventHandler
     void leaveMenuMode();
     bool enterDebugMode();
     void leaveDebugMode();
-    void takeSnapshot(uInt32 number = 0);
 
     /**
       Send an event directly to the event handler.
