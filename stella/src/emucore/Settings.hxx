@@ -94,17 +94,6 @@ class Settings
     const string& getString(const string& key) const { return value(key).toString(); }
     const GUI::Size getSize(const string& key) const { return value(key).toSize();   }
 
-  protected:
-    /**
-      This method will be called to load the current settings from an rc file.
-    */
-    //virtual void loadConfig();
-
-    /**
-      This method will be called to save the current settings to an rc file.
-    */
-    //virtual void saveConfig();
-
   private:
     // Copy constructor isn't supported by this class so make it private
     Settings(const Settings&);

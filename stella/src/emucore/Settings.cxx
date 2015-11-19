@@ -159,51 +159,6 @@ Settings::~Settings()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//void Settings::loadConfig()
-//{
-//  string line, key, value;
-//  string::size_type equalPos, garbage;
-//
-//  ifstream in(myOSystem->configFile().c_str());
-//  if(!in || !in.is_open())
-//  {
-//    myOSystem->logMessage("ERROR: Couldn't load settings file", 0);
-//    return;
-//  }
-//
-//  while(getline(in, line))
-//  {
-//    // Strip all whitespace and tabs from the line
-//    while((garbage = line.find("\t")) != string::npos)
-//      line.erase(garbage, 1);
-//
-//    // Ignore commented and empty lines
-//    if((line.length() == 0) || (line[0] == ';'))
-//      continue;
-//
-//    // Search for the equal sign and discard the line if its not found
-//    if((equalPos = line.find("=")) == string::npos)
-//      continue;
-//
-//    // Split the line into key/value pairs and trim any whitespace
-//    key   = line.substr(0, equalPos);
-//    value = line.substr(equalPos + 1, line.length() - key.length() - 1);
-//    key   = trim(key);
-//    value = trim(value);
-//
-//    // Check for absent key or value
-//    if((key.length() == 0) || (value.length() == 0))
-//      continue;
-//
-//    // Only settings which have been previously set are valid
-//    if(int idx = getInternalPos(key) != -1)
-//      setInternal(key, value, idx, true);
-//  }
-//
-//  in.close();
-//}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 string Settings::loadCommandLine(int argc, char** argv)
 {
   for(int i = 1; i < argc; ++i)
@@ -459,56 +414,6 @@ void Settings::setValue(const string& key, const Variant& value)
   else
     setExternal(key, value);
 }
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//void Settings::saveConfig()
-//{
-//  // Do a quick scan of the internal settings to see if any have
-//  // changed.  If not, we don't need to save them at all.
-//  bool settingsChanged = false;
-//  for(unsigned int i = 0; i < myInternalSettings.size(); ++i)
-//  {
-//    if(myInternalSettings[i].value != myInternalSettings[i].initialValue)
-//    {
-//      settingsChanged = true;
-//      break;
-//    }
-//  }
-//
-//  if(!settingsChanged)
-//    return;
-//
-//  ofstream out(myOSystem->configFile().c_str());
-//  if(!out || !out.is_open())
-//  {
-//    myOSystem->logMessage("ERROR: Couldn't save settings file", 0);
-//    return;
-//  }
-//
-//  out << ";  Stella configuration file" << endl
-//      << ";" << endl
-//      << ";  Lines starting with ';' are comments and are ignored." << endl
-//      << ";  Spaces and tabs are ignored." << endl
-//      << ";" << endl
-//      << ";  Format MUST be as follows:" << endl
-//      << ";    command = value" << endl
-//      << ";" << endl
-//      << ";  Commmands are the same as those specified on the commandline," << endl
-//      << ";  without the '-' character." << endl
-//      << ";" << endl
-//      << ";  Values are the same as those allowed on the commandline." << endl
-//      << ";  Boolean values are specified as 1 (or true) and 0 (or false)" << endl
-//      << ";" << endl;
-//
-//  // Write out each of the key and value pairs
-//  for(unsigned int i = 0; i < myInternalSettings.size(); ++i)
-//  {
-//    out << myInternalSettings[i].key << " = " <<
-//           myInternalSettings[i].value << endl;
-//  }
-//
-//  out.close();
-//}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int Settings::getInternalPos(const string& key) const
