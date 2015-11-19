@@ -47,14 +47,6 @@ class StateManager
 
   public:
     /**
-      Answers whether the manager is in record or playback mode
-    */
-    bool isActive();
-
-    bool toggleRecordMode();
-    bool toggleRewindMode();
-
-    /**
       Updates the state of the system based on the currently active mode
     */
     void update();
@@ -92,14 +84,6 @@ class StateManager
     StateManager& operator = (const StateManager&);
 
   private:
-    enum Mode {
-      kOffMode,
-      kMoviePlaybackMode,
-      kMovieRecordMode,
-      kRewindPlaybackMode,
-      kRewindRecordMode
-    };
-
     enum {
       kVersion = 001
     };
@@ -110,15 +94,8 @@ class StateManager
     // The current slot for load/save states
     int myCurrentSlot;
 
-    // Whether the manager is in record or playback mode
-    Mode myActiveMode;
-
     // MD5 of the currently active ROM (either in movie or rewind mode)
     string myMD5;
-
-    // Serializer classes used to save/load the eventstream
-    Serializer myMovieWriter;
-    Serializer myMovieReader;
 };
 
 #endif
