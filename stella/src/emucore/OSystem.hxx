@@ -188,41 +188,6 @@ class OSystem
 #endif
 
     /**
-      Get the font object of the system
-
-      @return The font reference
-    */
-    //const GUI::Font& font() const { return *myFont; }
-
-    /**
-      Get the info font object of the system
-
-      @return The font reference
-    */
-    //const GUI::Font& infoFont() const { return *myInfoFont; }
-
-    /**
-      Get the small font object of the system
-
-      @return The font reference
-    */
-    //const GUI::Font& smallFont() const { return *mySmallFont; }
-
-    /**
-      Get the launcher font object of the system
-
-      @return The font reference
-    */
-    //const GUI::Font& launcherFont() const { return *myLauncherFont; }
-
-    /**
-      Get the console font object of the system
-
-      @return The console font reference
-    */
-    //const GUI::Font& consoleFont() const { return *myConsoleFont; }
-
-    /**
       Set the framerate for the video system.  It's placed in this class since
       the mainLoop() method is defined here.
 
@@ -254,18 +219,6 @@ class OSystem
     uInt32 desktopHeight() const { return 512; }
 
     /**
-      Get the supported fullscreen resolutions for the video hardware.
-
-      @return  An array of supported resolutions
-    */
-    //const ResolutionList& supportedResolutions() const { return myResolutions; }
-
-    /**
-      Return the default full/complete directory name for storing data.
-    */
-    //const string& baseDir() const { return myBaseDir; }
-
-    /**
       Return the full/complete directory name for storing state files.
     */
     const string& stateDir() const { static string dir("."); return dir; }
@@ -275,25 +228,6 @@ class OSystem
      (flash/EEPROM) files.
      */
     const string& nvramDir() const { return myNVRamDir; }
-
-    /**
-      Return the full/complete directory name for storing Distella cfg files.
-    */
-    //const string& cfgDir() const { return myCfgDir; }
-
-    /**
-      This method should be called to get the full path of the cheat file.
-
-      @return String representing the full path of the cheat filename.
-    */
-    //const string& cheatFile() const { return myCheatFile; }
-
-    /**
-      This method should be called to get the full path of the config file.
-
-      @return String representing the full path of the config filename.
-    */
-    //const string& configFile() const { return myConfigFile; }
 
     /**
       This method should be called to get the full path of the
@@ -500,45 +434,6 @@ class OSystem
 
     // Pointer to the serial port object
     SerialPort* mySerialPort;
-
-    // Pointer to the Menu object
-    /*Menu* myMenu;
-
-    // Pointer to the CommandMenu object
-    CommandMenu* myCommandMenu;
-
-    // Pointer to the Launcher object
-    Launcher* myLauncher;
-
-    // Pointer to the Debugger object
-    Debugger* myDebugger;
-
-    // Pointer to the CheatManager object
-    CheatManager* myCheatManager;
-
-    // Pointer to the StateManager object
-    StateManager* myStateManager;
-
-    // The list of log messages
-    string myLogMessages;
-
-    // Maximum dimensions of the desktop area
-    uInt32 myDesktopWidth, myDesktopHeight;
-
-    // Supported fullscreen resolutions
-    ResolutionList myResolutions;*/
-
-    // Number of times per second to iterate through the main loop
-    //float myDisplayFrameRate;
-
-    // Time per frame for a video update, based on the current framerate
-    //uInt32 myTimePerFrame;
-
-    // The time (in milliseconds) from the UNIX epoch when the application starts
-    /*uInt32 myMillisAtStart;
-
-    // Indicates whether to stop the main loop
-    bool myQuitLoop;*/
 
   private:
     /*enum { kNumUIPalettes = 2 };
