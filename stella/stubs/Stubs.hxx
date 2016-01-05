@@ -2,6 +2,9 @@
 #include <sys/time.h>
 #include "OSystem.hxx"
 
+#if defined(_WIN32)
+#include <windows.h>
+#endif
 #if defined(__CELLOS_LV2__)
 #include <sys/sys_time.h>
 #include <sys/time_util.h>
