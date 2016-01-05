@@ -25,6 +25,7 @@
 #include "PropsSet.hxx"
 #include "Paddles.hxx"
 #include "SoundSDL.hxx"
+#include "M6532.hxx"
 
 static SoundSDL *vcsSound = 0;
 static uint32_t tiaSamplesPerFrame = 0;
@@ -269,12 +270,20 @@ unsigned retro_api_version(void)
 
 void *retro_get_memory_data(unsigned id)
 {
-   return NULL;
+   switch (id)
+   {
+      case RETRO_MEMORY_SYSTEM_RAM: return console->system().m6532().getRAM();
+      default: return NULL;
+   }
 }
 
 size_t retro_get_memory_size(unsigned id)
 {
-   return 0;
+   switch (id)
+   {
+      case RETRO_MEMORY_SYSTEM_RAM: return 128;
+      default: return 0;
+   }
 }
 
 void retro_init(void)
