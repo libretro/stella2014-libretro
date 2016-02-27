@@ -138,6 +138,13 @@ else ifeq ($(platform), vita)
    STATIC_LINKING = 1
 	FLAGS += -DVITA
 
+# Raspberry Pi 2
+else ifeq ($(platform), rpi2)
+	TARGET := $(TARGET_NAME)_libretro.so
+	fpic := -fPIC
+	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
+	FLAGS += -marm -mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -funsafe-math-optimizations
+	FLAGS += -fomit-frame-pointer -ffast-math
 
 # emscripten
 else ifeq ($(platform), emscripten)
