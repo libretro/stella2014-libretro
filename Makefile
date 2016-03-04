@@ -157,6 +157,19 @@ else ifeq ($(platform), rpi2)
 # emscripten
 else ifeq ($(platform), emscripten)
 	TARGET := $(TARGET_NAME)_libretro_emscripten.bc
+
+# GCW0
+else ifeq ($(platform), gcw0)
+	TARGET := $(TARGET_NAME)_libretro.so
+	CC = /opt/gcw0-toolchain/usr/bin/mipsel-linux-gcc
+	CXX = /opt/gcw0-toolchain/usr/bin/mipsel-linux-g++
+	AR = /opt/gcw0-toolchain/usr/bin/mipsel-linux-ar
+	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
+	LDFLAGS += $(PTHREAD_FLAGS) -lrt
+	FLAGS += $(PTHREAD_FLAGS) -DHAVE_MKDIR
+	FLAGS += -ffast-math -march=mips32 -mtune=mips32r2 -mhard-float
+	fpic := -fPIC
+
 else
    TARGET := $(TARGET_NAME)_libretro.dll
    CC = gcc
