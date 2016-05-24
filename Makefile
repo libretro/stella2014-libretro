@@ -143,7 +143,7 @@ else ifeq ($(platform), rpi1)
 	TARGET := $(TARGET_NAME)_libretro.so
 	fpic := -fPIC
 	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
-	FLAGS += -marm -march=armv6j -mfpu=vfp -mfloat-abi=hard -funsafe-math-optimizations
+	FLAGS += -marm -march=armv6j -mfpu=vfp -mfloat-abi=hard
 	FLAGS += -fomit-frame-pointer -ffast-math
 
 # Raspberry Pi 2
@@ -151,7 +151,15 @@ else ifeq ($(platform), rpi2)
 	TARGET := $(TARGET_NAME)_libretro.so
 	fpic := -fPIC
 	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
-	FLAGS += -marm -mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -funsafe-math-optimizations
+	FLAGS += -marm -mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard
+	FLAGS += -fomit-frame-pointer -ffast-math
+
+# Raspberry Pi 3
+else ifeq ($(platform), rpi3)
+	TARGET := $(TARGET_NAME)_libretro.so
+	fpic := -fPIC
+	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
+	FLAGS += -marm -mcpu=cortex-a53 -mfpu=neon-fp-armv8 -mfloat-abi=hard
 	FLAGS += -fomit-frame-pointer -ffast-math
 
 # emscripten
