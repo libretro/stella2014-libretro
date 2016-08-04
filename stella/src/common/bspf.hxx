@@ -105,9 +105,10 @@ static const string EmptyString("");
 // Some convenience functions
 
 template<typename T> inline void BSPF_swap(T& a, T& b) { T tmp = a; a = b; b = tmp; }
+
+#define MIN(a, b) ((a < b) ? a : b)
+#define MAX(a, b) ((a > b) ? a : b)
 template<typename T> inline T BSPF_abs (T x) { return (x>=0) ? x : -x; }
-template<typename T> inline T BSPF_min (T a, T b) { return (a<b) ? a : b; }
-template<typename T> inline T BSPF_max (T a, T b) { return (a>b) ? a : b; }
 template<typename T> inline T BSPF_clamp (T a, T l, T u) { return (a<l) ? l : (a>u) ? u : a; }
 
 // Test whether two characters are equal (case insensitive)

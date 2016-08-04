@@ -155,10 +155,10 @@ struct Rect
     @param r the rectangle to extend by
   */
   void extend(const Rect & r) {
-    left = BSPF_min(left, r.left);
-    right = BSPF_max(right, r.right);
-    top = BSPF_min(top, r.top);
-    bottom = BSPF_max(bottom, r.bottom);
+    left   = MIN(left, r.left);
+    right  = MAX(right, r.right);
+    top    = MIN(top, r.top);
+    bottom = MAX(bottom, r.bottom);
   }
 
   /*

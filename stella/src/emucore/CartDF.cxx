@@ -28,7 +28,7 @@ CartridgeDF::CartridgeDF(const uInt8* image, uInt32 size, const Settings& settin
   : Cartridge(settings)
 {
   // Copy the ROM image into my buffer
-  memcpy(myImage, image, BSPF_min(131072u, size));
+  memcpy(myImage, image, MIN(131072u, size));
   createCodeAccessBase(131072);
 
   // Remember startup bank

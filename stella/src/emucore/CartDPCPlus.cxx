@@ -39,7 +39,7 @@ CartridgeDPCPlus::CartridgeDPCPlus(const uInt8* image, uInt32 size,
 {
   // Store image, making sure it's at least 29KB
   uInt32 minsize = 4096 * 6 + 4096 + 1024 + 255;
-  mySize = BSPF_max(minsize, size);
+  mySize         = MAX(minsize, size);
   myImage = new uInt8[mySize];
   memcpy(myImage, image, size);
   createCodeAccessBase(4096 * 6);

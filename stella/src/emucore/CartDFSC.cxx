@@ -28,7 +28,7 @@ CartridgeDFSC::CartridgeDFSC(const uInt8* image, uInt32 size, const Settings& se
   : Cartridge(settings)
 {
   // Copy the ROM image into my buffer
-  memcpy(myImage, image, BSPF_min(131072u, size));
+  memcpy(myImage, image, MIN(131072u, size));
   createCodeAccessBase(131072);
 
   // This cart contains 128 bytes extended RAM @ 0x1000

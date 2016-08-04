@@ -593,7 +593,7 @@ void Console::setTIAProperties()
     myConsoleInfo.InitialFrameRate = "50";
 
     // PAL ROMs normally need at least 250 lines
-    height = BSPF_max(height, 250u);
+    height = MAX(height, 250u);
   }
 
   // Make sure these values fit within the bounds of the desktop
@@ -601,8 +601,8 @@ void Console::setTIAProperties()
   if(height > myOSystem->desktopHeight())
   {
     ystart += height - myOSystem->desktopHeight();
-    ystart = BSPF_min(ystart, 64u);
-    height = myOSystem->desktopHeight();
+    ystart  = MIN(ystart, 64u);
+    height  = myOSystem->desktopHeight();
   }
   myTIA->setYStart(ystart);
   myTIA->setHeight(height);

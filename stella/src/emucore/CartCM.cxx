@@ -29,7 +29,7 @@ CartridgeCM::CartridgeCM(const uInt8* image, uInt32 size, const Settings& settin
   : Cartridge(settings)
 {
   // Copy the ROM image into my buffer
-  memcpy(myImage, image, BSPF_min(16384u, size));
+  memcpy(myImage, image, MIN(16384u, size));
   createCodeAccessBase(16384);
 
   // This cart contains 2048 bytes extended RAM @ 0x1800
