@@ -50,7 +50,9 @@ class Variant
     Variant(const string& s) : data(s) { }
     Variant(const char* s) : data(s) { }
 
+    Variant(Int32 i) { buf().str(""); buf() << i; data = buf().str(); }
     Variant(int i) { buf().str(""); buf() << i; data = buf().str(); }
+    Variant(long unsigned int i) { buf().str(""); buf() << i; data = buf().str(); }
     Variant(unsigned int i) { buf().str(""); buf() << i; data = buf().str(); }
     Variant(float f) { buf().str(""); buf() << f; data = buf().str(); }
     Variant(double d) { buf().str(""); buf() << d; data = buf().str(); }
