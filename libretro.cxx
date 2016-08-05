@@ -219,7 +219,7 @@ bool retro_load_game(const struct retro_game_info *info)
    string cartType = props.get(Cartridge_Type);
    string cartId;//, romType("AUTO-DETECT");
    Settings *settings = new Settings(&osystem);
-   settings->setValue("romloadcount", 0);
+   settings->setValue("romloadcount", false);
    cartridge = Cartridge::create((const uInt8*)info->data, (uInt32)info->size, cartMD5, cartType, cartId, osystem, *settings);
 
    if(cartridge == 0)
