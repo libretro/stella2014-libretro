@@ -184,7 +184,8 @@ else ifeq ($(platform), rpi3)
 
 # emscripten
 else ifeq ($(platform), emscripten)
-	TARGET := $(TARGET_NAME)_libretro_emscripten.bc
+	TARGET := $(TARGET_NAME)_libretro_$(platform).bc
+	STATIC_LINKING = 1
 
 # GCW0
 else ifeq ($(platform), gcw0)
