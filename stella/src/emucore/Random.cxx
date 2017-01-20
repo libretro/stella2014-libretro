@@ -17,8 +17,6 @@
 // $Id: Random.cxx 2838 2014-01-17 23:34:03Z stephena $
 //============================================================================
 
-#include <time.h>
-
 #include "OSystem.hxx"
 #include "Random.hxx"
 
@@ -34,7 +32,7 @@ void Random::initSeed()
   if(ourSystem)
     myValue = ourSystem->getTicks();
   else
-    myValue = (uInt32)time(0);
+    myValue = 543; // Just to avoid a zero seed
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

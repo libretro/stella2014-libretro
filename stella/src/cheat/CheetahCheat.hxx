@@ -28,8 +28,8 @@ class CheetahCheat : public Cheat
     CheetahCheat(OSystem* os, const string& name, const string& code);
     ~CheetahCheat();
 
-    virtual bool enable();
-    virtual bool disable();
+    virtual Bool enable();
+    virtual Bool disable();
 
     virtual void evaluate();
 

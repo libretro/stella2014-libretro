@@ -344,10 +344,6 @@ void Console::togglePalette()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//Libretro: Function to receive palette
-#ifdef __LIBRETRO__
-extern void stellaSetPalette(const uInt32* palette);
-#endif
 void Console::setPalette(const string& type)
 {
   // Look at all the palettes, since we don't know which one is
@@ -374,15 +370,17 @@ void Console::setPalette(const string& type)
     paletteNum = 2;
 
   // Now consider the current display format
-  const uInt32* palette =
+  currentPalette =
     (myDisplayFormat.compare(0, 3, "PAL") == 0)   ? palettes[paletteNum][1] :
     (myDisplayFormat.compare(0, 5, "SECAM") == 0) ? palettes[paletteNum][2] :
      palettes[paletteNum][0];
 
-  //myOSystem->frameBuffer().setTIAPalette(palette);
-#ifdef __LIBRETRO__
-  stellaSetPalette(palette);
-#endif
+  //myOSystem->frameBuffer().setTIAPalette(currentPalette);
+}
+
+const uInt32* Console::getPalette(int direction) const
+{
+	return currentPalette;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

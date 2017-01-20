@@ -223,6 +223,11 @@ class TIA : public Device
     bool isPAL()
       { return float(myPALFrameCounter) / myFrameCounter >= (25.0/60.0); }
 
+    uInt64 getMilliSeconds() const {
+        uInt64 ntscFrames = myFrameCounter - myPALFrameCounter;
+        return ntscFrames * (1000.0f/60.0f) + myPALFrameCounter * (1000.0f/50.f);
+    }
+
     /**
       Answers the current color clock we've gotten to on this scanline.
 

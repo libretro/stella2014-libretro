@@ -38,7 +38,7 @@ RamCheat::~RamCheat()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool RamCheat::enable()
+Bool RamCheat::enable()
 {
   if(!myEnabled)
   {
@@ -49,7 +49,7 @@ bool RamCheat::enable()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool RamCheat::disable()
+Bool RamCheat::disable()
 {
   if(myEnabled)
   {

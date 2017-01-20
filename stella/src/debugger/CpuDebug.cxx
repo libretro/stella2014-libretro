@@ -109,43 +109,43 @@ void CpuDebug::setY(int y)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CpuDebug::setN(bool on)
+void CpuDebug::setN(Bool on)
 {
   my6502.N = on;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CpuDebug::setV(bool on)
+void CpuDebug::setV(Bool on)
 {
   my6502.V = on;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CpuDebug::setB(bool on)
+void CpuDebug::setB(Bool on)
 {
   // nop - B is always true
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CpuDebug::setD(bool on)
+void CpuDebug::setD(Bool on)
 {
   my6502.D = on;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CpuDebug::setI(bool on)
+void CpuDebug::setI(Bool on)
 {
   my6502.I = on;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CpuDebug::setZ(bool on)
+void CpuDebug::setZ(Bool on)
 {
   my6502.notZ = !on;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CpuDebug::setC(bool on)
+void CpuDebug::setC(Bool on)
 {
   my6502.C = on;
 }

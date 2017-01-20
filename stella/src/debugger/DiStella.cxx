@@ -41,7 +41,7 @@ DiStella::DiStella(const CartDebug& dbg, CartDebug::DisassemblyList& list,
   while(!myAddressQueue.empty())
     myAddressQueue.pop();
 
-  bool resolve_code = mySettings.resolve_code;
+  Bool resolve_code = mySettings.resolve_code;
 
   CartDebug::AddressList::iterator it = addresses.begin();
   uInt16 start = *it++;
@@ -254,7 +254,7 @@ void DiStella::disasm(uInt32 distart, int pass)
         else
           myDisasmBuf << Base::HEX4 << myPC+myOffset << "'     '";
 
-        bool isPGfx = check_bit(myPC, CartDebug::PGFX);
+        Bool isPGfx = check_bit(myPC, CartDebug::PGFX);
         const string& bit_string = isPGfx ? "\x1f" : "\x1e";
         uInt8 byte = Debugger::debugger().peek(myPC+myOffset);
         myDisasmBuf << ".byte $" << Base::HEX2 << (int)byte << "  |";
@@ -297,11 +297,11 @@ void DiStella::disasm(uInt32 distart, int pass)
 
       if (pass == 3)
       {
-        bool row = check_bit(myPC, CartDebug::ROW) &&
+        Bool row = check_bit(myPC, CartDebug::ROW) &&
                   !check_bit(myPC, CartDebug::CODE | CartDebug::DATA |
                                    CartDebug::GFX | CartDebug::PGFX);
-        bool referenced = check_bit(myPC, CartDebug::REFERENCED);
-        bool line_empty = true;
+        Bool referenced = check_bit(myPC, CartDebug::REFERENCED);
+        Bool line_empty = true;
         while (row && myPC <= myAppData.end)
         {
           if(referenced)        // start a new line with a label
@@ -838,7 +838,7 @@ void DiStella::disasm(uInt32 distart, int pass)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int DiStella::mark(uInt32 address, uInt8 mask, bool directive)
+int DiStella::mark(uInt32 address, uInt8 mask, Bool directive)
 {
   /*-----------------------------------------------------------------------
     For any given offset and code range...
@@ -920,7 +920,7 @@ int DiStella::mark(uInt32 address, uInt8 mask, bool directive)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool DiStella::check_bit(uInt16 address, uInt8 mask) const
+Bool DiStella::check_bit(uInt16 address, uInt8 mask) const
 {
   // The REFERENCED and VALID_ENTRY flags are needed for any inspection of
   // an address
@@ -943,7 +943,7 @@ bool DiStella::check_bit(uInt16 address, uInt8 mask) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool DiStella::check_range(uInt16 beg, uInt16 end) const
+Bool DiStella::check_range(uInt16 beg, uInt16 end) const
 {
   if(beg > end)
   {

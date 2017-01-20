@@ -77,13 +77,13 @@ class CpuDebug : public DebuggerSystem
     void setX(int x);
     void setY(int y);
 
-    void setN(bool on);
-    void setV(bool on);
-    void setB(bool on);
-    void setD(bool on);
-    void setI(bool on);
-    void setZ(bool on);
-    void setC(bool on);
+    void setN(Bool on);
+    void setV(Bool on);
+    void setB(Bool on);
+    void setD(Bool on);
+    void setI(Bool on);
+    void setZ(Bool on);
+    void setC(Bool on);
 
     void toggleN();
     void toggleV();

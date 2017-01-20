@@ -254,19 +254,19 @@ string CartDebug::toString()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartDebug::disassemble(bool force)
+Bool CartDebug::disassemble(Bool force)
 {
   // Test current disassembly; don't re-disassemble if it hasn't changed
   // Also check if the current PC is in the current list
-  bool bankChanged = myConsole.cartridge().bankChanged();
+  Bool bankChanged = myConsole.cartridge().bankChanged();
   uInt16 PC = myDebugger.cpuDebug().pc();
   int pcline = addressToLine(PC);
-  bool pcfound = (pcline != -1) && ((uInt32)pcline < myDisassembly.list.size()) &&
+  Bool pcfound = (pcline != -1) && ((uInt32)pcline < myDisassembly.list.size()) &&
                   (myDisassembly.list[pcline].disasm[0] != '.');
-  bool pagedirty = (PC & 0x1000) ? mySystem.isPageDirty(0x1000, 0x1FFF) :
+  Bool pagedirty = (PC & 0x1000) ? mySystem.isPageDirty(0x1000, 0x1FFF) :
                                    mySystem.isPageDirty(0x80, 0xFF);
 
-  bool changed = (force || bankChanged || !pcfound || pagedirty);
+  Bool changed = (force || bankChanged || !pcfound || pagedirty);
   if(changed)
   {
     // Are we disassembling from ROM or ZP RAM?
@@ -304,7 +304,7 @@ bool CartDebug::disassemble(bool force)
 
     // Always attempt to resolve code sections unless it's been
     // specifically disabled
-    bool found = fillDisassemblyList(info, PC);
+    Bool found = fillDisassemblyList(info, PC);
     if(!found && DiStella::settings.resolve_code)
     {
       // Temporarily turn off code resolution
@@ -318,7 +318,7 @@ bool CartDebug::disassemble(bool force)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartDebug::fillDisassemblyList(BankInfo& info, uInt16 search)
+Bool CartDebug::fillDisassemblyList(BankInfo& info, uInt16 search)
 {
   myDisassembly.list.clear(false);
   myDisassembly.fieldwidth = 14 + myLabelLength;
@@ -327,7 +327,7 @@ bool CartDebug::fillDisassemblyList(BankInfo& info, uInt16 search)
 
   // Parts of the disassembly will be accessed later in different ways
   // We place those parts in separate maps, to speed up access
-  bool found = false;
+  Bool found = false;
   myAddrToLineList.clear();
   myAddrToLineIsROM = info.offset & 0x1000;
   for(uInt32 i = 0; i < myDisassembly.list.size(); ++i)
@@ -405,7 +405,7 @@ string CartDebug::disassemble(uInt16 start, uInt16 lines) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartDebug::addDirective(CartDebug::DisasmType type,
+Bool CartDebug::addDirective(CartDebug::DisasmType type,
                              uInt16 start, uInt16 end, int bank)
 {
 #define PRINT_TAG(tag) \
@@ -498,7 +498,7 @@ bool CartDebug::addDirective(CartDebug::DisasmType type,
   {
     if(tag.end < i->start)  // node should be inserted *before* this one
     {
-      bool createNode = true;
+      Bool createNode = true;
 
       // Is the new range ending consecutive with the old range beginning?
       // If so, a merge will suffice
@@ -562,7 +562,7 @@ string CartDebug::getCartType() const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartDebug::addLabel(const string& label, uInt16 address)
+Bool CartDebug::addLabel(const string& label, uInt16 address)
 {
   // Only user-defined labels can be added or redefined
   switch(addressType(address))
@@ -581,7 +581,7 @@ bool CartDebug::addLabel(const string& label, uInt16 address)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartDebug::removeLabel(const string& label)
+Bool CartDebug::removeLabel(const string& label)
 {
   // Only user-defined labels can be removed
   LabelToAddr::iterator iter = myUserAddresses.find(label);
@@ -602,7 +602,7 @@ bool CartDebug::removeLabel(const string& label)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartDebug::getLabel(ostream& buf, uInt16 addr, bool isRead, int places) const
+Bool CartDebug::getLabel(ostream& buf, uInt16 addr, Bool isRead, int places) const
 {
   switch(addressType(addr))
   {
@@ -708,7 +708,7 @@ bool CartDebug::getLabel(ostream& buf, uInt16 addr, bool isRead, int places) con
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-string CartDebug::getLabel(uInt16 addr, bool isRead, int places) const
+string CartDebug::getLabel(uInt16 addr, Bool isRead, int places) const
 {
   ostringstream buf;
   getLabel(buf, addr, isRead, places);
@@ -1140,7 +1140,7 @@ string CartDebug::saveDisassembly()
       << ";         P = PGFX directive, shown as '*' (stored in playfield)\n\n"
       << "      processor 6502\n\n";
 
-  bool addrUsed = false;
+  Bool addrUsed = false;
   for(uInt16 addr = 0x00; addr <= 0x0F; ++addr)
     addrUsed = addrUsed || myReserved.TIARead[addr];
   for(uInt16 addr = 0x00; addr <= 0x3F; ++addr)

@@ -61,7 +61,7 @@ class Variant
     // Conversion methods
     const string& toString() const { return data; }
     int toInt() const { return atoi(data.c_str()); }
-    float toFloat() const { return atof(data.c_str()); }
+    float toFloat() const { return (float)atof(data.c_str()); }
     bool toBool() const { return data == "1" || data == "true"; }
     const GUI::Size toSize() const { return GUI::Size(data); }
 

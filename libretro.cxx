@@ -8,7 +8,6 @@
 
 #ifdef _MSC_VER
 #define snprintf _snprintf
-#pragma pack(1)
 #endif
 
 #include "libretro.h"
@@ -27,19 +26,14 @@
 #include "SoundSDL.hxx"
 #include "M6532.hxx"
 
-static SoundSDL *vcsSound = 0;
-static uint32_t tiaSamplesPerFrame = 0;
-static int16_t *sampleBuffer[2048];
-static uint32_t frameBuffer[256*160];
 #include "Stubs.hxx"
 
 static Console *console = 0;
 static Cartridge *cartridge = 0;
 static OSystem osystem;
 static StateManager stateManager(&osystem);
-const uint32_t* Palette;
 
-int videoWidth, videoHeight;
+static int videoWidth, videoHeight;
 
 static retro_log_printf_t log_cb;
 static retro_video_refresh_t video_cb;
@@ -48,19 +42,9 @@ static retro_input_state_t input_state_cb;
 static retro_environment_t environ_cb;
 static retro_audio_sample_t audio_cb;
 static retro_audio_sample_batch_t audio_batch_cb;
+static struct retro_system_av_info g_av_info;
 
-void retro_set_environment(retro_environment_t cb) { environ_cb = cb; }
-void retro_set_video_refresh(retro_video_refresh_t cb) { video_cb = cb; }
-void retro_set_audio_sample(retro_audio_sample_t cb) { audio_cb = cb; }
-void retro_set_audio_sample_batch(retro_audio_sample_batch_t cb) { audio_batch_cb = cb; }
-void retro_set_input_poll(retro_input_poll_t cb) { input_poll_cb = cb; }
-void retro_set_input_state(retro_input_state_t cb) { input_state_cb = cb; }
-
-// Set the palette for the current stella instance
-void stellaSetPalette (const uInt32* palette)
-{
-   Palette = palette;
-}
+#define STATE_SIZE 512
 
 static void update_input()
 {
@@ -104,7 +88,13 @@ static void update_input()
  * libretro implementation
  ************************************/
 
-static struct retro_system_av_info g_av_info;
+
+void retro_set_environment(retro_environment_t cb) { environ_cb = cb; }
+void retro_set_video_refresh(retro_video_refresh_t cb) { video_cb = cb; }
+void retro_set_audio_sample(retro_audio_sample_t cb) { audio_cb = cb; }
+void retro_set_audio_sample_batch(retro_audio_sample_batch_t cb) { audio_batch_cb = cb; }
+void retro_set_input_poll(retro_input_poll_t cb) { input_poll_cb = cb; }
+void retro_set_input_state(retro_input_state_t cb) { input_state_cb = cb; }
 
 void retro_get_system_info(struct retro_system_info *info)
 {
@@ -127,7 +117,7 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
    info->geometry.base_height  = videoHeight;
    info->geometry.max_width    = 320;
    info->geometry.max_height   = 256;
-   info->geometry.aspect_ratio = 4.0 / 3.0;
+   info->geometry.aspect_ratio = 4.0f / 3.0f;
 }
 
 void retro_set_controller_port_device(unsigned port, unsigned device)
@@ -138,28 +128,26 @@ void retro_set_controller_port_device(unsigned port, unsigned device)
 
 size_t retro_serialize_size(void) 
 {
-   //return STATE_SIZE;
-   return 0;
+   return STATE_SIZE;
 }
 
 bool retro_serialize(void *data, size_t size)
 {
-   //Serializer state(filename, 0);
-   //if(stateManager.saveState(state))
-   //{
-   //   return true;
-   //}
-   return false;
+    Serializer state;
+    if(!stateManager.saveState(state))
+        return false;
+    std::string s = state.get();
+    memcpy(data, s.data(), s.size());
+    return true;
 }
 
 bool retro_unserialize(const void *data, size_t size)
 {
-   //if (size != STATE_SIZE)
-   //Serializer state(filename, 1);
-   //if(stateManager.loadState(state))
-   //{
-   //   return true;
-   //}
+    std::string s((const char*)data, size);
+    Serializer state;
+    state.set(s);
+   if(stateManager.loadState(state))
+      return true;
    return false;
 }
 
@@ -214,7 +202,7 @@ bool retro_load_game(const struct retro_game_info *info)
    }
 
    // Get the game properties
-   string cartMD5 = MD5((const uInt8*)info->data, info->size);
+   string cartMD5 = MD5((const uInt8*)info->data, (uInt32)info->size);
    Properties props;
    osystem.propSet().getMD5(cartMD5, props);
 
@@ -313,8 +301,10 @@ void retro_reset(void)
 
 void retro_run(void)
 {
-   //Get the number of samples in a frame
-   tiaSamplesPerFrame = 31400.0f/console->getFramerate();
+    static int16_t *sampleBuffer[2048];
+    static uint32_t frameBuffer[256*160];
+    //Get the number of samples in a frame
+    static uint32_t tiaSamplesPerFrame = (uint32_t)(31400.0f/console->getFramerate());
 
    //INPUT
    update_input();
@@ -328,15 +318,17 @@ void retro_run(void)
    videoWidth = tia.width();
    videoHeight = tia.height();
 
+   const uint32_t *palette = console->getPalette(0);
    //Copy the frame from stella to libretro
-   for (unsigned int i = 0; i < videoHeight * videoWidth; ++i)
-      frameBuffer[i] = Palette[tia.currentFrameBuffer()[i]];
+   for (int i = 0; i < videoHeight * videoWidth; ++i)
+      frameBuffer[i] = palette[tia.currentFrameBuffer()[i]];
 
    video_cb(frameBuffer, videoWidth, videoHeight, videoWidth << 2);
 
    //AUDIO
    //Process one frame of audio from stella
-   vcsSound->processFragment((int16_t*)sampleBuffer, tiaSamplesPerFrame);
+   SoundSDL *sound = (SoundSDL*)&osystem.sound();
+   sound->processFragment((int16_t*)sampleBuffer, tiaSamplesPerFrame);
 
    audio_batch_cb((int16_t*)sampleBuffer, tiaSamplesPerFrame);
 }
