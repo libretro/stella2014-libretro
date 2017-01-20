@@ -66,7 +66,7 @@ class NullDevice : public Device
       @param out  The Serializer object to use
       @return  False on any errors, else true
     */
-    Bool save(Serializer& out) const;
+    bool save(Serializer& out) const;
 
     /**
       Load the current state of this device from the given Serializer.
@@ -74,7 +74,7 @@ class NullDevice : public Device
       @param in  The Serializer object to use
       @return  False on any errors, else true
     */
-    Bool load(Serializer& in);
+    bool load(Serializer& in);
 
     /**
       Get a descriptor for the device name (used in error checking).
@@ -99,7 +99,7 @@ class NullDevice : public Device
 
       @return  True if the poke changed the device address space, else false
     */
-    Bool poke(uInt16 address, uInt8 value);
+    bool poke(uInt16 address, uInt8 value);
 };
 
 #endif

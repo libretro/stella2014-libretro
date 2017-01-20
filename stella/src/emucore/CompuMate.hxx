@@ -80,7 +80,7 @@ class CompuMate
       would then be processed by the update handler as if they were
       entered on the CompuMate keyboard.
     */
-    void enableKeyHandling(Bool enable);
+    void enableKeyHandling(bool enable);
 
   private:
     /**
@@ -141,11 +141,11 @@ class CompuMate
     CMControl *myLeftController, *myRightController;
 
     // The keyboard state array (tells us the current state of the keyboard)
-    const Bool* myKeyTable;
+    const bool* myKeyTable;
 
     // Array of keyboard key states when in the debugger (the normal keyboard
     // keys are ignored in such a case)
-    Bool myInternalKeyTable[KBDK_LAST];
+    bool myInternalKeyTable[KBDK_LAST];
 
     // System cycle at which the update() method is called
     // Multiple calls at the same cycle should be ignored

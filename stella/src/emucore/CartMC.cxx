@@ -163,7 +163,7 @@ uInt8 CartridgeMC::peek(uInt16 address)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeMC::poke(uInt16 address, uInt8 value)
+bool CartridgeMC::poke(uInt16 address, uInt8 value)
 {
   address &= 0x1FFF;
 
@@ -210,7 +210,7 @@ Bool CartridgeMC::poke(uInt16 address, uInt8 value)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeMC::bank(uInt16 b)
+bool CartridgeMC::bank(uInt16 b)
 {
   // Doesn't support bankswitching in the normal sense
   return false;
@@ -231,7 +231,7 @@ uInt16 CartridgeMC::bankCount() const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeMC::patch(uInt16 address, uInt8 value)
+bool CartridgeMC::patch(uInt16 address, uInt8 value)
 {
   // TODO - add support for debugger
   return false;
@@ -245,7 +245,7 @@ const uInt8* CartridgeMC::getImage(int& size) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeMC::save(Serializer& out) const
+bool CartridgeMC::save(Serializer& out) const
 {
   try
   {
@@ -267,7 +267,7 @@ Bool CartridgeMC::save(Serializer& out) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeMC::load(Serializer& in)
+bool CartridgeMC::load(Serializer& in)
 {
   try
   {

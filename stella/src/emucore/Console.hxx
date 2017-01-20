@@ -148,7 +148,7 @@ class Console : public Serializable
       @param out The serializer device to save to.
       @return The result of the save.  True on success, false on failure.
     */
-    Bool save(Serializer& out) const;
+    bool save(Serializer& out) const;
 
     /**
       Loads the current state of this console class from the given Serializer.
@@ -156,7 +156,7 @@ class Console : public Serializable
       @param in The Serializer device to load from.
       @return The result of the load.  True on success, false on failure.
     */
-    Bool load(Serializer& in);
+    bool load(Serializer& in);
 
     /**
       Get a descriptor for this console class (used in error checking).
@@ -225,7 +225,7 @@ class Console : public Serializable
       Toggles the PAL color-loss effect.
     */
     void toggleColorLoss();
-    void toggleColorLoss(Bool state);
+    void toggleColorLoss(bool state);
 
     /**
       Initialize the video subsystem wrt this class.
@@ -236,7 +236,7 @@ class Console : public Serializable
 
       @return  The results from FrameBuffer::initialize()
     */
-    FBInitStatus initializeVideo(Bool full = true);
+    FBInitStatus initializeVideo(bool full = true);
 
     /**
       Initialize the audio subsystem wrt this class.
@@ -334,8 +334,8 @@ class Console : public Serializable
     */
     void setColorLossPalette();
 
-    void toggleTIABit(TIABit bit, const string& bitname, Bool show = true) const;
-    void toggleTIACollision(TIABit bit, const string& bitname, Bool show = true) const;
+    void toggleTIABit(TIABit bit, const string& bitname, bool show = true) const;
+    void toggleTIACollision(TIABit bit, const string& bitname, bool show = true) const;
 
   private:
     // Pointer to the osystem object
@@ -380,7 +380,7 @@ class Console : public Serializable
 
     // Indicates whether an external palette was found and
     // successfully loaded
-    Bool myUserPaletteDefined;
+    bool myUserPaletteDefined;
 
     // Contains detailed info about this console
     ConsoleInfo myConsoleInfo;

@@ -62,7 +62,7 @@ Keyboard::~Keyboard()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Keyboard::write(DigitalPin pin, Bool value)
+void Keyboard::write(DigitalPin pin, bool value)
 {
   myDigitalPinState[pin] = value;
 

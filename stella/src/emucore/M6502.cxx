@@ -195,7 +195,7 @@ inline void M6502::poke(uInt16 address, uInt8 value)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool M6502::execute(uInt32 number)
+bool M6502::execute(uInt32 number)
 {
   // Clear all of the execution status bits except for the fatal error bit
   myExecutionStatus &= FatalErrorBit;
@@ -331,7 +331,7 @@ void M6502::interruptHandler()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool M6502::save(Serializer& out) const
+bool M6502::save(Serializer& out) const
 {
   const string& CPU = name();
 
@@ -378,7 +378,7 @@ Bool M6502::save(Serializer& out) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool M6502::load(Serializer& in)
+bool M6502::load(Serializer& in)
 {
   const string& CPU = name();
 

@@ -140,7 +140,7 @@ void TrackBall::update()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool TrackBall::setMouseControl(
+bool TrackBall::setMouseControl(
     Controller::Type xtype, int xid, Controller::Type ytype, int yid)
 {
   // Currently, the various trackball controllers take full control of the

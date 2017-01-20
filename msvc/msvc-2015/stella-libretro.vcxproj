@@ -254,6 +254,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>SOUND_SUPPORT;WIN32;_DEBUG;_WINDOWS;_USRDLL;MSVC2010_EXPORTS;%(PreprocessorDefinitions);__LIBRETRO__;HAVE_INTTYPES</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\stella\stubs;$(ProjectDir)..\..\stella\src\gui;$(ProjectDir)..\..\stella\src\debugger;$(ProjectDir)..\..\stella\src\emucore;$(ProjectDir)..\..\stella\src\common</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4800</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -270,6 +271,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SOUND_SUPPORT;WIN32;_DEBUG;_WINDOWS;_USRDLL;MSVC2010_EXPORTS;%(PreprocessorDefinitions);__LIBRETRO__;HAVE_INTTYPES</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\stella\stubs;$(ProjectDir)..\..\stella\src\gui;$(ProjectDir)..\..\stella\src\debugger;$(ProjectDir)..\..\stella\src\emucore;$(ProjectDir)..\..\stella\src\common</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4800</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -288,6 +290,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>SOUND_SUPPORT;WIN32;NDEBUG;_WINDOWS;_USRDLL;MSVC2010_EXPORTS;%(PreprocessorDefinitions);__LIBRETRO__;HAVE_INTTYPES</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\stella\stubs;$(ProjectDir)..\..\stella\src\gui;$(ProjectDir)..\..\stella\src\debugger;$(ProjectDir)..\..\stella\src\emucore;$(ProjectDir)..\..\stella\src\common</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4800</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -308,6 +311,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SOUND_SUPPORT;WIN32;NDEBUG;_WINDOWS;_USRDLL;MSVC2010_EXPORTS;%(PreprocessorDefinitions);__LIBRETRO__;HAVE_INTTYPES</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\stella\stubs;$(ProjectDir)..\..\stella\src\gui;$(ProjectDir)..\..\stella\src\debugger;$(ProjectDir)..\..\stella\src\emucore;$(ProjectDir)..\..\stella\src\common</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4800</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

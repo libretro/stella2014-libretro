@@ -48,7 +48,7 @@ System::System(uInt16 n, uInt16 m)
 
   // Allocate page table and dirty list
   myPageAccessTable = new PageAccess[myNumberOfPages];
-  myPageIsDirtyTable = new Bool[myNumberOfPages];
+  myPageIsDirtyTable = new bool[myNumberOfPages];
 
   // Initialize page access table
   PageAccess access;
@@ -86,7 +86,7 @@ System::~System()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void System::reset(Bool autodetect)
+void System::reset(bool autodetect)
 {
   // Provide hint to devices that autodetection is active (or not)
   mySystemInAutodetect = autodetect;
@@ -192,7 +192,7 @@ void System::setDirtyPage(uInt16 addr)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool System::isPageDirty(uInt16 start_addr, uInt16 end_addr) const
+bool System::isPageDirty(uInt16 start_addr, uInt16 end_addr) const
 {
   uInt16 start_page = (start_addr & myAddressMask) >> myPageShift;
   uInt16 end_page = (end_addr & myAddressMask) >> myPageShift;
@@ -305,7 +305,7 @@ void System::unlockDataBus()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool System::save(Serializer& out) const
+bool System::save(Serializer& out) const
 {
   try
   {
@@ -331,7 +331,7 @@ Bool System::save(Serializer& out) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool System::load(Serializer& in)
+bool System::load(Serializer& in)
 {
   try
   {

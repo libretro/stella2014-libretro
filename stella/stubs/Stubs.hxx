@@ -1,14 +1,5 @@
 #include <ctime>
-#include <sys/time.h>
 #include "OSystem.hxx"
-
-#if defined(_WIN32)
-#include <windows.h>
-#endif
-#if defined(__CELLOS_LV2__)
-#include <sys/sys_time.h>
-#include <sys/time_util.h>
-#endif
 
 OSystem::OSystem()
 {
@@ -28,13 +19,13 @@ OSystem::~OSystem()
     
 }
 
-Bool OSystem::create() { return 1; }
+bool OSystem::create() { return 1; }
 
 void OSystem::mainLoop() { }
 
 void OSystem::pollEvent() { }
 
-Bool OSystem::queryVideoHardware() { return 1; }
+bool OSystem::queryVideoHardware() { return 1; }
 
 void OSystem::stateChanged(EventHandler::State state) { }
 
@@ -75,7 +66,7 @@ FBInitStatus FrameBuffer::initialize(const string& title, uInt32 width, uInt32 h
 
 void FrameBuffer::refresh() { }
 
-void FrameBuffer::showFrameStats(Bool enable) { }
+void FrameBuffer::showFrameStats(bool enable) { }
 
 // 0 to <counts> - 1, i_s caches the value of counts
 //#define iterateTimes(counts, i) for(unsigned int i = 0, i ## _s = counts; i < (i ## _s); i++)

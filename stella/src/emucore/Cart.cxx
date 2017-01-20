@@ -308,7 +308,7 @@ Cartridge::~Cartridge()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge::save(ofstream& out)
+bool Cartridge::save(ofstream& out)
 {
   int size = -1;
 
@@ -332,9 +332,9 @@ uInt16 Cartridge::startBank()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge::bankChanged()
+bool Cartridge::bankChanged()
 {
-  Bool changed = myBankChanged;
+  bool changed = myBankChanged;
   myBankChanged = false;
   return changed;
 }
@@ -405,7 +405,7 @@ string Cartridge::autodetectType(const uInt8* image, uInt32 size)
   {
     // First check for *potential* F8
     uInt8 signature[] = { 0x8D, 0xF9, 0x1F };  // STA $1FF9
-    Bool f8 = searchForBytes(image, size, signature, 3, 2);
+    bool f8 = searchForBytes(image, size, signature, 3, 2);
 
     if(isProbablySC(image, size))
       type = "F8SC";
@@ -532,7 +532,7 @@ string Cartridge::autodetectType(const uInt8* image, uInt32 size)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge::searchForBytes(const uInt8* image, uInt32 imagesize,
+bool Cartridge::searchForBytes(const uInt8* image, uInt32 imagesize,
                                const uInt8* signature, uInt32 sigsize,
                                uInt32 minhits)
 {
@@ -560,7 +560,7 @@ Bool Cartridge::searchForBytes(const uInt8* image, uInt32 imagesize,
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge::isProbablySC(const uInt8* image, uInt32 size)
+bool Cartridge::isProbablySC(const uInt8* image, uInt32 size)
 {
   // We assume a Superchip cart contains the same bytes for its entire
   // RAM area; obviously this test will fail if it doesn't
@@ -578,7 +578,7 @@ Bool Cartridge::isProbablySC(const uInt8* image, uInt32 size)
   return true;
 }
 
-Bool Cartridge::isProbably4KSC(const uInt8* image, uInt32 size)
+bool Cartridge::isProbably4KSC(const uInt8* image, uInt32 size)
 {
   // We check if the first 256 bytes are identical *and* if there's
   // an "SC" signature for one of our larger SC types at 1FFA.
@@ -596,7 +596,7 @@ Bool Cartridge::isProbably4KSC(const uInt8* image, uInt32 size)
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge::isProbablyARM(const uInt8* image, uInt32 size)
+bool Cartridge::isProbablyARM(const uInt8* image, uInt32 size)
 {
   // ARM code contains the following 'loader' patterns in the first 1K
   // Thanks to Thomas Jentzsch of AtariAge for this advice
@@ -611,7 +611,7 @@ Bool Cartridge::isProbablyARM(const uInt8* image, uInt32 size)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge::isProbably0840(const uInt8* image, uInt32 size)
+bool Cartridge::isProbably0840(const uInt8* image, uInt32 size)
 {
   // 0840 cart bankswitching is triggered by accessing addresses 0x0800
   // or 0x0840 at least twice
@@ -636,7 +636,7 @@ Bool Cartridge::isProbably0840(const uInt8* image, uInt32 size)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge::isProbably3E(const uInt8* image, uInt32 size)
+bool Cartridge::isProbably3E(const uInt8* image, uInt32 size)
 {
   // 3E cart bankswitching is triggered by storing the bank number
   // in address 3E using 'STA $3E', commonly followed by an
@@ -646,7 +646,7 @@ Bool Cartridge::isProbably3E(const uInt8* image, uInt32 size)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge::isProbably3F(const uInt8* image, uInt32 size)
+bool Cartridge::isProbably3F(const uInt8* image, uInt32 size)
 {
   // 3F cart bankswitching is triggered by storing the bank number
   // in address 3F using 'STA $3F'
@@ -657,7 +657,7 @@ Bool Cartridge::isProbably3F(const uInt8* image, uInt32 size)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge::isProbably4A50(const uInt8* image, uInt32 size)
+bool Cartridge::isProbably4A50(const uInt8* image, uInt32 size)
 {
   // 4A50 carts store address $4A50 at the NMI vector, which
   // in this scheme is always in the last page of ROM at
@@ -675,13 +675,13 @@ Bool Cartridge::isProbably4A50(const uInt8* image, uInt32 size)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge::isProbablyCTY(const uInt8* image, uInt32 size)
+bool Cartridge::isProbablyCTY(const uInt8* image, uInt32 size)
 {
   return false;  // TODO - add autodetection
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge::isProbablyCV(const uInt8* image, uInt32 size)
+bool Cartridge::isProbablyCV(const uInt8* image, uInt32 size)
 {
   // CV RAM access occurs at addresses $f3ff and $f400
   // These signatures are attributed to the MESS project
@@ -696,7 +696,7 @@ Bool Cartridge::isProbablyCV(const uInt8* image, uInt32 size)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge::isProbablyDPCplus(const uInt8* image, uInt32 size)
+bool Cartridge::isProbablyDPCplus(const uInt8* image, uInt32 size)
 {
   // DPC+ ARM code has 2 occurrences of the string DPC+
   uInt8 signature[] = { 'D', 'P', 'C', '+' };
@@ -704,7 +704,7 @@ Bool Cartridge::isProbablyDPCplus(const uInt8* image, uInt32 size)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge::isProbablyE0(const uInt8* image, uInt32 size)
+bool Cartridge::isProbablyE0(const uInt8* image, uInt32 size)
 {
   // E0 cart bankswitching is triggered by accessing addresses
   // $FE0 to $FF9 using absolute non-indexed addressing
@@ -730,7 +730,7 @@ Bool Cartridge::isProbablyE0(const uInt8* image, uInt32 size)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge::isProbablyE7(const uInt8* image, uInt32 size)
+bool Cartridge::isProbablyE7(const uInt8* image, uInt32 size)
 {
   // E7 cart bankswitching is triggered by accessing addresses
   // $FE0 to $FE6 using absolute non-indexed addressing
@@ -755,7 +755,7 @@ Bool Cartridge::isProbablyE7(const uInt8* image, uInt32 size)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge::isProbablyEF(const uInt8* image, uInt32 size, const char*& type)
+bool Cartridge::isProbablyEF(const uInt8* image, uInt32 size, const char*& type)
 {
   // Newer EF carts store strings 'EFEF' and 'EFSC' starting at address $FFF8
   // This signature is attributed to "RevEng" of AtariAge
@@ -775,7 +775,7 @@ Bool Cartridge::isProbablyEF(const uInt8* image, uInt32 size, const char*& type)
   // Otherwise, EF cart bankswitching switches banks by accessing addresses
   // 0xFE0 to 0xFEF, usually with either a NOP or LDA
   // It's likely that the code will switch to bank 0, so that's what is tested
-  Bool isEF = false;
+  bool isEF = false;
   uInt8 signature[4][3] = {
     { 0x0C, 0xE0, 0xFF },  // NOP $FFE0
     { 0xAD, 0xE0, 0xFF },  // LDA $FFE0
@@ -803,7 +803,7 @@ Bool Cartridge::isProbablyEF(const uInt8* image, uInt32 size, const char*& type)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge::isProbablyBF(const uInt8* image, uInt32 size, const char*& type)
+bool Cartridge::isProbablyBF(const uInt8* image, uInt32 size, const char*& type)
 {
   // BF carts store strings 'BFBF' and 'BFSC' starting at address $FFF8
   // This signature is attributed to "RevEng" of AtariAge
@@ -824,7 +824,7 @@ Bool Cartridge::isProbablyBF(const uInt8* image, uInt32 size, const char*& type)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge::isProbablyDF(const uInt8* image, uInt32 size, const char*& type)
+bool Cartridge::isProbablyDF(const uInt8* image, uInt32 size, const char*& type)
 {
 
   // BF carts store strings 'DFDF' and 'DFSC' starting at address $FFF8
@@ -847,7 +847,7 @@ Bool Cartridge::isProbablyDF(const uInt8* image, uInt32 size, const char*& type)
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge::isProbablyFA2(const uInt8* image, uInt32 size)
+bool Cartridge::isProbablyFA2(const uInt8* image, uInt32 size)
 {
   // This currently tests only the 32K version of FA2; the 24 and 28K
   // versions are easy, in that they're the only possibility with those
@@ -862,7 +862,7 @@ Bool Cartridge::isProbablyFA2(const uInt8* image, uInt32 size)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge::isProbablyFE(const uInt8* image, uInt32 size)
+bool Cartridge::isProbablyFE(const uInt8* image, uInt32 size)
 {
   // FE bankswitching is very weird, but always seems to include a
   // 'JSR $xxxx'
@@ -881,7 +881,7 @@ Bool Cartridge::isProbablyFE(const uInt8* image, uInt32 size)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge::isProbablySB(const uInt8* image, uInt32 size)
+bool Cartridge::isProbablySB(const uInt8* image, uInt32 size)
 {
   // SB cart bankswitching switches banks by accessing address 0x0800
   uInt8 signature[2][3] = {
@@ -895,7 +895,7 @@ Bool Cartridge::isProbablySB(const uInt8* image, uInt32 size)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge::isProbablyUA(const uInt8* image, uInt32 size)
+bool Cartridge::isProbablyUA(const uInt8* image, uInt32 size)
 {
   // UA cart bankswitching switches to bank 1 by accessing address 0x240
   // using 'STA $240' or 'LDA $240'
@@ -912,7 +912,7 @@ Bool Cartridge::isProbablyUA(const uInt8* image, uInt32 size)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge::isProbablyX07(const uInt8* image, uInt32 size)
+bool Cartridge::isProbablyX07(const uInt8* image, uInt32 size)
 {
   // X07 bankswitching switches to bank 0, 1, 2, etc by accessing address 0x08xd
   uInt8 signature[6][3] = {

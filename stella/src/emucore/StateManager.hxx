@@ -59,7 +59,7 @@ class StateManager
 
       @return  False on any load errors, else true
     */
-    Bool loadState(Serializer& in);
+    bool loadState(Serializer& in);
 
     /**
       Save the current state from the system into the given Serializer.
@@ -69,7 +69,7 @@ class StateManager
 
       @return  False on any save errors, else true
     */
-    Bool saveState(Serializer& out);
+    bool saveState(Serializer& out);
 
     /**
       Resets manager to defaults

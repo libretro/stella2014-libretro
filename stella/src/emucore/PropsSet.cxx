@@ -69,7 +69,7 @@ void PropertiesSet::load(const string& filename)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool PropertiesSet::save(const string& filename) const
+bool PropertiesSet::save(const string& filename) const
 {
   ofstream out(filename.c_str(), ios::out);
   if(!out)
@@ -84,11 +84,11 @@ Bool PropertiesSet::save(const string& filename) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool PropertiesSet::getMD5(const string& md5, Properties& properties,
-                           Bool useDefaults) const
+bool PropertiesSet::getMD5(const string& md5, Properties& properties,
+                           bool useDefaults) const
 {
   properties.setDefaults();
-  Bool found = false;
+  bool found = false;
 
   // There are three lists to search when looking for a properties entry,
   // which must be done in the following order
@@ -162,7 +162,7 @@ Bool PropertiesSet::getMD5(const string& md5, Properties& properties,
 //}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void PropertiesSet::insert(const Properties& properties, Bool save)
+void PropertiesSet::insert(const Properties& properties, bool save)
 {
   // Note that the following code is optimized for insertion when an item
   // doesn't already exist, and when the external properties file is
@@ -181,7 +181,7 @@ void PropertiesSet::insert(const Properties& properties, Bool save)
   // The status of 'save' determines which list to save to
   PropsList& list = save ? myExternalProps : myTempProps;
 
-  pair<PropsList::iterator,Bool> ret;
+  pair<PropsList::iterator,bool> ret;
   ret = list.insert(make_pair(md5, properties));
   if(ret.second == false)
   {

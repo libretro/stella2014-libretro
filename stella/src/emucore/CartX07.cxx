@@ -95,7 +95,7 @@ uInt8 CartridgeX07::peek(uInt16 address)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeX07::poke(uInt16 address, uInt8 value)
+bool CartridgeX07::poke(uInt16 address, uInt8 value)
 {
   // Check for RAM or TIA mirroring
   uInt16 lowAddress = address & 0x3ff;
@@ -116,7 +116,7 @@ Bool CartridgeX07::poke(uInt16 address, uInt8 value)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeX07::bank(uInt16 bank)
+bool CartridgeX07::bank(uInt16 bank)
 { 
   if(bankLocked()) return false;
 
@@ -151,7 +151,7 @@ uInt16 CartridgeX07::bankCount() const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeX07::patch(uInt16 address, uInt8 value)
+bool CartridgeX07::patch(uInt16 address, uInt8 value)
 {
   myImage[(myCurrentBank << 12) + (address & 0x0FFF)] = value;
   return myBankChanged = true;
@@ -165,7 +165,7 @@ const uInt8* CartridgeX07::getImage(int& size) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeX07::save(Serializer& out) const
+bool CartridgeX07::save(Serializer& out) const
 {
    out.putString(name());
    out.putShort(myCurrentBank);
@@ -174,7 +174,7 @@ Bool CartridgeX07::save(Serializer& out) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeX07::load(Serializer& in)
+bool CartridgeX07::load(Serializer& in)
 {
    if(in.getString() != name())
       return false;

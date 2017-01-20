@@ -136,7 +136,7 @@ class Controller : public Serializable
       @param pin The pin of the controller jack to read
       @return The state of the pin
     */
-    virtual Bool read(DigitalPin pin);
+    virtual bool read(DigitalPin pin);
 
     /**
       Read the resistance at the specified analog pin for this controller.  
@@ -155,7 +155,7 @@ class Controller : public Serializable
       @param pin The pin of the controller jack to write to
       @param value The value to write to the pin
     */
-    virtual void write(DigitalPin pin, Bool value) { };
+    virtual void write(DigitalPin pin, bool value) { };
 
     /**
       Called after *all* digital pins have been written on Port A.
@@ -194,7 +194,7 @@ class Controller : public Serializable
 
       @return  Whether the controller supports using the mouse
     */
-    virtual Bool setMouseControl(
+    virtual bool setMouseControl(
       Controller::Type xtype, int xid, Controller::Type ytype, int yid)
     { return false; }
 
@@ -217,7 +217,7 @@ class Controller : public Serializable
       @param pin The pin of the controller jack to modify
       @param value The value to set on the pin
     */
-    void set(DigitalPin pin, Bool value);
+    void set(DigitalPin pin, bool value);
     void set(AnalogPin pin, Int32 value);
 
     /**
@@ -226,7 +226,7 @@ class Controller : public Serializable
       @param out The serializer device to save to.
       @return The result of the save.  True on success, false on failure.
     */
-    Bool save(Serializer& out) const;
+    bool save(Serializer& out) const;
 
     /**
       Loads the current state of this controller from the given Serializer.
@@ -234,7 +234,7 @@ class Controller : public Serializable
       @param in The serializer device to load from.
       @return The result of the load.  True on success, false on failure.
     */
-    Bool load(Serializer& in);
+    bool load(Serializer& in);
 
   public:
     /// Constant which represents maximum resistance for analog pins
@@ -260,7 +260,7 @@ class Controller : public Serializable
     string myName;
 
     /// The boolean value on each digital pin
-    Bool myDigitalPinState[5];
+    bool myDigitalPinState[5];
 
     /// The analog value on each analog pin
     Int32 myAnalogPinValue[2];

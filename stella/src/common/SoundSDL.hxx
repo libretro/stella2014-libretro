@@ -54,7 +54,7 @@ class SoundSDL : public Sound
 
       @param state  True or false, to enable or disable the sound system
     */
-    void setEnabled(Bool state);
+    void setEnabled(bool state);
 
     /**
       The system cycle counter is being adjusting by the specified amount. Any
@@ -100,7 +100,7 @@ class SoundSDL : public Sound
 
       @param state  Mutes sound if true, unmute if false
     */
-    void mute(Bool state);
+    void mute(bool state);
 
     /**
       Reset the sound device.
@@ -140,7 +140,7 @@ class SoundSDL : public Sound
       @param out  The serializer device to save to.
       @return  The result of the save.  True on success, false on failure.
     */
-    Bool save(Serializer& out) const;
+    bool save(Serializer& out) const;
 
     /**
       Loads the current state of this device from the given Serializer.
@@ -148,7 +148,7 @@ class SoundSDL : public Sound
       @param in  The Serializer device to load from.
       @return  The result of the load.  True on success, false on failure.
     */
-    Bool load(Serializer& in);
+    bool load(Serializer& in);
 
     /**
       Get a descriptor for this console class (used in error checking).
@@ -248,10 +248,10 @@ class SoundSDL : public Sound
     TIASound myTIASound;
 
     // Indicates if the sound subsystem is to be initialized
-    Bool myIsEnabled;
+    bool myIsEnabled;
 
     // Indicates if the sound device was successfully initialized
-    Bool myIsInitializedFlag;
+    bool myIsInitializedFlag;
 
     // Indicates the cycle when a sound register was last set
     Int32 myLastRegisterSetCycle;
@@ -260,7 +260,7 @@ class SoundSDL : public Sound
     uInt32 myNumChannels;
 
     // Indicates if the sound is currently muted
-    Bool myIsMuted;
+    bool myIsMuted;
 
     // Current volume as a percentage (0 - 100)
     uInt32 myVolume;

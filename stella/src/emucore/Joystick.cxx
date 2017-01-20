@@ -120,7 +120,7 @@ void Joystick::update()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Joystick::setMouseControl(
+bool Joystick::setMouseControl(
     Controller::Type xtype, int xid, Controller::Type ytype, int yid)
 {
   // Currently, the joystick takes full control of the mouse, using both

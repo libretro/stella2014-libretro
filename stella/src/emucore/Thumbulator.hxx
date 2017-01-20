@@ -62,7 +62,7 @@
 class Thumbulator
 {
   public:
-    Thumbulator(const uInt16* rom, uInt16* ram, Bool traponfatal);
+    Thumbulator(const uInt16* rom, uInt16* ram, bool traponfatal);
     ~Thumbulator();
 
     /**
@@ -87,7 +87,7 @@ class Thumbulator
 
       @param enable  Enable (the default) or disable exceptions on fatal errors
     */
-    static void trapFatalErrors(Bool enable) { trapOnFatal = enable; }
+    static void trapFatalErrors(bool enable) { trapOnFatal = enable; }
 
   private:
     uInt32 read_register ( uInt32 reg );
@@ -141,7 +141,7 @@ class Thumbulator
 
     ostringstream statusMsg;
 
-    static Bool trapOnFatal;
+    static bool trapOnFatal;
 };
 
 #endif

@@ -3075,7 +3075,7 @@ case 0x2a:
   peek(PC, DISASM_NONE);
 }
 {
-  Bool oldC = C;
+  bool oldC = C;
 
   // Set carry flag according to the left-most bit
   C = A & 0x80;
@@ -3095,7 +3095,7 @@ case 0x26:
   poke(operandAddress, operand);
 }
 {
-  Bool oldC = C;
+  bool oldC = C;
 
   // Set carry flag according to the left-most bit in operand
   C = operand & 0x80;
@@ -3117,7 +3117,7 @@ case 0x36:
   poke(operandAddress, operand);
 }
 {
-  Bool oldC = C;
+  bool oldC = C;
 
   // Set carry flag according to the left-most bit in operand
   C = operand & 0x80;
@@ -3138,7 +3138,7 @@ case 0x2e:
   poke(operandAddress, operand);
 }
 {
-  Bool oldC = C;
+  bool oldC = C;
 
   // Set carry flag according to the left-most bit in operand
   C = operand & 0x80;
@@ -3161,7 +3161,7 @@ case 0x3e:
   poke(operandAddress, operand);
 }
 {
-  Bool oldC = C;
+  bool oldC = C;
 
   // Set carry flag according to the left-most bit in operand
   C = operand & 0x80;
@@ -3180,7 +3180,7 @@ case 0x6a:
   peek(PC, DISASM_NONE);
 }
 {
-  Bool oldC = C;
+  bool oldC = C;
 
   // Set carry flag according to the right-most bit
   C = A & 0x01;
@@ -3199,7 +3199,7 @@ case 0x66:
   poke(operandAddress, operand);
 }
 {
-  Bool oldC = C;
+  bool oldC = C;
 
   // Set carry flag according to the right-most bit
   C = operand & 0x01;
@@ -3221,7 +3221,7 @@ case 0x76:
   poke(operandAddress, operand);
 }
 {
-  Bool oldC = C;
+  bool oldC = C;
 
   // Set carry flag according to the right-most bit
   C = operand & 0x01;
@@ -3242,7 +3242,7 @@ case 0x6e:
   poke(operandAddress, operand);
 }
 {
-  Bool oldC = C;
+  bool oldC = C;
 
   // Set carry flag according to the right-most bit
   C = operand & 0x01;
@@ -3265,7 +3265,7 @@ case 0x7e:
   poke(operandAddress, operand);
 }
 {
-  Bool oldC = C;
+  bool oldC = C;
 
   // Set carry flag according to the right-most bit
   C = operand & 0x01;
@@ -3287,7 +3287,7 @@ case 0x6f:
   poke(operandAddress, operand);
 }
 {
-  Bool oldC = C;
+  bool oldC = C;
 
   // Set carry flag according to the right-most bit
   C = operand & 0x01;
@@ -3336,7 +3336,7 @@ case 0x7f:
   poke(operandAddress, operand);
 }
 {
-  Bool oldC = C;
+  bool oldC = C;
 
   // Set carry flag according to the right-most bit
   C = operand & 0x01;
@@ -3385,7 +3385,7 @@ case 0x7b:
   poke(operandAddress, operand);
 }
 {
-  Bool oldC = C;
+  bool oldC = C;
 
   // Set carry flag according to the right-most bit
   C = operand & 0x01;
@@ -3431,7 +3431,7 @@ case 0x67:
   poke(operandAddress, operand);
 }
 {
-  Bool oldC = C;
+  bool oldC = C;
 
   // Set carry flag according to the right-most bit
   C = operand & 0x01;
@@ -3479,7 +3479,7 @@ case 0x77:
   poke(operandAddress, operand);
 }
 {
-  Bool oldC = C;
+  bool oldC = C;
 
   // Set carry flag according to the right-most bit
   C = operand & 0x01;
@@ -3529,7 +3529,7 @@ case 0x63:
   poke(operandAddress, operand);
 }
 {
-  Bool oldC = C;
+  bool oldC = C;
 
   // Set carry flag according to the right-most bit
   C = operand & 0x01;
@@ -3579,7 +3579,7 @@ case 0x73:
   poke(operandAddress, operand);
 }
 {
-  Bool oldC = C;
+  bool oldC = C;
 
   // Set carry flag according to the right-most bit
   C = operand & 0x01;

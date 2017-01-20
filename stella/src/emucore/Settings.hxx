@@ -90,7 +90,7 @@ class Settings
     */
     int getInt(const string& key) const     { return value(key).toInt();   }
     float getFloat(const string& key) const { return value(key).toFloat(); }
-    Bool getBool(const string& key) const   { return value(key).toBool();  }
+    bool getBool(const string& key) const   { return value(key).toBool();  }
     const string& getString(const string& key) const { return value(key).toString(); }
     const GUI::Size getSize(const string& key) const { return value(key).toSize();   }
 
@@ -133,9 +133,9 @@ class Settings
 
     /** Add key,value pair to specified array at specified position */
     int setInternal(const string& key, const Variant& value,
-                    int pos = -1, Bool useAsInitial = false);
+                    int pos = -1, bool useAsInitial = false);
     int setExternal(const string& key, const Variant& value,
-                    int pos = -1, Bool useAsInitial = false);
+                    int pos = -1, bool useAsInitial = false);
 
   private:
     // Holds key,value pairs that are necessary for Stella to

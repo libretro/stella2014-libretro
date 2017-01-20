@@ -116,7 +116,7 @@ uInt8 Cartridge4KSC::peek(uInt16 address)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge4KSC::poke(uInt16 address, uInt8)
+bool Cartridge4KSC::poke(uInt16 address, uInt8)
 {
   // NOTE: This does not handle accessing RAM, however, this function
   // should never be called for RAM because of the way page accessing
@@ -125,7 +125,7 @@ Bool Cartridge4KSC::poke(uInt16 address, uInt8)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge4KSC::bank(uInt16 bank)
+bool Cartridge4KSC::bank(uInt16 bank)
 { 
   // Doesn't support bankswitching
   return false;
@@ -144,7 +144,7 @@ uInt16 Cartridge4KSC::bankCount() const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge4KSC::patch(uInt16 address, uInt8 value)
+bool Cartridge4KSC::patch(uInt16 address, uInt8 value)
 {
   address &= 0x0FFF;
 
@@ -169,7 +169,7 @@ const uInt8* Cartridge4KSC::getImage(int& size) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge4KSC::save(Serializer& out) const
+bool Cartridge4KSC::save(Serializer& out) const
 {
    out.putString(name());
    out.putShort(myCurrentBank);
@@ -179,7 +179,7 @@ Bool Cartridge4KSC::save(Serializer& out) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge4KSC::load(Serializer& in)
+bool Cartridge4KSC::load(Serializer& in)
 {
    if(in.getString() != name())
       return false;

@@ -68,7 +68,7 @@ void TIASound::outputFrequency(Int32 freq)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-string TIASound::channels(uInt32 hardware, Bool stereo)
+string TIASound::channels(uInt32 hardware, bool stereo)
 {
   if(hardware == 1)
     myChannelMode = Hardware1;

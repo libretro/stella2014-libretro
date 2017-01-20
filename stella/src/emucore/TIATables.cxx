@@ -608,7 +608,7 @@ const Int16 TIATables::PokeDelay[64] = {
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const Bool TIATables::HMOVEBlankEnableCycles[76] = {
+const bool TIATables::HMOVEBlankEnableCycles[76] = {
   true,  true,  true,  true,  true,  true,  true,  true,  true,  true,   // 00
   true,  true,  true,  true,  true,  true,  true,  true,  true,  true,   // 10
   true,  false, false, false, false, false, false, false, false, false,  // 20

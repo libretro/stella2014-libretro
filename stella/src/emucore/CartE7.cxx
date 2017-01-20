@@ -145,7 +145,7 @@ uInt8 CartridgeE7::peek(uInt16 address)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeE7::poke(uInt16 address, uInt8)
+bool CartridgeE7::poke(uInt16 address, uInt8)
 {
   address &= 0x0FFF;
 
@@ -199,7 +199,7 @@ void CartridgeE7::bankRAM(uInt16 bank)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeE7::bank(uInt16 slice)
+bool CartridgeE7::bank(uInt16 slice)
 { 
   if(bankLocked()) return false;
 
@@ -259,7 +259,7 @@ uInt16 CartridgeE7::bankCount() const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeE7::patch(uInt16 address, uInt8 value)
+bool CartridgeE7::patch(uInt16 address, uInt8 value)
 {
   address = address & 0x0FFF;
 
@@ -296,7 +296,7 @@ const uInt8* CartridgeE7::getImage(int& size) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeE7::save(Serializer& out) const
+bool CartridgeE7::save(Serializer& out) const
 {
    out.putString(name());
    out.putShortArray(myCurrentSlice, 2);
@@ -307,7 +307,7 @@ Bool CartridgeE7::save(Serializer& out) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeE7::load(Serializer& in)
+bool CartridgeE7::load(Serializer& in)
 {
    if(in.getString() != name())
       return false;

@@ -165,17 +165,17 @@ class SharedPtr
     Pointer get() const { return _pointer; }
 
     /**
-     * Implicit conversion operator to Bool for convenience, to make
+     * Implicit conversion operator to bool for convenience, to make
      * checks like "if (sharedPtr) ..." possible.
      */
-    operator Bool() const { return _pointer != 0; }
+    operator bool() const { return _pointer != 0; }
 
     /**
      * Checks if the SharedPtr object is the only object refering
      * to the assigned pointer. This should just be used for
      * debugging purposes.
      */
-    Bool unique() const { return refCount() == 1; }
+    bool unique() const { return refCount() == 1; }
 
     /**
      * Returns the number of references to the assigned pointer.
@@ -209,12 +209,12 @@ class SharedPtr
 } // end of namespace Common
 
 template<class T1, class T2>
-Bool operator ==(const Common::SharedPtr<T1> &l, const Common::SharedPtr<T2> &r) {
+bool operator ==(const Common::SharedPtr<T1> &l, const Common::SharedPtr<T2> &r) {
   return l.get() == r.get();
 }
 
 template<class T1, class T2>
-Bool operator !=(const Common::SharedPtr<T1> &l, const Common::SharedPtr<T2> &r) {
+bool operator !=(const Common::SharedPtr<T1> &l, const Common::SharedPtr<T2> &r) {
   return l.get() != r.get();
 }
 

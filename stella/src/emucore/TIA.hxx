@@ -106,7 +106,7 @@ class TIA : public Device
       @param out  The Serializer object to use
       @return  False on any errors, else true
     */
-    Bool save(Serializer& out) const;
+    bool save(Serializer& out) const;
 
     /**
       Load the current state of this device from the given Serializer.
@@ -114,7 +114,7 @@ class TIA : public Device
       @param in  The Serializer object to use
       @return  False on any errors, else true
     */
-    Bool load(Serializer& in);
+    bool load(Serializer& in);
 
     /**
       The following are very similar to save() and load(), except they
@@ -135,8 +135,8 @@ class TIA : public Device
       more information.  The methods below save/load this extra info,
       and eliminate having to save approx. 50K to normal state files.
     */
-    Bool saveDisplay(Serializer& out) const;
-    Bool loadDisplay(Serializer& in);
+    bool saveDisplay(Serializer& out) const;
+    bool loadDisplay(Serializer& in);
 
     /**
       Get a descriptor for the device name (used in error checking).
@@ -160,7 +160,7 @@ class TIA : public Device
 
       @return  True if the poke changed the device address space, else false
     */
-    Bool poke(uInt16 address, uInt8 value);
+    bool poke(uInt16 address, uInt8 value);
 
     /**
       This method should be called at an interval corresponding to the 
@@ -206,21 +206,21 @@ class TIA : public Device
 
       @param mode  Whether to enable or disable all auto-frame calculation
     */
-    void enableAutoFrame(Bool mode) { myAutoFrameEnabled = mode; }
+    void enableAutoFrame(bool mode) { myAutoFrameEnabled = mode; }
 
     /**
       Enables/disables color-loss for PAL modes only.
 
       @param mode  Whether to enable or disable PAL color-loss mode
     */
-    void enableColorLoss(Bool mode)
+    void enableColorLoss(bool mode)
       { myColorLossEnabled = myFramerate <= 55 ? mode : false; }
 
     /**
       Answers whether this TIA runs at NTSC or PAL scanrates,
       based on how many frames of out the total count are PAL frames.
     */
-    Bool isPAL()
+    bool isPAL()
       { return float(myPALFrameCounter) / myFrameCounter >= (25.0/60.0); }
 
     uInt64 getMilliSeconds() const {
@@ -260,7 +260,7 @@ class TIA : public Device
 
       @return If we're in partial frame mode
     */
-    Bool partialFrame() const { return myPartialFrameFlag; }
+    bool partialFrame() const { return myPartialFrameFlag; }
 
     /**
       Answers the first scanline at which drawing occured in the last frame.
@@ -279,7 +279,7 @@ class TIA : public Device
       @return The x/y coordinates of the scanline electron beam, and whether
               it is in the visible/viewable area of the screen
     */
-    Bool scanlinePos(uInt16& x, uInt16& y) const;
+    bool scanlinePos(uInt16& x, uInt16& y) const;
 
     /**
       Enables/disable/toggle the specified (or all) TIA bit(s).  Note that
@@ -290,8 +290,8 @@ class TIA : public Device
 
       @return  Whether the bit was enabled or disabled
     */
-    Bool toggleBit(TIABit b, uInt8 mode = 2);
-    Bool toggleBits();
+    bool toggleBit(TIABit b, uInt8 mode = 2);
+    bool toggleBits();
 
     /**
       Enables/disable/toggle the specified (or all) TIA bit collision(s).
@@ -301,15 +301,15 @@ class TIA : public Device
 
       @return  Whether the collision was enabled or disabled
     */
-    Bool toggleCollision(TIABit b, uInt8 mode = 2);
-    Bool toggleCollisions();
+    bool toggleCollision(TIABit b, uInt8 mode = 2);
+    bool toggleCollisions();
 
     /**
       Toggle the display of HMOVE blanks.
 
       @return  Whether the HMOVE blanking was enabled or disabled
     */
-    Bool toggleHMOVEBlank();
+    bool toggleHMOVEBlank();
 
     /**
       Enables/disable/toggle 'fixed debug colors' mode.
@@ -319,7 +319,7 @@ class TIA : public Device
 
       @return  Whether the mode was enabled or disabled
     */
-    Bool toggleFixedColors(uInt8 mode = 2);
+    bool toggleFixedColors(uInt8 mode = 2);
 
     /**
       Enable/disable/query state of 'undriven/floating TIA pins'.
@@ -328,7 +328,7 @@ class TIA : public Device
 
       @return  Whether the mode was enabled or disabled
     */
-    Bool driveUnusedPinsRandom(uInt8 mode = 2);
+    bool driveUnusedPinsRandom(uInt8 mode = 2);
 
 #ifdef DEBUGGER_SUPPORT
     /**
@@ -356,14 +356,14 @@ class TIA : public Device
 
       @param mode  Whether to enable or disable all bits
     */
-    void enableBits(Bool mode);
+    void enableBits(bool mode);
 
     /**
       Enables/disables all TIABit collisions.
 
       @param mode  Whether to enable or disable all collisions
     */
-    void enableCollisions(Bool mode);
+    void enableCollisions(bool mode);
 
     // Update the current frame buffer to the specified color clock
     void updateFrame(Int32 clock);
@@ -479,8 +479,8 @@ class TIA : public Device
 
     uInt8 myCTRLPF;       // Playfield control register
 
-    Bool myREFP0;         // Indicates if player 0 is being reflected
-    Bool myREFP1;         // Indicates if player 1 is being reflected
+    bool myREFP0;         // Indicates if player 0 is being reflected
+    bool myREFP1;         // Indicates if player 1 is being reflected
 
     uInt32 myPF;          // Playfield graphics (19-12:PF2 11-4:PF1 3-0:PF0)
 
@@ -490,11 +490,11 @@ class TIA : public Device
     uInt8 myDGRP0;        // Player 0 delayed graphics register
     uInt8 myDGRP1;        // Player 1 delayed graphics register
 
-    Bool myENAM0;         // Indicates if missle 0 is enabled
-    Bool myENAM1;         // Indicates if missle 1 is enabled
+    bool myENAM0;         // Indicates if missle 0 is enabled
+    bool myENAM1;         // Indicates if missle 1 is enabled
 
-    Bool myENABL;         // Indicates if the ball is enabled
-    Bool myDENABL;        // Indicates if the vertically delayed ball is enabled
+    bool myENABL;         // Indicates if the ball is enabled
+    bool myDENABL;        // Indicates if the vertically delayed ball is enabled
 
     uInt8 myHMP0;         // Player 0 horizontal motion register
     uInt8 myHMP1;         // Player 1 horizontal motion register
@@ -502,12 +502,12 @@ class TIA : public Device
     uInt8 myHMM1;         // Missle 1 horizontal motion register
     uInt8 myHMBL;         // Ball horizontal motion register
 
-    Bool myVDELP0;        // Indicates if player 0 is being vertically delayed
-    Bool myVDELP1;        // Indicates if player 1 is being vertically delayed
-    Bool myVDELBL;        // Indicates if the ball is being vertically delayed
+    bool myVDELP0;        // Indicates if player 0 is being vertically delayed
+    bool myVDELP1;        // Indicates if player 1 is being vertically delayed
+    bool myVDELBL;        // Indicates if the ball is being vertically delayed
 
-    Bool myRESMP0;        // Indicates if missle 0 is reset to player 0
-    Bool myRESMP1;        // Indicates if missle 1 is reset to player 1
+    bool myRESMP0;        // Indicates if missle 0 is reset to player 0
+    bool myRESMP1;        // Indicates if missle 1 is reset to player 1
 
     uInt16 myCollision;     // Collision register
 
@@ -550,11 +550,11 @@ class TIA : public Device
 
     // Latches for 'more motion required' as described in A. Towers TIA
     // Hardware Notes
-    Bool myHMP0mmr;
-    Bool myHMP1mmr;
-    Bool myHMM0mmr;
-    Bool myHMM1mmr;
-    Bool myHMBLmmr;
+    bool myHMP0mmr;
+    bool myHMP1mmr;
+    bool myHMM0mmr;
+    bool myHMM1mmr;
+    bool myHMBLmmr;
 
     // Graphics for Player 0 that should be displayed.  This will be
     // reflected if the player is being reflected.
@@ -581,7 +581,7 @@ class TIA : public Device
     Int32 myDumpDisabledCycle;
 
     // Indicates if the dump is current enabled for the paddles
-    Bool myDumpEnabled;
+    bool myDumpEnabled;
 
     // Latches for INPT4 and INPT5
     uInt8 myINPT4, myINPT5;
@@ -590,12 +590,12 @@ class TIA : public Device
     // and at which horizontal position the HMOVE was initiated
     Int32 myCurrentHMOVEPos;
     Int32 myPreviousHMOVEPos;
-    Bool myHMOVEBlankEnabled;
-    Bool myAllowHMOVEBlanks;
+    bool myHMOVEBlankEnabled;
+    bool myAllowHMOVEBlanks;
 
     // Indicates if unused TIA pins are randomly driven high or low
     // Otherwise, they take on the value previously on the databus
-    Bool myTIAPinsDriven;
+    bool myTIAPinsDriven;
 
     // Bitmap of the objects that should be considered while drawing
     uInt8 myEnabledObjects;
@@ -608,14 +608,14 @@ class TIA : public Device
     // Indicates if color loss should be enabled or disabled.  Color loss
     // occurs on PAL (and maybe SECAM) systems when the previous frame
     // contains an odd number of scanlines.
-    Bool myColorLossEnabled;
+    bool myColorLossEnabled;
 
     // Indicates whether we're done with the current frame. poke() clears this
     // when VSYNC is strobed or the max scanlines/frame limit is hit.
-    Bool myPartialFrameFlag;
+    bool myPartialFrameFlag;
 
     // Automatic framerate correction based on number of scanlines
-    Bool myAutoFrameEnabled;
+    bool myAutoFrameEnabled;
 
     // Number of total frames displayed by this TIA
     uInt32 myFrameCounter;
@@ -627,7 +627,7 @@ class TIA : public Device
     float myFramerate;
 
     // Whether TIA bits/collisions are currently enabled/disabled
-    Bool myBitsEnabled, myCollisionsEnabled;
+    bool myBitsEnabled, myCollisionsEnabled;
 
   private:
     // Copy constructor isn't supported by this class so make it private

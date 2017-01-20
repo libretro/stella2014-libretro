@@ -49,20 +49,20 @@ uInt8 NullDevice::peek(uInt16 address)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool NullDevice::poke(uInt16 address, uInt8 value)
+bool NullDevice::poke(uInt16 address, uInt8 value)
 {
   cerr << hex << "NullDevice: poke(" << address << "," << value << ")" << endl;
   return false;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool NullDevice::save(Serializer& out) const
+bool NullDevice::save(Serializer& out) const
 {
   return true;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool NullDevice::load(Serializer& in)
+bool NullDevice::load(Serializer& in)
 {
   return true;
 }

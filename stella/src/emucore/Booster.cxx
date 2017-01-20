@@ -129,7 +129,7 @@ void BoosterGrip::update()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool BoosterGrip::setMouseControl(
+bool BoosterGrip::setMouseControl(
     Controller::Type xtype, int xid, Controller::Type ytype, int yid)
 {
   // Currently, the booster-grip takes full control of the mouse, using both

@@ -52,7 +52,7 @@ class Sound : public Serializable
 
       @param enable  Either true or false, to enable or disable the sound system
     */
-    virtual void setEnabled(Bool enable) = 0;
+    virtual void setEnabled(bool enable) = 0;
 
     /**
       The system cycle counter is being adjusting by the specified amount.  Any
@@ -94,7 +94,7 @@ class Sound : public Serializable
 
       @param state Mutes sound if true, unmute if false
     */
-    virtual void mute(Bool state) = 0;
+    virtual void mute(bool state) = 0;
 
     /**
       Reset the sound device.

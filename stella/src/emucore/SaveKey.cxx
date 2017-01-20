@@ -40,7 +40,7 @@ SaveKey::~SaveKey()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool SaveKey::read(DigitalPin pin)
+bool SaveKey::read(DigitalPin pin)
 {
   // We need to override the Controller::read() method, since the timing
   // of the actual read is important for the EEPROM (we can't just read
@@ -58,7 +58,7 @@ Bool SaveKey::read(DigitalPin pin)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SaveKey::write(DigitalPin pin, Bool value)
+void SaveKey::write(DigitalPin pin, bool value)
 {
   // Change the pin state based on value
   switch(pin)

@@ -132,7 +132,7 @@ void Properties::load(istream& in)
 void Properties::save(ostream& out) const
 {
   // Write out each of the key and value pairs
-  Bool changed = false;
+  bool changed = false;
   for(int i = 0; i < LastPropType; ++i)
   {
     // Try to save some space by only saving the items that differ from default

@@ -71,13 +71,13 @@ class FrameBuffer
     /**
       Shows a message containing frame statistics for the current frame.
     */
-    void showFrameStats(Bool enable);
+    void showFrameStats(bool enable);
 
     /**
       Enable/disable any pending messages.  Disabled messages aren't removed
       from the message queue; they're just not redrawn into the framebuffer.
     */
-    void enableMessages(Bool enable);
+    void enableMessages(bool enable);
 
     /**
       Allocate a new surface with a unique ID.  The FrameBuffer class takes
@@ -90,7 +90,7 @@ class FrameBuffer
 
       @return  A unique ID used to identify this surface
     */
-    int allocateSurface(int w, int h, Bool useBase = false);
+    int allocateSurface(int w, int h, bool useBase = false);
 
     /**
       Refresh display according to the current state, taking single vs.
@@ -110,7 +110,7 @@ class FrameBuffer
 
       @param enable  Set the fullscreen mode to this value
     */
-    void setFullscreen(Bool enable);
+    void setFullscreen(bool enable);
 
     /**
       This method is called when the user wants to switch to the next available
@@ -121,7 +121,7 @@ class FrameBuffer
 
       @param direction  Described above
     */
-    Bool changeVidMode(int direction);
+    bool changeVidMode(int direction);
 
     /**
       Sets the state of the cursor (hidden or grabbed) based on the
@@ -138,12 +138,12 @@ class FrameBuffer
     /**
       Shows or hides the cursor based on the given boolean value.
     */
-    void showCursor(Bool show);
+    void showCursor(bool show);
 
     /**
       Answers if the display is currently in fullscreen mode.
     */
-    Bool fullScreen() const;
+    bool fullScreen() const;
 
     /**
       Set the title for the main SDL window.
@@ -180,7 +180,7 @@ class FrameBuffer
     */
     void showMessage(const string& message,
                      int position = 0,
-                     Bool force = false,
+                     bool force = false,
                      uInt32 color = 0) { };
 
   //////////////////////////////////////////////////////////////////////
@@ -191,7 +191,7 @@ class FrameBuffer
     /**
       Enable/disable phosphor effect.
     */
-    void enablePhosphor(Bool enable, int blend) { }
+    void enablePhosphor(bool enable, int blend) { }
 
     /**
       This method is called to get the specified scanline data from the

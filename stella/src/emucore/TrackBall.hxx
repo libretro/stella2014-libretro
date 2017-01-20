@@ -89,7 +89,7 @@ class TrackBall : public Controller
 
       @return  Whether the controller supports using the mouse
     */
-    Bool setMouseControl(
+    bool setMouseControl(
       Controller::Type xtype, int xid, Controller::Type ytype, int yid);
 
   private:

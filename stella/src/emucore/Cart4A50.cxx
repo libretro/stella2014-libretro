@@ -145,7 +145,7 @@ uInt8 Cartridge4A50::peek(uInt16 address)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge4A50::poke(uInt16 address, uInt8 value)
+bool Cartridge4A50::poke(uInt16 address, uInt8 value)
 {
   if(!(address & 0x1000))                      // Hotspots below 0x1000
   {
@@ -337,7 +337,7 @@ void Cartridge4A50::checkBankSwitch(uInt16 address, uInt8 value)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge4A50::bank(uInt16)
+bool Cartridge4A50::bank(uInt16)
 {
   // Doesn't support bankswitching in the normal sense
   return false;
@@ -359,7 +359,7 @@ uInt16 Cartridge4A50::bankCount() const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge4A50::patch(uInt16 address, uInt8 value)
+bool Cartridge4A50::patch(uInt16 address, uInt8 value)
 {
   if((address & 0x1800) == 0x1000)           // 2K region from 0x1000 - 0x17ff
   {
@@ -398,7 +398,7 @@ const uInt8* Cartridge4A50::getImage(int& size) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge4A50::save(Serializer& out) const
+bool Cartridge4A50::save(Serializer& out) const
 {
    out.putString(name());
 
@@ -423,7 +423,7 @@ Bool Cartridge4A50::save(Serializer& out) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge4A50::load(Serializer& in)
+bool Cartridge4A50::load(Serializer& in)
 {
    if(in.getString() != name())
       return false;

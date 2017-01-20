@@ -120,7 +120,7 @@ uInt8 CartridgeDFSC::peek(uInt16 address)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeDFSC::poke(uInt16 address, uInt8)
+bool CartridgeDFSC::poke(uInt16 address, uInt8)
 {
   address &= 0x0FFF;
 
@@ -135,7 +135,7 @@ Bool CartridgeDFSC::poke(uInt16 address, uInt8)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeDFSC::bank(uInt16 bank)
+bool CartridgeDFSC::bank(uInt16 bank)
 {
   if(bankLocked()) return false;
 
@@ -178,7 +178,7 @@ uInt16 CartridgeDFSC::bankCount() const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeDFSC::patch(uInt16 address, uInt8 value)
+bool CartridgeDFSC::patch(uInt16 address, uInt8 value)
 {
   address &= 0x0FFF;
 
@@ -203,7 +203,7 @@ const uInt8* CartridgeDFSC::getImage(int& size) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeDFSC::save(Serializer& out) const
+bool CartridgeDFSC::save(Serializer& out) const
 {
    out.putString(name());
    out.putShort(myCurrentBank);
@@ -213,7 +213,7 @@ Bool CartridgeDFSC::save(Serializer& out) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeDFSC::load(Serializer& in)
+bool CartridgeDFSC::load(Serializer& in)
 {
    if(in.getString() != name())
       return false;

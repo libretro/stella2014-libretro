@@ -24,7 +24,7 @@
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Paddles::Paddles(Jack jack, const Event& event, const System& system,
-                 Bool swappaddle, Bool swapaxis, Bool swapdir)
+                 bool swappaddle, bool swapaxis, bool swapdir)
   : Controller(jack, event, system, Controller::Paddles),
     myMPaddleID(-1),
     myMPaddleIDX(-1),
@@ -264,7 +264,7 @@ void Paddles::update()
   // we only process the first one we see (when it differs from
   // previous values by a pre-defined amount)
   // Otherwise, it would always override input from digital and mouse
-  Bool sa_changed = false;
+  bool sa_changed = false;
   int sa_xaxis = myEvent.get(myP0AxisValue);
   int sa_yaxis = myEvent.get(myP1AxisValue);
   if(abs(myLastAxisX - sa_xaxis) > 10)
@@ -383,7 +383,7 @@ void Paddles::update()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Paddles::setMouseControl(
+bool Paddles::setMouseControl(
     Controller::Type xtype, int xid, Controller::Type ytype, int yid)
 {
   // In 'automatic' mode, both axes on the mouse map to a single paddle,

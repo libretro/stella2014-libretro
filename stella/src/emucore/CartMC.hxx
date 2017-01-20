@@ -179,7 +179,7 @@ class CartridgeMC : public Cartridge
 
       @param bank The bank that should be installed in the system
     */
-    Bool bank(uInt16 bank);
+    bool bank(uInt16 bank);
 
     /**
       Get the current bank.
@@ -198,7 +198,7 @@ class CartridgeMC : public Cartridge
       @param value    The value to place into the address
       @return    Success or failure of the patch operation
     */
-    Bool patch(uInt16 address, uInt8 value);
+    bool patch(uInt16 address, uInt8 value);
 
     /**
       Access the internal ROM image for this cartridge.
@@ -214,7 +214,7 @@ class CartridgeMC : public Cartridge
       @param out  The Serializer object to use
       @return  False on any errors, else true
     */
-    Bool save(Serializer& out) const;
+    bool save(Serializer& out) const;
 
     /**
       Load the current state of this cart from the given Serializer.
@@ -222,7 +222,7 @@ class CartridgeMC : public Cartridge
       @param in  The Serializer object to use
       @return  False on any errors, else true
     */
-    Bool load(Serializer& in);
+    bool load(Serializer& in);
 
     /**
       Get a descriptor for the device name (used in error checking).
@@ -258,7 +258,7 @@ class CartridgeMC : public Cartridge
       @param value The value to be stored at the address
       @return  True if the poke changed the device address space, else false
     */
-    Bool poke(uInt16 address, uInt8 value);
+    bool poke(uInt16 address, uInt8 value);
 
   private:
     // The 128K ROM image for the cartridge
@@ -271,7 +271,7 @@ class CartridgeMC : public Cartridge
     uInt8 myCurrentBlock[4];
 
     // Indicates if slot 3 is locked to block $FF or not
-    Bool mySlot3Locked;
+    bool mySlot3Locked;
 };
 
 #endif

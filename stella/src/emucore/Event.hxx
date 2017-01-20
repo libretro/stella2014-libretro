@@ -114,19 +114,19 @@ class Event
     /**
       Get the keytable associated with this event
     */
-    const Bool* getKeys() const { return myKeyTable; }
+    const bool* getKeys() const { return myKeyTable; }
 
     /**
       Set the value associated with the event of the specified type
     */
-    void setKey(StellaKey key, Bool state) { myKeyTable[key] = state; }
+    void setKey(StellaKey key, bool state) { myKeyTable[key] = state; }
 
   private:
     // Array of values associated with each event type
     Int32 myValues[LastType];
 
     // Array of keyboard key states
-    Bool myKeyTable[KBDK_LAST];
+    bool myKeyTable[KBDK_LAST];
 };
 
 #endif

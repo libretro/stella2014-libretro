@@ -64,11 +64,11 @@ class DebuggerParser
     }
 
   private:
-    Bool getArgs(const string& command, string& verb);
-    Bool validateArgs(int cmd);
+    bool getArgs(const string& command, string& verb);
+    bool validateArgs(int cmd);
     string eval();
     string trapStatus(int addr);
-    Bool saveScriptFile(string file);
+    bool saveScriptFile(string file);
 
   private:
     enum {
@@ -102,8 +102,8 @@ class DebuggerParser
     struct Command {
       string cmdString;
       string description;
-      Bool parmsRequired;
-      Bool refreshRequired;
+      bool parmsRequired;
+      bool refreshRequired;
       parameters parms[kMAX_ARG_TYPES];
       METHOD executor;
     };

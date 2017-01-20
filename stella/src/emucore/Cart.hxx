@@ -90,7 +90,7 @@ class Cartridge : public Device
 
       @param out  The output file stream to save the image
     */
-    Bool save(ofstream& out);
+    bool save(ofstream& out);
 
     /**
       Lock/unlock bankswitching capability.  The debugger will lock
@@ -99,7 +99,7 @@ class Cartridge : public Device
     */
     void lockBank()   { myBankLocked = true;  }
     void unlockBank() { myBankLocked = false; }
-    Bool bankLocked() { return myBankLocked;  }
+    bool bankLocked() { return myBankLocked;  }
 
     /**
       Get the default startup bank for a cart.  This is the bank where
@@ -119,7 +119,7 @@ class Cartridge : public Device
 
       @return  Whether the bank was changed
     */
-    virtual Bool bankChanged();
+    virtual bool bankChanged();
 
     const RamAreaList& ramAreas() { return myRamAreaList; }
 
@@ -131,7 +131,7 @@ class Cartridge : public Device
     /**
       Set the specified bank.
     */
-    virtual Bool bank(uInt16 bank) = 0;
+    virtual bool bank(uInt16 bank) = 0;
 
     /**
       Get the current bank.
@@ -160,7 +160,7 @@ class Cartridge : public Device
       @param value    The value to place into the address
       @return    Success or failure of the patch operation
     */
-    virtual Bool patch(uInt16 address, uInt8 value) = 0;
+    virtual bool patch(uInt16 address, uInt8 value) = 0;
 
     /**
       Access the internal ROM image for this cartridge.
@@ -176,7 +176,7 @@ class Cartridge : public Device
       @param out  The Serializer object to use
       @return  False on any errors, else true
     */
-    virtual Bool save(Serializer& out) const = 0;
+    virtual bool save(Serializer& out) const = 0;
 
     /**
       Load the current state of this device from the given Serializer.
@@ -184,7 +184,7 @@ class Cartridge : public Device
       @param in  The Serializer object to use
       @return  False on any errors, else true
     */
-    virtual Bool load(Serializer& in) = 0;
+    virtual bool load(Serializer& in) = 0;
 
     /**
       Get a descriptor for the device name (used in error checking).
@@ -264,113 +264,113 @@ class Cartridge : public Device
 
       @return  True if the signature was found at least 'minhits' time, else false
     */
-    static Bool searchForBytes(const uInt8* image, uInt32 imagesize,
+    static bool searchForBytes(const uInt8* image, uInt32 imagesize,
                                const uInt8* signature, uInt32 sigsize,
                                uInt32 minhits);
 
     /**
       Returns true if the image is probably a SuperChip (256 bytes RAM)
     */
-    static Bool isProbablySC(const uInt8* image, uInt32 size);
+    static bool isProbablySC(const uInt8* image, uInt32 size);
 
     /**
       Returns true if the image is probably a 4K SuperChip (256 bytes RAM)
     */
-    static Bool isProbably4KSC(const uInt8* image, uInt32 size);
+    static bool isProbably4KSC(const uInt8* image, uInt32 size);
 
     /**
       Returns true if the image probably contains ARM code in the first 1K
     */
-    static Bool isProbablyARM(const uInt8* image, uInt32 size);
+    static bool isProbablyARM(const uInt8* image, uInt32 size);
 
     /**
       Returns true if the image is probably a 0840 bankswitching cartridge
     */
-    static Bool isProbably0840(const uInt8* image, uInt32 size);
+    static bool isProbably0840(const uInt8* image, uInt32 size);
 
     /**
       Returns true if the image is probably a 3E bankswitching cartridge
     */
-    static Bool isProbably3E(const uInt8* image, uInt32 size);
+    static bool isProbably3E(const uInt8* image, uInt32 size);
 
     /**
       Returns true if the image is probably a 3F bankswitching cartridge
     */
-    static Bool isProbably3F(const uInt8* image, uInt32 size);
+    static bool isProbably3F(const uInt8* image, uInt32 size);
 
     /**
       Returns true if the image is probably a 4A50 bankswitching cartridge
     */
-    static Bool isProbably4A50(const uInt8* image, uInt32 size);
+    static bool isProbably4A50(const uInt8* image, uInt32 size);
 
     /**
       Returns true if the image is probably a CTY bankswitching cartridge
     */
-    static Bool isProbablyCTY(const uInt8* image, uInt32 size);
+    static bool isProbablyCTY(const uInt8* image, uInt32 size);
 
     /**
       Returns true if the image is probably a CV bankswitching cartridge
     */
-    static Bool isProbablyCV(const uInt8* image, uInt32 size);
+    static bool isProbablyCV(const uInt8* image, uInt32 size);
 
     /**
       Returns true if the image is probably a DPC+ bankswitching cartridge
     */
-    static Bool isProbablyDPCplus(const uInt8* image, uInt32 size);
+    static bool isProbablyDPCplus(const uInt8* image, uInt32 size);
 
     /**
       Returns true if the image is probably a E0 bankswitching cartridge
     */
-    static Bool isProbablyE0(const uInt8* image, uInt32 size);
+    static bool isProbablyE0(const uInt8* image, uInt32 size);
 
     /**
       Returns true if the image is probably a E7 bankswitching cartridge
     */
-    static Bool isProbablyE7(const uInt8* image, uInt32 size);
+    static bool isProbablyE7(const uInt8* image, uInt32 size);
 
     /**
       Returns true if the image is probably an EF/EFSC bankswitching cartridge
     */
-    static Bool isProbablyEF(const uInt8* image, uInt32 size, const char*& type);
+    static bool isProbablyEF(const uInt8* image, uInt32 size, const char*& type);
 
     /**
       Returns true if the image is probably a BF/BFSC bankswitching cartridge
     */
-    static Bool isProbablyBF(const uInt8* image, uInt32 size, const char*& type);
+    static bool isProbablyBF(const uInt8* image, uInt32 size, const char*& type);
     /**
       Returns true if the image is probably a DF/DFSC bankswitching cartridge
     */
-    static Bool isProbablyDF(const uInt8* image, uInt32 size, const char*& type);
+    static bool isProbablyDF(const uInt8* image, uInt32 size, const char*& type);
 
     /**
       Returns true if the image is probably an F6 bankswitching cartridge
     */
-    static Bool isProbablyF6(const uInt8* image, uInt32 size);
+    static bool isProbablyF6(const uInt8* image, uInt32 size);
 
     /**
       Returns true if the image is probably an FA2 bankswitching cartridge
     */
-    static Bool isProbablyFA2(const uInt8* image, uInt32 size);
+    static bool isProbablyFA2(const uInt8* image, uInt32 size);
 
     /**
       Returns true if the image is probably an FE bankswitching cartridge
     */
-    static Bool isProbablyFE(const uInt8* image, uInt32 size);
+    static bool isProbablyFE(const uInt8* image, uInt32 size);
 
     /**
       Returns true if the image is probably a SB bankswitching cartridge
     */
-    static Bool isProbablySB(const uInt8* image, uInt32 size);
+    static bool isProbablySB(const uInt8* image, uInt32 size);
 
     /**
       Returns true if the image is probably a UA bankswitching cartridge
     */
-    static Bool isProbablyUA(const uInt8* image, uInt32 size);
+    static bool isProbablyUA(const uInt8* image, uInt32 size);
 
     /**
       Returns true if the image is probably an X07 bankswitching cartridge
     */
-    static Bool isProbablyX07(const uInt8* image, uInt32 size);
+    static bool isProbablyX07(const uInt8* image, uInt32 size);
 
   protected:
     // Settings class for the application
@@ -380,7 +380,7 @@ class Cartridge : public Device
     uInt16 myStartBank;
 
     // Indicates if the bank has changed somehow (a bankswitch has occurred)
-    Bool myBankChanged;
+    bool myBankChanged;
 
     // The array containing information about every byte of ROM indicating
     // whether it is used as code.
@@ -392,7 +392,7 @@ class Cartridge : public Device
 
     // If myBankLocked is true, ignore attempts at bankswitching. This is used
     // by the debugger, when disassembling/dumping ROM.
-    Bool myBankLocked;
+    bool myBankLocked;
 
     // Contains info about this cartridge in string format
     static string myAboutString;

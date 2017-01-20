@@ -94,14 +94,14 @@ uInt8 Cartridge2K::peek(uInt16 address)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge2K::poke(uInt16, uInt8)
+bool Cartridge2K::poke(uInt16, uInt8)
 {
   // This is ROM so poking has no effect :-)
   return false;
 } 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge2K::bank(uInt16 bank)
+bool Cartridge2K::bank(uInt16 bank)
 {
   // Doesn't support bankswitching
   return false;
@@ -121,7 +121,7 @@ uInt16 Cartridge2K::bankCount() const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge2K::patch(uInt16 address, uInt8 value)
+bool Cartridge2K::patch(uInt16 address, uInt8 value)
 {
   myImage[address & myMask] = value;
   return myBankChanged = true;
@@ -135,7 +135,7 @@ const uInt8* Cartridge2K::getImage(int& size) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge2K::save(Serializer& out) const
+bool Cartridge2K::save(Serializer& out) const
 {
    out.putString(name());
 
@@ -143,7 +143,7 @@ Bool Cartridge2K::save(Serializer& out) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Cartridge2K::load(Serializer& in)
+bool Cartridge2K::load(Serializer& in)
 {
    if(in.getString() != name())
       return false;

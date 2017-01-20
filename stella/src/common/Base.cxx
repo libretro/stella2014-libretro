@@ -22,7 +22,7 @@
 namespace Common {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Base::setHexUppercase(Bool enable)
+void Base::setHexUppercase(bool enable)
 {
   if(enable)
   {

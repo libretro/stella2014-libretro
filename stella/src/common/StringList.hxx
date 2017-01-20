@@ -44,7 +44,7 @@ class StringList : public Common::Array<string>
       string tmp;
       for(unsigned int i = 0; i < str.length(); ++i)
       {
-        Bool match = false;
+        bool match = false;
         for(unsigned int j = 0; j < pattern.length(); ++j)
         {
           if(str[i] == pattern[j])

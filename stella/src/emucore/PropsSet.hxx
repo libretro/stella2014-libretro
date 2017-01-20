@@ -69,7 +69,7 @@ class PropertiesSet
       @return  True on success, false on failure
                Failure occurs if file couldn't be opened for writing
     */
-    Bool save(const string& filename) const;
+    bool save(const string& filename) const;
 
     /**
       Get the property from the set with the given MD5.
@@ -82,8 +82,8 @@ class PropertiesSet
 
       @return  True if the set with the specified md5 was found, else false
     */
-    Bool getMD5(const string& md5, Properties& properties,
-                Bool useDefaults = false) const;
+    bool getMD5(const string& md5, Properties& properties,
+                bool useDefaults = false) const;
 
     /**
       Get the property from the set with the given MD5, at the same time
@@ -108,7 +108,7 @@ class PropertiesSet
       @param save        Indicates whether the properties should be saved
                          when the program exits
     */
-    void insert(const Properties& properties, Bool save = true);
+    void insert(const Properties& properties, bool save = true);
 
     /**
       Marks the property with the given MD5 as being removed.

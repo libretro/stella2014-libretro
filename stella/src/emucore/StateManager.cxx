@@ -52,7 +52,7 @@ void StateManager::update()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool StateManager::loadState(Serializer& in)
+bool StateManager::loadState(Serializer& in)
 {
   if(&myOSystem->console())
   {
@@ -70,7 +70,7 @@ Bool StateManager::loadState(Serializer& in)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool StateManager::saveState(Serializer& out)
+bool StateManager::saveState(Serializer& out)
 {
   try
   {

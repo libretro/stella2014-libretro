@@ -411,7 +411,7 @@ uInt8 CartridgeDPCPlus::peek(uInt16 address)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeDPCPlus::poke(uInt16 address, uInt8 value)
+bool CartridgeDPCPlus::poke(uInt16 address, uInt8 value)
 {
   address &= 0x0FFF;
 
@@ -600,7 +600,7 @@ Bool CartridgeDPCPlus::poke(uInt16 address, uInt8 value)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeDPCPlus::bank(uInt16 bank)
+bool CartridgeDPCPlus::bank(uInt16 bank)
 {
   if(bankLocked()) return false;
 
@@ -634,7 +634,7 @@ uInt16 CartridgeDPCPlus::bankCount() const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeDPCPlus::patch(uInt16 address, uInt8 value)
+bool CartridgeDPCPlus::patch(uInt16 address, uInt8 value)
 {
   address &= 0x0FFF;
 
@@ -656,7 +656,7 @@ const uInt8* CartridgeDPCPlus::getImage(int& size) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeDPCPlus::save(Serializer& out) const
+bool CartridgeDPCPlus::save(Serializer& out) const
 {
    out.putString(name());
 
@@ -707,7 +707,7 @@ Bool CartridgeDPCPlus::save(Serializer& out) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeDPCPlus::load(Serializer& in)
+bool CartridgeDPCPlus::load(Serializer& in)
 {
    if(in.getString() != name())
       return false;

@@ -76,7 +76,7 @@ class Device : public Serializable
       @param out  The Serializer object to use
       @return  False on any errors, else true
     */
-    virtual Bool save(Serializer& out) const = 0;
+    virtual bool save(Serializer& out) const = 0;
 
     /**
       Load the current state of this device from the given Serializer.
@@ -84,7 +84,7 @@ class Device : public Serializable
       @param in  The Serializer object to use
       @return  False on any errors, else true
     */
-    virtual Bool load(Serializer& in) = 0;
+    virtual bool load(Serializer& in) = 0;
 
     /**
       Get a descriptor for the device name (used in error checking).
@@ -109,7 +109,7 @@ class Device : public Serializable
 
       @return  True if the poke changed the device address space, else false
     */
-    virtual Bool poke(uInt16 address, uInt8 value) = 0;
+    virtual bool poke(uInt16 address, uInt8 value) = 0;
 
     /**
       Query/change the given address type to use the given disassembly flags

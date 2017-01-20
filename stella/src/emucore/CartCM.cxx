@@ -88,7 +88,7 @@ uInt8 CartridgeCM::peek(uInt16 address)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeCM::poke(uInt16 address, uInt8 value)
+bool CartridgeCM::poke(uInt16 address, uInt8 value)
 {
   // NOTE: This could be called for RIOT writes or cart ROM writes
   // In the latter case, the write is ignored
@@ -108,7 +108,7 @@ Bool CartridgeCM::poke(uInt16 address, uInt8 value)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeCM::bank(uInt16 bank)
+bool CartridgeCM::bank(uInt16 bank)
 {
   if(bankLocked()) return false;
 
@@ -179,7 +179,7 @@ uInt16 CartridgeCM::bankCount() const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeCM::patch(uInt16 address, uInt8 value)
+bool CartridgeCM::patch(uInt16 address, uInt8 value)
 {
   if((mySWCHA & 0x30) == 0x20)
     myRAM[address & 0x7FF] = value;
@@ -197,7 +197,7 @@ const uInt8* CartridgeCM::getImage(int& size) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeCM::save(Serializer& out) const
+bool CartridgeCM::save(Serializer& out) const
 {
    out.putString(name());
    out.putShort(myCurrentBank);
@@ -209,7 +209,7 @@ Bool CartridgeCM::save(Serializer& out) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeCM::load(Serializer& in)
+bool CartridgeCM::load(Serializer& in)
 {
    if(in.getString() != name())
       return false;

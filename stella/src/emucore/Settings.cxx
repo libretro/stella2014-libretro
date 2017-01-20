@@ -437,7 +437,7 @@ int Settings::getExternalPos(const string& key) const
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int Settings::setInternal(const string& key, const Variant& value,
-                          int pos, Bool useAsInitial)
+                          int pos, bool useAsInitial)
 {
   int idx = -1;
 
@@ -492,7 +492,7 @@ int Settings::setInternal(const string& key, const Variant& value,
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int Settings::setExternal(const string& key, const Variant& value,
-                          int pos, Bool useAsInitial)
+                          int pos, bool useAsInitial)
 {
   int idx = -1;
 

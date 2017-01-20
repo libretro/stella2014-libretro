@@ -74,7 +74,7 @@ class System : public Serializable
                          use this hint to act differently under those
                          circumstances.
     */
-    void reset(Bool autodetect = false);
+    void reset(bool autodetect = false);
 
     /**
       Attach the specified device and claim ownership of it.  The device 
@@ -196,7 +196,7 @@ class System : public Serializable
     /**
       Answers whether the system is currently in device autodetect mode.
     */
-    Bool autodetectMode() const { return mySystemInAutodetect; }
+    bool autodetectMode() const { return mySystemInAutodetect; }
 
   public:
     /**
@@ -384,7 +384,7 @@ class System : public Serializable
       @param start_addr The start address; determines the start page
       @param end_addr   The end address; determines the end page
     */
-    Bool isPageDirty(uInt16 start_addr, uInt16 end_addr) const;
+    bool isPageDirty(uInt16 start_addr, uInt16 end_addr) const;
 
     /**
       Mark all pages as clean (ie, turn off the dirty flag).
@@ -397,7 +397,7 @@ class System : public Serializable
       @param out  The Serializer object to use
       @return  False on any errors, else true
     */
-    Bool save(Serializer& out) const;
+    bool save(Serializer& out) const;
 
     /**
       Load the current state of this system from the given Serializer.
@@ -405,7 +405,7 @@ class System : public Serializable
       @param in  The Serializer object to use
       @return  False on any errors, else true
     */
-    Bool load(Serializer& in);
+    bool load(Serializer& in);
 
     /**
       Get a descriptor for the device name (used in error checking).
@@ -431,7 +431,7 @@ class System : public Serializable
     PageAccess* myPageAccessTable;
 
     // Pointer to a dynamically allocated array for dirty pages
-    Bool* myPageIsDirtyTable;
+    bool* myPageIsDirtyTable;
 
     // Array of all the devices attached to the system
     Device* myDevices[100];
@@ -464,12 +464,12 @@ class System : public Serializable
     // Whether or not peek() updates the data bus state. This
     // is true during normal emulation, and false when the
     // debugger is active.
-    Bool myDataBusLocked;
+    bool myDataBusLocked;
 
     // Whether autodetection is currently running (ie, the emulation
     // core is attempting to autodetect display settings, cart modes, etc)
     // Some parts of the codebase need to act differently in such a case
-    Bool mySystemInAutodetect;
+    bool mySystemInAutodetect;
 
   private:
     // Copy constructor isn't supported by this class so make it private

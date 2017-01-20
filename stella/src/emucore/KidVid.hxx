@@ -86,19 +86,19 @@ class KidVid : public Controller
 
     // Whether the KidVid device is enabled (only for games that it
     // supports, and if it's plugged into the right port
-    Bool myEnabled;
+    bool myEnabled;
 
     // The file handles for the WAV files
     FILE *mySampleFile, *mySharedSampleFile;
 
     // Indicates if sample files have been successfully opened
-    Bool myFileOpened;
+    bool myFileOpened;
 
     // Is the tape currently 'busy' / in use?
-    Bool myTapeBusy;
+    bool myTapeBusy;
 
     uInt32 myFilePointer, mySongCounter;
-    Bool myBeep, mySharedData;
+    bool myBeep, mySharedData;
     uInt8 mySampleByte;
     uInt32 myGame, myTape;
     uInt32 myIdx, myBlock, myBlockIdx;

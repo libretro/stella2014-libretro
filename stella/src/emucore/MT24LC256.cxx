@@ -99,13 +99,13 @@ MT24LC256::~MT24LC256()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool MT24LC256::readSDA()
+bool MT24LC256::readSDA()
 {
   return jpee_mdat && jpee_sdat;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void MT24LC256::writeSDA(Bool state)
+void MT24LC256::writeSDA(bool state)
 {
   mySDA = state;
   myCyclesWhenSDASet = mySystem.cycles();
@@ -114,7 +114,7 @@ void MT24LC256::writeSDA(Bool state)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void MT24LC256::writeSCL(Bool state)
+void MT24LC256::writeSCL(bool state)
 {
   mySCL = state;
   myCyclesWhenSCLSet = mySystem.cycles();
@@ -347,7 +347,7 @@ void MT24LC256::jpee_clock_fall()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool MT24LC256::jpee_timercheck(int mode)
+bool MT24LC256::jpee_timercheck(int mode)
 {
   /*
     Evaluate how long the EEPROM is busy.  When invoked with an argument of 1,

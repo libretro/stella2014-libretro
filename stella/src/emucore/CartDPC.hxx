@@ -85,7 +85,7 @@ class CartridgeDPC : public Cartridge
 
       @param bank The bank that should be installed in the system
     */
-    Bool bank(uInt16 bank);
+    bool bank(uInt16 bank);
 
     /**
       Get the current bank.
@@ -104,7 +104,7 @@ class CartridgeDPC : public Cartridge
       @param value    The value to place into the address
       @return    Success or failure of the patch operation
     */
-    Bool patch(uInt16 address, uInt8 value);
+    bool patch(uInt16 address, uInt8 value);
 
     /**
       Access the internal ROM image for this cartridge.
@@ -120,7 +120,7 @@ class CartridgeDPC : public Cartridge
       @param out  The Serializer object to use
       @return  False on any errors, else true
     */
-    Bool save(Serializer& out) const;
+    bool save(Serializer& out) const;
 
     /**
       Load the current state of this cart from the given Serializer.
@@ -128,7 +128,7 @@ class CartridgeDPC : public Cartridge
       @param in  The Serializer object to use
       @return  False on any errors, else true
     */
-    Bool load(Serializer& in);
+    bool load(Serializer& in);
 
     /**
       Get a descriptor for the device name (used in error checking).
@@ -164,7 +164,7 @@ class CartridgeDPC : public Cartridge
       @param value The value to be stored at the address
       @return  True if the poke changed the device address space, else false
     */
-    Bool poke(uInt16 address, uInt8 value);
+    bool poke(uInt16 address, uInt8 value);
 
   private:
     /** 
@@ -207,7 +207,7 @@ class CartridgeDPC : public Cartridge
     uInt8 myFlags[8];
 
     // The music mode DF5, DF6, & DF7 enabled flags
-    Bool myMusicMode[3];
+    bool myMusicMode[3];
 
     // The random number generator register
     uInt8 myRandomNumber;

@@ -56,7 +56,7 @@ class CheatManager
       @return  The cheat (if was created), else NULL.
     */
     const Cheat* add(const string& name, const string& code,
-                     Bool enable = true, int idx = -1);
+                     bool enable = true, int idx = -1);
 
     /**
       Remove the cheat at 'idx' from the cheat list(s).
@@ -73,7 +73,7 @@ class CheatManager
       @param cheat   The actual cheat object
       @param enable  Add or remove the cheat to the per-frame list
     */
-    void addPerFrame(Cheat* cheat, Bool enable);
+    void addPerFrame(Cheat* cheat, bool enable);
 
     /**
       Creates and enables a one-shot cheat.  One-shot cheats are the
@@ -91,7 +91,7 @@ class CheatManager
       @param code    The actual cheatcode to search for
       @param enable  Enable/disable the cheat
     */
-    void enable(const string& code, Bool enable);
+    void enable(const string& code, bool enable);
 
     /**
       Returns the game cheatlist.
@@ -126,7 +126,7 @@ class CheatManager
     /**
       Checks if a code is valid.
     */
-    Bool isValidCode(const string& code);
+    bool isValidCode(const string& code);
 
   private:
     /**
@@ -165,7 +165,7 @@ class CheatManager
     string myCurrentCheat;
 
     // Indicates that the list has been modified, and should be saved to disk
-    Bool myListIsDirty;
+    bool myListIsDirty;
 };
 
 #endif

@@ -84,7 +84,7 @@ uInt8 CartridgeFE::peek(uInt16 address)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeFE::poke(uInt16, uInt8)
+bool CartridgeFE::poke(uInt16, uInt8)
 {
   return false;
 }
@@ -104,7 +104,7 @@ void CartridgeFE::setAccessFlags(uInt16 address, uInt8 flags)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeFE::bank(uInt16)
+bool CartridgeFE::bank(uInt16)
 {
   // Doesn't support bankswitching in the normal sense
   return false;
@@ -124,7 +124,7 @@ uInt16 CartridgeFE::bankCount() const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeFE::bankChanged()
+bool CartridgeFE::bankChanged()
 {
   if(myLastAddressChanged)
   {
@@ -142,7 +142,7 @@ Bool CartridgeFE::bankChanged()
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeFE::patch(uInt16 address, uInt8 value)
+bool CartridgeFE::patch(uInt16 address, uInt8 value)
 {
   myImage[(address & 0x0FFF) + (((address & 0x2000) == 0) ? 4096 : 0)] = value;
   return myBankChanged = true;
@@ -156,7 +156,7 @@ const uInt8* CartridgeFE::getImage(int& size) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeFE::save(Serializer& out) const
+bool CartridgeFE::save(Serializer& out) const
 {
    out.putString(name());
    out.putShort(myLastAddress1);
@@ -166,7 +166,7 @@ Bool CartridgeFE::save(Serializer& out) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CartridgeFE::load(Serializer& in)
+bool CartridgeFE::load(Serializer& in)
 {
    if(in.getString() != name())
       return false;

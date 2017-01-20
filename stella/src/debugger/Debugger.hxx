@@ -107,18 +107,18 @@ class Debugger : public DialogContainer
       @param message  Message to display when entering debugger
       @param data     An address associated with the message
     */
-    Bool start(const string& message = "", int address = -1);
-    Bool startWithFatalError(const string& message = "");
+    bool start(const string& message = "", int address = -1);
+    bool startWithFatalError(const string& message = "");
 
     /**
       Wrapper method for EventHandler::leaveDebugMode() for those classes
       that don't have access to EventHandler.
     */
-    void quit(Bool exitrom);
+    void quit(bool exitrom);
 
-    Bool addFunction(const string& name, const string& def,
-                     Expression* exp, Bool builtin = false);
-    Bool delFunction(const string& name);
+    bool addFunction(const string& name, const string& def,
+                     Expression* exp, bool builtin = false);
+    bool delFunction(const string& name);
     const Expression* getFunction(const string& name) const;
 
     const string& getFunctionDef(const string& name) const;
@@ -187,7 +187,7 @@ class Debugger : public DialogContainer
         { return myParser->decipher_arg(stringval); }
 
     /* Convenience methods to get/set bit(s) in an 8-bit register */
-    static uInt8 set_bit(uInt8 input, uInt8 bit, Bool on)
+    static uInt8 set_bit(uInt8 input, uInt8 bit, bool on)
     {
       if(on)
         return input | (1 << bit);
@@ -235,10 +235,10 @@ class Debugger : public DialogContainer
     void setAccessFlags(uInt16 addr, uInt8 flags)
       { mySystem.setAccessFlags(addr, flags); }
 
-    void setBreakPoint(int bp, Bool set);
+    void setBreakPoint(int bp, bool set);
 
-    Bool setBank(int bank);
-    Bool patchROM(int addr, int value);
+    bool setBank(int bank);
+    bool patchROM(int addr, int value);
 
     /**
       Normally, accessing RAM or ROM during emulation can possibly trigger
@@ -255,7 +255,7 @@ class Debugger : public DialogContainer
     /**
       Save state of each debugger subsystem.
     */
-    void saveOldState(Bool addrewind = true);
+    void saveOldState(bool addrewind = true);
 
     /**
       Set initial state before entering the debugger.
@@ -271,16 +271,16 @@ class Debugger : public DialogContainer
     int trace();
     void nextScanline(int lines);
     void nextFrame(int frames);
-    Bool rewindState();
+    bool rewindState();
 
     void toggleBreakPoint(int bp);
 
-    Bool breakPoint(int bp);
+    bool breakPoint(int bp);
     void toggleReadTrap(int t);
     void toggleWriteTrap(int t);
     void toggleTrap(int t);
-    Bool readTrap(int t);
-    Bool writeTrap(int t);
+    bool readTrap(int t);
+    bool writeTrap(int t);
     void clearAllTraps();
 
     // Set a bunch of RAM locations at once
@@ -323,9 +323,9 @@ class Debugger : public DialogContainer
         virtual ~RewindManager();
 
       public:
-        Bool addState();
-        Bool rewindState();
-        Bool isEmpty();
+        bool addState();
+        bool rewindState();
+        bool isEmpty();
         void clear();
 
       private:
