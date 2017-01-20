@@ -103,7 +103,7 @@ class M6502 : public Serializable
       @param number Indicates the number of instructions to execute
       @return true iff execution stops normally
     */
-    bool execute(uInt32 number);
+    Bool execute(uInt32 number);
 
     /**
       Tell the processor to stop executing instructions.  Invoking this 
@@ -118,7 +118,7 @@ class M6502 : public Serializable
 
       @return true iff a fatal error has occured
     */
-    bool fatalError() const { return myExecutionStatus & FatalErrorBit; }
+    Bool fatalError() const { return myExecutionStatus & FatalErrorBit; }
   
     /**
       Get the 16-bit value of the Program Counter register.
@@ -132,7 +132,7 @@ class M6502 : public Serializable
 
       @return true iff last access was a read
     */ 
-    bool lastAccessWasRead() const { return myLastAccessWasRead; }
+    Bool lastAccessWasRead() const { return myLastAccessWasRead; }
 
     /**                                                                    
       Return the last address that was part of a read/peek.  Note that
@@ -189,7 +189,7 @@ class M6502 : public Serializable
       @param out The serializer device to save to.
       @return The result of the save.  True on success, false on failure.
     */
-    bool save(Serializer& out) const;
+    Bool save(Serializer& out) const;
 
     /**
       Loads the current state of this device from the given Serializer.
@@ -197,7 +197,7 @@ class M6502 : public Serializable
       @param in The Serializer device to load from.
       @return The result of the load.  True on success, false on failure.
     */
-    bool load(Serializer& in);
+    Bool load(Serializer& in);
 
     /**
       Get a null terminated string which is the processor's name (i.e. "M6532")
@@ -296,13 +296,13 @@ class M6502 : public Serializable
     uInt8 IR;   // Instruction register
     uInt16 PC;  // Program Counter
 
-    bool N;     // N flag for processor status register
-    bool V;     // V flag for processor status register
-    bool B;     // B flag for processor status register
-    bool D;     // D flag for processor status register
-    bool I;     // I flag for processor status register
-    bool notZ;  // Z flag complement for processor status register
-    bool C;     // C flag for processor status register
+    Bool N;     // N flag for processor status register
+    Bool V;     // V flag for processor status register
+    Bool B;     // B flag for processor status register
+    Bool D;     // D flag for processor status register
+    Bool I;     // I flag for processor status register
+    Bool notZ;  // Z flag complement for processor status register
+    Bool C;     // C flag for processor status register
 
     /** 
       Bit fields used to indicate that certain conditions need to be 
@@ -331,7 +331,7 @@ class M6502 : public Serializable
     uInt32 myInstructionSystemCycleTable[256]; 
 
     /// Indicates if the last memory access was a read or not
-    bool myLastAccessWasRead;
+    Bool myLastAccessWasRead;
 
     /// The total number of instructions executed so far
     int myTotalInstructionCount;
@@ -366,7 +366,7 @@ class M6502 : public Serializable
     PackedBitArray* myWriteTraps;
 
     // Did we just now hit a trap?
-    bool myJustHitTrapFlag;
+    Bool myJustHitTrapFlag;
     struct HitTrapInfo {
       string message;
       int address;

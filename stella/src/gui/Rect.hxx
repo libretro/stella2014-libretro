@@ -49,8 +49,8 @@ struct Point
       x = y = 0;
   }
   Point & operator=(const Point & p) { x = p.x; y = p.y; return *this; };
-  bool operator==(const Point & p) const { return x == p.x && y == p.y; };
-  bool operator!=(const Point & p) const { return x != p.x || y != p.y; };
+  Bool operator==(const Point & p) const { return x == p.x && y == p.y; };
+  Bool operator!=(const Point & p) const { return x != p.x || y != p.y; };
 
   friend ostream& operator<<(ostream& os, const Point& p) {
     os << p.x << "x" << p.y;
@@ -75,8 +75,8 @@ struct Size
       w = h = -1;
   }
   Size & operator=(const Size & s) { w = s.w; h = s.h; return *this; };
-  bool operator==(const Size & s) const { return w == s.w && h == s.h; };
-  bool operator!=(const Size & s) const { return w != s.w || h != s.h; };
+  Bool operator==(const Size & s) const { return w == s.w && h == s.h; };
+  Bool operator!=(const Size & s) const { return w != s.w || h != s.h; };
 
   friend ostream& operator<<(ostream& os, const Size& s) {
     os << s.w << "x" << s.h;
@@ -131,7 +131,7 @@ struct Rect
 
     @return true if the given position is inside this rectangle, false otherwise
   */
-  bool contains(int x, int y) const {
+  Bool contains(int x, int y) const {
     return (left <= x) && (x < right) && (top <= y) && (y < bottom);
   }
 
@@ -140,14 +140,14 @@ struct Rect
 
     @return true if the given point is inside this rectangle, false otherwise
   */
-  bool contains(const Point & p) const { return contains(p.x, p.y); }
+  Bool contains(const Point & p) const { return contains(p.x, p.y); }
 
   /*
     @param r the rectangle to check
 
     @return true if the given rectangle is inside the rectangle, false otherwise
   */
-  bool intersects(const Rect & r) const {
+  Bool intersects(const Rect & r) const {
     return (left < r.right) && (r.left < right) && (top < r.bottom) && (r.top < bottom);
   }
 
@@ -194,7 +194,7 @@ struct Rect
     clip(Rect(0, 0, maxw, maxh));
   }
 
-  bool isValidRect() const {
+  Bool isValidRect() const {
     return (left <= right && top <= bottom);
   }
 

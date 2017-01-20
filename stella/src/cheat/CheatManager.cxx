@@ -48,7 +48,7 @@ CheatManager::~CheatManager()
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const Cheat* CheatManager::add(const string& name, const string& code,
-                               bool enable, int idx)
+                               Bool enable, int idx)
 {
   Cheat* cheat = (Cheat*) createCheat(name, code);
   if(!cheat)
@@ -97,13 +97,13 @@ void CheatManager::remove(int idx)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CheatManager::addPerFrame(Cheat* cheat, bool enable)
+void CheatManager::addPerFrame(Cheat* cheat, Bool enable)
 {
   if(!cheat)
     return;
 
   // Make sure there are no duplicates
-  bool found = false;
+  Bool found = false;
   unsigned int i;
   for(i = 0; i < myPerFrameList.size(); i++)
   {
@@ -217,7 +217,7 @@ void CheatManager::parse(const string& cheats)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CheatManager::enable(const string& code, bool enable)
+void CheatManager::enable(const string& code, Bool enable)
 {
   for(unsigned int i = 0; i < myCheatList.size(); i++)
   {
@@ -326,7 +326,7 @@ void CheatManager::saveCheats(const string& md5sum)
       cheats << ",";
   }
 
-  bool changed = cheats.str() != myCurrentCheat;
+  Bool changed = cheats.str() != myCurrentCheat;
 
   // Only update the list if absolutely necessary
   if(changed)
@@ -360,7 +360,7 @@ void CheatManager::clear()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CheatManager::isValidCode(const string& code)
+Bool CheatManager::isValidCode(const string& code)
 {
   for(unsigned int i = 0; i < code.size(); i++)
     if(!isxdigit(code[i]))

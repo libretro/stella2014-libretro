@@ -72,7 +72,7 @@ uInt8 CartridgeEF::peek(uInt16 address)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeEF::poke(uInt16 address, uInt8)
+Bool CartridgeEF::poke(uInt16 address, uInt8)
 {
   address &= 0x0FFF;
 
@@ -84,7 +84,7 @@ bool CartridgeEF::poke(uInt16 address, uInt8)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeEF::bank(uInt16 bank)
+Bool CartridgeEF::bank(uInt16 bank)
 {
   if(bankLocked()) return false;
 
@@ -127,7 +127,7 @@ uInt16 CartridgeEF::bankCount() const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeEF::patch(uInt16 address, uInt8 value)
+Bool CartridgeEF::patch(uInt16 address, uInt8 value)
 {
   myImage[(myCurrentBank << 12) + (address & 0x0FFF)] = value;
   return myBankChanged = true;
@@ -141,7 +141,7 @@ const uInt8* CartridgeEF::getImage(int& size) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeEF::save(Serializer& out) const
+Bool CartridgeEF::save(Serializer& out) const
 {
   try
   {
@@ -158,7 +158,7 @@ bool CartridgeEF::save(Serializer& out) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeEF::load(Serializer& in)
+Bool CartridgeEF::load(Serializer& in)
 {
   try
   {

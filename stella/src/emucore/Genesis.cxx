@@ -105,7 +105,7 @@ void Genesis::update()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Genesis::setMouseControl(
+Bool Genesis::setMouseControl(
     Controller::Type xtype, int xid, Controller::Type ytype, int yid)
 {
   // Currently, the Genesis controller takes full control of the mouse, using

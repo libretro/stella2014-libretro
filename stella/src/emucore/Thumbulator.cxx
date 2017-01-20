@@ -48,7 +48,7 @@ using namespace Common;
 #endif
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Thumbulator::Thumbulator(const uInt16* rom_ptr, uInt16* ram_ptr, bool traponfatal)
+Thumbulator::Thumbulator(const uInt16* rom_ptr, uInt16* ram_ptr, Bool traponfatal)
   : rom(rom_ptr),
     ram(ram_ptr)
 {
@@ -1975,6 +1975,6 @@ int Thumbulator::reset ( void )
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Thumbulator::trapOnFatal = true;
+Bool Thumbulator::trapOnFatal = true;
 
 #endif

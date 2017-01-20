@@ -180,7 +180,7 @@ void DebuggerParser::getCompletions(const char* in, StringList& completions) con
 // internally by DebuggerParser::run()
 int DebuggerParser::decipher_arg(const string& str)
 {
-  bool derefByte=false, derefWord=false, lobyte=false, hibyte=false, bin=false, dec=false;
+  Bool derefByte=false, derefWord=false, lobyte=false, hibyte=false, bin=false, dec=false;
   int result;
   string arg = str;
 
@@ -324,7 +324,7 @@ string DebuggerParser::showWatches()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool DebuggerParser::getArgs(const string& command, string& verb)
+Bool DebuggerParser::getArgs(const string& command, string& verb)
 {
   int state = kIN_COMMAND, i = 0, length = command.length();
   string curArg = "";
@@ -415,10 +415,10 @@ bool DebuggerParser::getArgs(const string& command, string& verb)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool DebuggerParser::validateArgs(int cmd)
+Bool DebuggerParser::validateArgs(int cmd)
 {
   // cerr << "entering validateArgs(" << cmd << ")" << endl;
-  bool required = commands[cmd].parmsRequired;
+  Bool required = commands[cmd].parmsRequired;
   parameters *p = commands[cmd].parms;
 
   if(argCount == 0)
@@ -533,7 +533,7 @@ string DebuggerParser::eval()
   {
     string rlabel = debugger.cartDebug().getLabel(args[i], true);
     string wlabel = debugger.cartDebug().getLabel(args[i], false);
-    bool validR = rlabel != "" && rlabel[0] != '$',
+    Bool validR = rlabel != "" && rlabel[0] != '$',
          validW = wlabel != "" && wlabel[0] != '$';
     if(validR && validW)
     {
@@ -568,8 +568,8 @@ string DebuggerParser::trapStatus(int addr)
   string result;
   result += Base::toString(addr);
   result += ": ";
-  bool r = debugger.readTrap(addr);
-  bool w = debugger.writeTrap(addr);
+  Bool r = debugger.readTrap(addr);
+  Bool w = debugger.writeTrap(addr);
   if(r && w)
     result += "read|write";
   else if(r)
@@ -591,7 +591,7 @@ string DebuggerParser::trapStatus(int addr)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool DebuggerParser::saveScriptFile(string file)
+Bool DebuggerParser::saveScriptFile(string file)
 {
   if( file.find_last_of('.') == string::npos ) {
     file += ".stella";
@@ -611,8 +611,8 @@ bool DebuggerParser::saveScriptFile(string file)
       out << "break #" << i << endl;
 
   for(unsigned int i=0; i<0x10000; i++) {
-    bool r = debugger.readTrap(i);
-    bool w = debugger.writeTrap(i);
+    Bool r = debugger.readTrap(i);
+    Bool w = debugger.writeTrap(i);
 
     if(r && w)
       out << "trap #" << i << endl;
@@ -626,7 +626,7 @@ bool DebuggerParser::saveScriptFile(string file)
   for(unsigned int i=0; i<conds.size(); i++)
     out << "breakif {" << conds[i] << "}" << endl;
 
-  bool ok = out.good();
+  Bool ok = out.good();
   out.close();
   return ok;
 }
@@ -832,7 +832,7 @@ void DebuggerParser::executeCode()
     return;
   }
 
-  bool result = debugger.cartDebug().addDirective(
+  Bool result = debugger.cartDebug().addDirective(
                   CartDebug::CODE, args[0], args[1]);
   commandResult << (result ? "added" : "removed") << " CODE directive on range $"
                 << hex << args[0] << " $" << hex << args[1];
@@ -873,7 +873,7 @@ void DebuggerParser::executeData()
     return;
   }
 
-  bool result = debugger.cartDebug().addDirective(
+  Bool result = debugger.cartDebug().addDirective(
                   CartDebug::DATA, args[0], args[1]);
   commandResult << (result ? "added" : "removed") << " DATA directive on range $"
                 << hex << args[0] << " $" << hex << args[1];
@@ -1018,7 +1018,7 @@ void DebuggerParser::executeGfx()
     return;
   }
 
-  bool result = debugger.cartDebug().addDirective(
+  Bool result = debugger.cartDebug().addDirective(
                   CartDebug::GFX, args[0], args[1]);
   commandResult << (result ? "added" : "removed") << " GFX directive on range $"
                 << hex << args[0] << " $" << hex << args[1];
@@ -1201,7 +1201,7 @@ void DebuggerParser::executePGfx()
     return;
   }
 
-  bool result = debugger.cartDebug().addDirective(
+  Bool result = debugger.cartDebug().addDirective(
                   CartDebug::PGFX, args[0], args[1]);
   commandResult << (result ? "added" : "removed") << " PGFX directive on range $"
                 << hex << args[0] << " $" << hex << args[1];
@@ -1293,7 +1293,7 @@ void DebuggerParser::executeRow()
     return;
   }
 
-  bool result = debugger.cartDebug().addDirective(
+  Bool result = debugger.cartDebug().addDirective(
                   CartDebug::ROW, args[0], args[1]);
   commandResult << (result ? "added" : "removed") << " ROW directive on range $"
                 << hex << args[0] << " $" << hex << args[1];
@@ -1325,7 +1325,7 @@ void DebuggerParser::executeRunTo()
   ProgressDialog progress(debugger.myBaseDialog, debugger.lfont(), buf.str());
   progress.setRange(0, max_iterations, 5);
 
-  bool done = false;
+  Bool done = false;
   do {
     debugger.step();
 
@@ -1360,7 +1360,7 @@ void DebuggerParser::executeRunToPc()
   const CartDebug::DisassemblyList& list = cartdbg.disassembly().list;
 
   uInt32 count = 0;
-  bool done = false;
+  Bool done = false;
   do {
     debugger.step();
 
@@ -1536,7 +1536,7 @@ void DebuggerParser::executeType()
 // "uhex"
 void DebuggerParser::executeUHex()
 {
-  bool enable = !Base::hexUppercase();
+  Bool enable = !Base::hexUppercase();
   Base::setHexUppercase(enable);
 
   settings.setValue("dbg.uhex", enable);

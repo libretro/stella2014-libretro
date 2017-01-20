@@ -88,7 +88,7 @@ void M6532::update()
   Controller& port1 = myConsole.controller(Controller::Right);
 
   // Get current PA7 state
-  bool prevPA7 = port0.myDigitalPinState[Controller::Four];
+  Bool prevPA7 = port0.myDigitalPinState[Controller::Four];
 
   // Update entire port state
   port0.update();
@@ -96,7 +96,7 @@ void M6532::update()
   myConsole.switches().update();
 
   // Get new PA7 state
-  bool currPA7 = port0.myDigitalPinState[Controller::Four];
+  Bool currPA7 = port0.myDigitalPinState[Controller::Four];
 
   // PA7 Flag is set on active transition in appropriate direction
   if((!myEdgeDetectPositive && prevPA7 && !currPA7) ||
@@ -229,7 +229,7 @@ uInt8 M6532::peek(uInt16 addr)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool M6532::poke(uInt16 addr, uInt8 value)
+Bool M6532::poke(uInt16 addr, uInt8 value)
 {
   // Access RAM directly.  Originally, accesses to RAM could bypass
   // this method and its pages could be installed directly into the
@@ -303,7 +303,7 @@ void M6532::setTimerRegister(uInt8 value, uInt8 interval)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void M6532::setPinState(bool swcha)
+void M6532::setPinState(Bool swcha)
 {
   /*
     When a bit in the DDR is set as input, +5V is placed on its output
@@ -337,7 +337,7 @@ void M6532::setPinState(bool swcha)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool M6532::save(Serializer& out) const
+Bool M6532::save(Serializer& out) const
 {
   try
   {
@@ -369,7 +369,7 @@ bool M6532::save(Serializer& out) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool M6532::load(Serializer& in)
+Bool M6532::load(Serializer& in)
 {
   try
   {

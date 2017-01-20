@@ -74,10 +74,10 @@ class MouseControl
     const string& next();
 
   private:
-    void addLeftControllerModes(bool noswap);
-    void addRightControllerModes(bool noswap);
+    void addLeftControllerModes(Bool noswap);
+    void addRightControllerModes(Bool noswap);
     void addPaddleModes(int lport, int rport, int lname, int rname);
-    bool controllerSupportsMouse(Controller& controller);
+    Bool controllerSupportsMouse(Controller& controller);
 
   private:
     const Properties& myProps;

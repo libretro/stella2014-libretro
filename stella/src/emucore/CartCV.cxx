@@ -144,7 +144,7 @@ uInt8 CartridgeCV::peek(uInt16 address)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeCV::poke(uInt16, uInt8)
+Bool CartridgeCV::poke(uInt16, uInt8)
 {
   // NOTE: This does not handle accessing RAM, however, this function 
   // should never be called for RAM because of the way page accessing 
@@ -153,7 +153,7 @@ bool CartridgeCV::poke(uInt16, uInt8)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeCV::bank(uInt16 bank)
+Bool CartridgeCV::bank(uInt16 bank)
 {
   // Doesn't support bankswitching
   return false;
@@ -173,7 +173,7 @@ uInt16 CartridgeCV::bankCount() const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeCV::patch(uInt16 address, uInt8 value)
+Bool CartridgeCV::patch(uInt16 address, uInt8 value)
 {
   address &= 0x0FFF;
 
@@ -199,7 +199,7 @@ const uInt8* CartridgeCV::getImage(int& size) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeCV::save(Serializer& out) const
+Bool CartridgeCV::save(Serializer& out) const
 {
    out.putString(name());
    out.putByteArray(myRAM, 1024);
@@ -208,7 +208,7 @@ bool CartridgeCV::save(Serializer& out) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeCV::load(Serializer& in)
+Bool CartridgeCV::load(Serializer& in)
 {
    if(in.getString() != name())
       return false;

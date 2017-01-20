@@ -47,7 +47,7 @@ class Paddles : public Controller
                         resistance to decrease instead of increase)
     */
     Paddles(Jack jack, const Event& event, const System& system,
-            bool swappaddle, bool swapaxis, bool swapdir);
+            Bool swappaddle, Bool swapaxis, Bool swapdir);
 
     /**
       Destructor
@@ -77,7 +77,7 @@ class Paddles : public Controller
 
       @return  Whether the controller supports using the mouse
     */
-    bool setMouseControl(
+    Bool setMouseControl(
       Controller::Type xtype, int xid, Controller::Type ytype, int yid);
 
     /**
@@ -121,7 +121,7 @@ class Paddles : public Controller
     int myMPaddleID;                // paddle to emulate in 'automatic' mode
     int myMPaddleIDX, myMPaddleIDY; // paddles to emulate in 'specific axis' mode
 
-    bool myKeyRepeat0, myKeyRepeat1;
+    Bool myKeyRepeat0, myKeyRepeat1;
     int myPaddleRepeat0, myPaddleRepeat1;
     int myCharge[2], myLastCharge[2];
     int myLastAxisX, myLastAxisY;

@@ -132,7 +132,7 @@ class Array
     uInt32 size() const     { return _size;     }
     uInt32 capacity() const { return _capacity; }
 
-    void clear(bool fullerase = true)
+    void clear(Bool fullerase = true)
     {
       if(fullerase)
       {
@@ -146,7 +146,7 @@ class Array
       _size = 0;
     }
 	
-    bool isEmpty() const
+    Bool isEmpty() const
     {
       return (_size == 0);
     }
@@ -194,7 +194,7 @@ class Array
 }  // Namespace Common
 
 typedef Common::Array<int>   IntArray;
-typedef Common::Array<bool>  BoolArray;
+typedef Common::Array<Bool>  BoolArray;
 typedef Common::Array<uInt8> ByteArray;
 
 #endif

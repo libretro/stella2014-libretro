@@ -118,7 +118,7 @@ Console::Console(OSystem* osystem, Cartridge* cart, const Properties& props)
     // We turn off the SuperCharger progress bars, otherwise the SC BIOS
     // will take over 250 frames!
     // The 'fastscbios' option must be changed before the system is reset
-    bool fastscbios = myOSystem->settings().getBool("fastscbios");
+    Bool fastscbios = myOSystem->settings().getBool("fastscbios");
     myOSystem->settings().setValue("fastscbios", true);
     mySystem->reset(true);  // autodetect in reset enabled
     for(int i = 0; i < 60; ++i)
@@ -155,7 +155,7 @@ Console::Console(OSystem* osystem, Cartridge* cart, const Properties& props)
 
   // Bumper Bash always requires all 4 directions
   // Other ROMs can use it if the setting is enabled
-  bool joyallow4 = md5 == "aa1c41f86ec44c0a44eb64c332ce08af" ||
+  Bool joyallow4 = md5 == "aa1c41f86ec44c0a44eb64c332ce08af" ||
                    md5 == "1bf503c724001b09be79c515ecfcbd03" ||
                    myOSystem->settings().getBool("joyallow4");
   myOSystem->eventHandler().allowAllDirections(joyallow4);
@@ -184,7 +184,7 @@ Console::~Console()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Console::save(Serializer& out) const
+Bool Console::save(Serializer& out) const
 {
   try
   {
@@ -207,7 +207,7 @@ bool Console::save(Serializer& out) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Console::load(Serializer& in)
+Bool Console::load(Serializer& in)
 {
   try
   {
@@ -285,7 +285,7 @@ void Console::toggleFormat(int direction)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Console::toggleColorLoss()
 {
-  bool colorloss = !myOSystem->settings().getBool("colorloss");
+  Bool colorloss = !myOSystem->settings().getBool("colorloss");
   myOSystem->settings().setValue("colorloss", colorloss);
   myTIA->enableColorLoss(colorloss);
 
@@ -295,7 +295,7 @@ void Console::toggleColorLoss()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Console::toggleColorLoss(bool state)
+void Console::toggleColorLoss(Bool state)
 {
   myTIA->enableColorLoss(state);
 }
@@ -388,7 +388,7 @@ void Console::togglePhosphor()
 {
   const string& phosphor = myProperties.get(Display_Phosphor);
   int blend = atoi(myProperties.get(Display_PPBlend).c_str());
-  bool enable;
+  Bool enable;
   if(phosphor == "YES")
   {
     myProperties.set(Display_Phosphor, "No");
@@ -412,7 +412,7 @@ void Console::setProperties(const Properties& props)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-FBInitStatus Console::initializeVideo(bool full)
+FBInitStatus Console::initializeVideo(Bool full)
 {
   FBInitStatus fbstatus = kSuccess;
 
@@ -429,7 +429,7 @@ FBInitStatus Console::initializeVideo(bool full)
     setColorLossPalette();
   }
 
-  bool enable = myProperties.get(Display_Phosphor) == "YES";
+  Bool enable = myProperties.get(Display_Phosphor) == "YES";
   int blend = atoi(myProperties.get(Display_PPBlend).c_str());
   myOSystem->frameBuffer().enablePhosphor(enable, blend);
   setPalette(myOSystem->settings().getString("palette"));
@@ -639,7 +639,7 @@ void Console::setControllers(const string& rommd5)
   }
 
   // Also check if we should swap the paddles plugged into a jack
-  bool swapPaddles = myProperties.get(Controller_SwapPaddles) == "YES";
+  Bool swapPaddles = myProperties.get(Controller_SwapPaddles) == "YES";
 
   // Construct left controller
   if(left == "BOOSTERGRIP")
@@ -656,7 +656,7 @@ void Console::setControllers(const string& rommd5)
   }
   else if(BSPF_startsWithIgnoreCase(left, "PADDLES"))
   {
-    bool swapAxis = false, swapDir = false;
+    Bool swapAxis = false, swapDir = false;
     if(left == "PADDLES_IAXIS")
       swapAxis = true;
     else if(left == "PADDLES_IDIR")
@@ -710,7 +710,7 @@ void Console::setControllers(const string& rommd5)
   }
   else if(BSPF_startsWithIgnoreCase(right, "PADDLES"))
   {
-    bool swapAxis = false, swapDir = false;
+    Bool swapAxis = false, swapDir = false;
     if(right == "PADDLES_IAXIS")
       swapAxis = true;
     else if(right == "PADDLES_IDIR")
@@ -871,9 +871,9 @@ void Console::setFramerate(float framerate)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Console::toggleTIABit(TIABit bit, const string& bitname, bool show) const
+void Console::toggleTIABit(TIABit bit, const string& bitname, Bool show) const
 {
-  bool result = myTIA->toggleBit(bit);
+  Bool result = myTIA->toggleBit(bit);
   string message = bitname + (result ? " enabled" : " disabled");
   myOSystem->frameBuffer().showMessage(message);
 }
@@ -881,15 +881,15 @@ void Console::toggleTIABit(TIABit bit, const string& bitname, bool show) const
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Console::toggleBits() const
 {
-  bool enabled = myTIA->toggleBits();
+  Bool enabled = myTIA->toggleBits();
   string message = string("TIA bits") + (enabled ? " enabled" : " disabled");
   myOSystem->frameBuffer().showMessage(message);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Console::toggleTIACollision(TIABit bit, const string& bitname, bool show) const
+void Console::toggleTIACollision(TIABit bit, const string& bitname, Bool show) const
 {
-  bool result = myTIA->toggleCollision(bit);
+  Bool result = myTIA->toggleCollision(bit);
   string message = bitname + (result ? " collision enabled" : " collision disabled");
   myOSystem->frameBuffer().showMessage(message);
 }
@@ -897,7 +897,7 @@ void Console::toggleTIACollision(TIABit bit, const string& bitname, bool show) c
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Console::toggleCollisions() const
 {
-  bool enabled = myTIA->toggleCollisions();
+  Bool enabled = myTIA->toggleCollisions();
   string message = string("TIA collisions") + (enabled ? " enabled" : " disabled");
   myOSystem->frameBuffer().showMessage(message);
 }

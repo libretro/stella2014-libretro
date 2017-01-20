@@ -53,7 +53,7 @@ class Serializer
       The isValid() method must immediately be called to verify the stream
       was correctly initialized.
     */
-    Serializer(const string& filename, bool readonly = false);
+    Serializer(const string& filename, Bool readonly = false);
     Serializer(void);
 
     /**
@@ -66,7 +66,7 @@ class Serializer
       Answers whether the serializer is currently initialized for reading
       and writing.
     */
-    bool isValid(void);
+    Bool isValid(void);
 
     /**
       Resets the read/write location to the beginning of the stream.
@@ -131,7 +131,7 @@ class Serializer
 
       @result The boolean value which has been read from the stream.
     */
-    bool getBool(void);
+    Bool getBool(void);
 
     /**
       Writes an byte value (unsigned 8-bit) to the current output stream.
@@ -190,7 +190,7 @@ class Serializer
 
       @param b The boolean value to write to the output stream.
     */
-    void putBool(bool b);
+    void putBool(Bool b);
 
     std::string get()
     {
@@ -207,7 +207,7 @@ class Serializer
   private:
     // The stream to send the serialized data to.
     iostream* myStream;
-    bool myUseFilestream;
+    Bool myUseFilestream;
 
     enum {
       TruePattern  = 0xfe,

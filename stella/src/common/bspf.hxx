@@ -58,6 +58,8 @@
   typedef uint64_t uInt64;
 #endif
 
+  typedef int Bool;
+
 
 // The following code should provide access to the standard C++ objects and
 // types: cout, cerr, string, ostream, istream, etc.
@@ -112,7 +114,7 @@ template<typename T> inline T BSPF_abs (T x) { return (x>=0) ? x : -x; }
 template<typename T> inline T BSPF_clamp (T a, T l, T u) { return (a<l) ? l : (a>u) ? u : a; }
 
 // Test whether two characters are equal (case insensitive)
-static bool BSPF_equalsIgnoreCaseChar(char ch1, char ch2)
+static Bool BSPF_equalsIgnoreCaseChar(char ch1, char ch2)
 {
   return toupper((unsigned char)ch1) == toupper((unsigned char)ch2);
 }
@@ -136,7 +138,7 @@ inline int BSPF_compareIgnoreCase(const char* s1, const char* s2)
 }
 
 // Test whether the first string starts with the second one (case insensitive)
-inline bool BSPF_startsWithIgnoreCase(const string& s1, const string& s2)
+inline Bool BSPF_startsWithIgnoreCase(const string& s1, const string& s2)
 {
 #ifdef _MSC_VER
   return _strnicmp(s1.c_str(), s2.c_str(), s2.length()) == 0;
@@ -144,7 +146,7 @@ inline bool BSPF_startsWithIgnoreCase(const string& s1, const string& s2)
   return strncasecmp(s1.c_str(), s2.c_str(), s2.length()) == 0;
 #endif
 }
-inline bool BSPF_startsWithIgnoreCase(const char* s1, const char* s2)
+inline Bool BSPF_startsWithIgnoreCase(const char* s1, const char* s2)
 {
 #ifdef _MSC_VER
   return _strnicmp(s1, s2, strlen(s2)) == 0;
@@ -154,7 +156,7 @@ inline bool BSPF_startsWithIgnoreCase(const char* s1, const char* s2)
 }
 
 // Test whether two strings are equal (case insensitive)
-inline bool BSPF_equalsIgnoreCase(const string& s1, const string& s2)
+inline Bool BSPF_equalsIgnoreCase(const string& s1, const string& s2)
 {
   return BSPF_compareIgnoreCase(s1, s2) == 0;
 }
@@ -169,7 +171,7 @@ inline size_t BSPF_findIgnoreCase(const string& s1, const string& s2, int startp
 }
 
 // Test whether the first string ends with the second one (case insensitive)
-inline bool BSPF_endsWithIgnoreCase(const string& s1, const string& s2)
+inline Bool BSPF_endsWithIgnoreCase(const string& s1, const string& s2)
 {
   if(s1.length() >= s2.length())
   {
@@ -180,7 +182,7 @@ inline bool BSPF_endsWithIgnoreCase(const string& s1, const string& s2)
 }
 
 // Test whether the first string contains the second one (case insensitive)
-inline bool BSPF_containsIgnoreCase(const string& s1, const string& s2)
+inline Bool BSPF_containsIgnoreCase(const string& s1, const string& s2)
 {
   return BSPF_findIgnoreCase(s1, s2) != string::npos;
 }

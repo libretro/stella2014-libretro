@@ -28,13 +28,13 @@ OSystem::~OSystem()
     
 }
 
-bool OSystem::create() { return 1; }
+Bool OSystem::create() { return 1; }
 
 void OSystem::mainLoop() { }
 
 void OSystem::pollEvent() { }
 
-bool OSystem::queryVideoHardware() { return 1; }
+Bool OSystem::queryVideoHardware() { return 1; }
 
 void OSystem::stateChanged(EventHandler::State state) { }
 
@@ -75,7 +75,7 @@ FBInitStatus FrameBuffer::initialize(const string& title, uInt32 width, uInt32 h
 
 void FrameBuffer::refresh() { }
 
-void FrameBuffer::showFrameStats(bool enable) { }
+void FrameBuffer::showFrameStats(Bool enable) { }
 
 // 0 to <counts> - 1, i_s caches the value of counts
 //#define iterateTimes(counts, i) for(unsigned int i = 0, i ## _s = counts; i < (i ## _s); i++)

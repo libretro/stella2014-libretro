@@ -66,7 +66,7 @@ class MindLink : public Controller
       @param pin The pin of the controller jack to write to
       @param value The value to write to the pin
     */
-    void write(DigitalPin pin, bool value) { myDigitalPinState[pin] = value; }
+    void write(DigitalPin pin, Bool value) { myDigitalPinState[pin] = value; }
 
     /**
       Called after *all* digital pins have been written on Port A.
@@ -97,7 +97,7 @@ class MindLink : public Controller
 
       @return  Whether the controller supports using the mouse
     */
-    bool setMouseControl(
+    Bool setMouseControl(
       Controller::Type xtype, int xid, Controller::Type ytype, int yid);
 
   private:

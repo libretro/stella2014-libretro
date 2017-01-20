@@ -197,7 +197,7 @@ uInt8 CartridgeCTY::peek(uInt16 address)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeCTY::poke(uInt16 address, uInt8 value)
+Bool CartridgeCTY::poke(uInt16 address, uInt8 value)
 {
   address &= 0x0FFF;
 
@@ -249,7 +249,7 @@ bool CartridgeCTY::poke(uInt16 address, uInt8 value)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeCTY::bank(uInt16 bank)
+Bool CartridgeCTY::bank(uInt16 bank)
 { 
   if(bankLocked()) return false;
 
@@ -280,7 +280,7 @@ uInt16 CartridgeCTY::bankCount() const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeCTY::patch(uInt16 address, uInt8 value)
+Bool CartridgeCTY::patch(uInt16 address, uInt8 value)
 {
   address &= 0x0FFF;
 
@@ -305,7 +305,7 @@ const uInt8* CartridgeCTY::getImage(int& size) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeCTY::save(Serializer& out) const
+Bool CartridgeCTY::save(Serializer& out) const
 {
    out.putString(name());
    out.putShort(bank());
@@ -322,7 +322,7 @@ bool CartridgeCTY::save(Serializer& out) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeCTY::load(Serializer& in)
+Bool CartridgeCTY::load(Serializer& in)
 {
    if(in.getString() != name())
       return false;

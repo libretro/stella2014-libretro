@@ -59,8 +59,8 @@ class Base
     static Base::Format format()             { return myDefaultBase; }
 
     /** Get/set HEX output to be upper/lower case */
-    static void setHexUppercase(bool enable);
-    static bool hexUppercase() { return myHexflags & std::ios_base::uppercase; }
+    static void setHexUppercase(Bool enable);
+    static Bool hexUppercase() { return myHexflags & std::ios_base::uppercase; }
 
     /** Output HEX digits in 1/2/4 byte format */
     static inline std::ostream& HEX2(std::ostream& os) {

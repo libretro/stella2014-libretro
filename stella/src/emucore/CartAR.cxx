@@ -176,9 +176,9 @@ uInt8 CartridgeAR::peek(uInt16 addr)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeAR::poke(uInt16 addr, uInt8)
+Bool CartridgeAR::poke(uInt16 addr, uInt8)
 {
-  bool modified = false;
+  Bool modified = false;
 
   // Cancel any pending write if more than 5 distinct accesses have occurred
   // TODO: Modify to handle when the distinct counter wraps around...
@@ -237,7 +237,7 @@ void CartridgeAR::setAccessFlags(uInt16 address, uInt8 flags)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeAR::bankConfiguration(uInt8 configuration)
+Bool CartridgeAR::bankConfiguration(uInt8 configuration)
 {
   // D7-D5 of this byte: Write Pulse Delay (n/a for emulator)
   //
@@ -392,7 +392,7 @@ void CartridgeAR::loadIntoRAM(uInt8 load)
       }
 
       // Load all of the pages from the load
-      bool invalidPageChecksumSeen = false;
+      Bool invalidPageChecksumSeen = false;
       for(uInt32 j = 0; j < myHeader[3]; ++j)
       {
         uInt32 bank = myHeader[16 + j] & 0x03;
@@ -430,7 +430,7 @@ void CartridgeAR::loadIntoRAM(uInt8 load)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeAR::bank(uInt16 bank)
+Bool CartridgeAR::bank(uInt16 bank)
 {
   if(!bankLocked())
     return bankConfiguration(bank);
@@ -451,7 +451,7 @@ uInt16 CartridgeAR::bankCount() const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeAR::patch(uInt16 address, uInt8 value)
+Bool CartridgeAR::patch(uInt16 address, uInt8 value)
 {
   // TODO - add support for debugger
   return false;
@@ -465,7 +465,7 @@ const uInt8* CartridgeAR::getImage(int& size) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeAR::save(Serializer& out) const
+Bool CartridgeAR::save(Serializer& out) const
 {
    out.putString(name());
 
@@ -507,7 +507,7 @@ bool CartridgeAR::save(Serializer& out) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeAR::load(Serializer& in)
+Bool CartridgeAR::load(Serializer& in)
 {
    if(in.getString() != name())
       return false;

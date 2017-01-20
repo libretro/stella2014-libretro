@@ -54,7 +54,7 @@ AtariVox::~AtariVox()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool AtariVox::read(DigitalPin pin)
+Bool AtariVox::read(DigitalPin pin)
 {
   // We need to override the Controller::read() method, since the timing
   // of the actual read is important for the EEPROM (we can't just read
@@ -77,7 +77,7 @@ bool AtariVox::read(DigitalPin pin)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void AtariVox::write(DigitalPin pin, bool value)
+void AtariVox::write(DigitalPin pin, Bool value)
 {
   // Change the pin state based on value
   switch(pin)
@@ -109,7 +109,7 @@ void AtariVox::write(DigitalPin pin, bool value)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void AtariVox::clockDataIn(bool value)
+void AtariVox::clockDataIn(Bool value)
 {
   uInt32 cycle = mySystem.cycles();
 

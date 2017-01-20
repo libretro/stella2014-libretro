@@ -74,7 +74,7 @@ uInt8 CartridgeF0::peek(uInt16 address)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeF0::poke(uInt16 address, uInt8)
+Bool CartridgeF0::poke(uInt16 address, uInt8)
 {
   address &= 0x0FFF;
 
@@ -118,7 +118,7 @@ void CartridgeF0::incbank()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeF0::bank(uInt16 bank)
+Bool CartridgeF0::bank(uInt16 bank)
 {
   if(bankLocked()) return false;
 
@@ -141,7 +141,7 @@ uInt16 CartridgeF0::bankCount() const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeF0::patch(uInt16 address, uInt8 value)
+Bool CartridgeF0::patch(uInt16 address, uInt8 value)
 {
   myImage[(myCurrentBank << 12) + (address & 0x0FFF)] = value;
   return myBankChanged = true;
@@ -155,7 +155,7 @@ const uInt8* CartridgeF0::getImage(int& size) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeF0::save(Serializer& out) const
+Bool CartridgeF0::save(Serializer& out) const
 {
    out.putString(name());
    out.putShort(myCurrentBank);
@@ -164,7 +164,7 @@ bool CartridgeF0::save(Serializer& out) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeF0::load(Serializer& in)
+Bool CartridgeF0::load(Serializer& in)
 {
    if(in.getString() != name())
       return false;

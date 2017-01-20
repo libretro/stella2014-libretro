@@ -81,7 +81,7 @@ void MindLink::nextMindlinkBit()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool MindLink::setMouseControl(
+Bool MindLink::setMouseControl(
     Controller::Type xtype, int xid, Controller::Type ytype, int yid)
 {
   // Currently, the mindlink takes full control of the mouse, but only ever

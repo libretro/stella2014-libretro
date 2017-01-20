@@ -106,7 +106,7 @@ uInt8 CartridgeE0::peek(uInt16 address)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeE0::poke(uInt16 address, uInt8)
+Bool CartridgeE0::poke(uInt16 address, uInt8)
 {
   address &= 0x0FFF;
 
@@ -193,7 +193,7 @@ void CartridgeE0::segmentTwo(uInt16 slice)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeE0::bank(uInt16)
+Bool CartridgeE0::bank(uInt16)
 {
   // Doesn't support bankswitching in the normal sense
   return false;
@@ -215,7 +215,7 @@ uInt16 CartridgeE0::bankCount() const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeE0::patch(uInt16 address, uInt8 value)
+Bool CartridgeE0::patch(uInt16 address, uInt8 value)
 {
   address &= 0x0FFF;
   myImage[(myCurrentSlice[address >> 10] << 10) + (address & 0x03FF)] = value;
@@ -230,7 +230,7 @@ const uInt8* CartridgeE0::getImage(int& size) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeE0::save(Serializer& out) const
+Bool CartridgeE0::save(Serializer& out) const
 {
   try
   {
@@ -247,7 +247,7 @@ bool CartridgeE0::save(Serializer& out) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeE0::load(Serializer& in)
+Bool CartridgeE0::load(Serializer& in)
 {
   try
   {

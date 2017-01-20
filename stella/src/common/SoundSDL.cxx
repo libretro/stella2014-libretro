@@ -56,7 +56,7 @@ SoundSDL::~SoundSDL()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SoundSDL::setEnabled(bool state)
+void SoundSDL::setEnabled(Bool state)
 {
   myOSystem->settings().setValue("sound", state);
 }
@@ -109,7 +109,7 @@ void SoundSDL::close()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SoundSDL::mute(bool state)
+void SoundSDL::mute(Bool state)
 {
   if(myIsInitializedFlag)
   {
@@ -354,7 +354,7 @@ void SoundSDL::callback(void* udata, uInt8* stream, int len)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool SoundSDL::save(Serializer& out) const
+Bool SoundSDL::save(Serializer& out) const
 {
    out.putString(name());
 
@@ -384,7 +384,7 @@ bool SoundSDL::save(Serializer& out) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool SoundSDL::load(Serializer& in)
+Bool SoundSDL::load(Serializer& in)
 {
    if(in.getString() != name())
       return false;

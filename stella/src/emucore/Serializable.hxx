@@ -42,7 +42,7 @@ class Serializable
       @param out  The Serializer object to use
       @return  False on any errors, else true
     */
-    virtual bool save(Serializer& out) const = 0;
+    virtual Bool save(Serializer& out) const = 0;
 
     /**
       Load the current state of the object from the given Serializer.
@@ -50,7 +50,7 @@ class Serializable
       @param in  The Serializer object to use
       @return  False on any errors, else true
     */
-    virtual bool load(Serializer& in) = 0;
+    virtual Bool load(Serializer& in) = 0;
 
     /**
       Get a descriptor for the object name (used in error checking).

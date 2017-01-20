@@ -70,7 +70,7 @@ class Joystick : public Controller
 
       @return  Whether the controller supports using the mouse
     */
-    bool setMouseControl(
+    Bool setMouseControl(
       Controller::Type xtype, int xid, Controller::Type ytype, int yid);
 
     /**

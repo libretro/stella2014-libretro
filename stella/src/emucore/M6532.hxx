@@ -104,7 +104,7 @@ class M6532 : public Device
       @param out  The Serializer object to use
       @return  False on any errors, else true
     */
-    bool save(Serializer& out) const;
+    Bool save(Serializer& out) const;
 
     /**
       Load the current state of this device from the given Serializer.
@@ -112,7 +112,7 @@ class M6532 : public Device
       @param in  The Serializer object to use
       @return  False on any errors, else true
     */
-    bool load(Serializer& in);
+    Bool load(Serializer& in);
 
     /**
       Get a descriptor for the device name (used in error checking).
@@ -137,14 +137,14 @@ class M6532 : public Device
 
       @return  True if the poke changed the device address space, else false
     */
-    bool poke(uInt16 address, uInt8 value);
+    Bool poke(uInt16 address, uInt8 value);
 
   private:
     Int32 timerClocks() const
       { return myTimer - (mySystem->cycles() - myCyclesWhenTimerSet); }
 
     void setTimerRegister(uInt8 data, uInt8 interval);
-    void setPinState(bool shcha);
+    void setPinState(Bool shcha);
 
     // The following are used by the debugger to read INTIM/TIMINT
     // We need separate methods to do this, so the state of the system
@@ -196,11 +196,11 @@ class M6532 : public Device
 
     // Whether the timer flag (as currently set) can be used
     // If it isn't valid, it will be updated as required
-    bool myTimerFlagValid;
+    Bool myTimerFlagValid;
 
     // Used to determine whether an active transition on PA7 has occurred
     // True is positive edge-detect, false is negative edge-detect
-    bool myEdgeDetectPositive;
+    Bool myEdgeDetectPositive;
 
     // Last value written to the timer registers
     uInt8 myOutTimer[4];

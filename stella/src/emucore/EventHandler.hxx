@@ -174,7 +174,7 @@ class EventHandler
     */
     void setContinuousSnapshots(uInt32 interval);
 
-//    inline bool kbdAlt(int mod) const
+//    inline Bool kbdAlt(int mod) const
 //    {
 //  #ifndef MAC_OSX
 //      return (mod & KMOD_ALT);
@@ -183,19 +183,19 @@ class EventHandler
 //  #endif
 //    }
 //
-//    inline bool kbdControl(int mod) const
+//    inline Bool kbdControl(int mod) const
 //    {
 //      return (mod & KMOD_CTRL) > 0;
 //    }
 //
-//    inline bool kbdShift(int mod) const
+//    inline Bool kbdShift(int mod) const
 //    {
 //      return (mod & KMOD_SHIFT);
 //    }
 
     void enterMenuMode(State state);
     void leaveMenuMode();
-    bool enterDebugMode();
+    Bool enterDebugMode();
     void leaveDebugMode();
 
     /**
@@ -207,7 +207,7 @@ class EventHandler
     */
     void handleEvent(Event::Type type, Int32 value);
 
-//    bool frying() const { return myFryingFlag; }
+//    Bool frying() const { return myFryingFlag; }
 
     void getActionList(EventMode mode, StringList& list) const;
     void getComboList(EventMode mode, VariantList& map) const;
@@ -236,7 +236,7 @@ class EventHandler
       @param mode   The mode where this event is active
       @param key    The key to bind to this event
     */
-    bool addKeyMapping(Event::Type event, EventMode mode, StellaKey key);
+    Bool addKeyMapping(Event::Type event, EventMode mode, StellaKey key);
 
     /**
       Bind a joystick axis direction to an event/action and regenerate
@@ -251,9 +251,9 @@ class EventHandler
                           we want to do this, unless there are a batch of
                           'adds', in which case it's delayed until the end
     */
-    bool addJoyAxisMapping(Event::Type event, EventMode mode,
+    Bool addJoyAxisMapping(Event::Type event, EventMode mode,
                            int stick, int axis, int value,
-                           bool updateMenus = true);
+                           Bool updateMenus = true);
 
     /**
       Bind a joystick button to an event/action and regenerate the
@@ -267,8 +267,8 @@ class EventHandler
                           we want to do this, unless there are a batch of
                           'adds', in which case it's delayed until the end
     */
-    bool addJoyButtonMapping(Event::Type event, EventMode mode, int stick, int button,
-                             bool updateMenus = true);
+    Bool addJoyButtonMapping(Event::Type event, EventMode mode, int stick, int button,
+                             Bool updateMenus = true);
 
     /**
       Bind a joystick hat direction to an event/action and regenerate
@@ -283,9 +283,9 @@ class EventHandler
                           we want to do this, unless there are a batch of
                           'adds', in which case it's delayed until the end
     */
-    bool addJoyHatMapping(Event::Type event, EventMode mode,
+    Bool addJoyHatMapping(Event::Type event, EventMode mode,
                           int stick, int hat, int value,
-                          bool updateMenus = true);
+                          Bool updateMenus = true);
 
     /**
       Erase the specified mapping
@@ -314,7 +314,7 @@ class EventHandler
 
       @param allow  Whether or not to allow impossible directions
     */
-    void allowAllDirections(bool allow) { myAllowAllDirectionsFlag = allow; }
+    void allowAllDirections(Bool allow) { myAllowAllDirectionsFlag = allow; }
 
   private:
 //    enum {
@@ -330,7 +330,7 @@ class EventHandler
       @param type  The event
       @return      True if the state changed, else false
     */
-    bool eventStateChange(Event::Type type);
+    Bool eventStateChange(Event::Type type);
 
     /**
       The following methods take care of assigning action mappings.
@@ -352,7 +352,7 @@ class EventHandler
       @param event  The event to test for analog processing
       @return       True if analog, else false
     */
-    bool eventIsAnalog(Event::Type event) const;
+    Bool eventIsAnalog(Event::Type event) const;
 
     void setEventState(State state);
 
@@ -365,11 +365,11 @@ class EventHandler
 //      Event::Type event;
 //      const char* action;
 //      char* key;
-//      bool allow_combo;
+//      Bool allow_combo;
 //    };
 //
 //    struct JoyMouse {   // Used for joystick to mouse emulation
-//      bool active;
+//      Bool active;
 //      int x, y, x_amt, y_amt, amt, val, old_val;
 //    };
 
@@ -399,21 +399,21 @@ class EventHandler
 //    State myState;
 
     // Indicates whether the joystick emulates 'impossible' directions
-    bool myAllowAllDirectionsFlag;;
+    Bool myAllowAllDirectionsFlag;;
 
     // Indicates whether or not we're in frying mode
-/*     bool myFryingFlag;
+/*     Bool myFryingFlag;
 
     // Indicates whether the key-combos tied to the Control key are
     // being used or not (since Ctrl by default is the fire button,
     // pressing it with a movement key could inadvertantly activate
     // a Ctrl combo when it isn't wanted)
-    bool myUseCtrlKeyFlag;
+    Bool myUseCtrlKeyFlag;
 
     // A bug in the SDL video handler creates an extraneous mouse motion
     // event after a video state change
     // We detect when this happens and discard the event
-    bool mySkipMouseMotion;
+    Bool mySkipMouseMotion;
 
     // Used for continuous snapshot mode
     uInt32 myContSnapshotInterval;
@@ -440,7 +440,7 @@ class EventHandler
 
         string setStick(int i);
         string getMap() const;
-        bool setMap(const string& map);
+        Bool setMap(const string& map);
         void eraseMap(EventMode mode);
         void eraseEvent(Event::Type event, EventMode mode);
         string about() const;

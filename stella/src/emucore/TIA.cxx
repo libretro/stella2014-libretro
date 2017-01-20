@@ -266,7 +266,7 @@ void TIA::install(System& system, Device& device)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool TIA::save(Serializer& out) const
+Bool TIA::save(Serializer& out) const
 {
   const string& device = name();
 
@@ -369,7 +369,7 @@ bool TIA::save(Serializer& out) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool TIA::load(Serializer& in)
+Bool TIA::load(Serializer& in)
 {
   const string& device = name();
 
@@ -478,7 +478,7 @@ bool TIA::load(Serializer& in)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool TIA::saveDisplay(Serializer& out) const
+Bool TIA::saveDisplay(Serializer& out) const
 {
   try
   {
@@ -496,7 +496,7 @@ bool TIA::saveDisplay(Serializer& out) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool TIA::loadDisplay(Serializer& in)
+Bool TIA::loadDisplay(Serializer& in)
 {
   try
   {
@@ -674,7 +674,7 @@ inline void TIA::endFrame()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool TIA::scanlinePos(uInt16& x, uInt16& y) const
+Bool TIA::scanlinePos(uInt16& x, uInt16& y) const
 {
   if(myPartialFrameFlag)
   {
@@ -701,7 +701,7 @@ bool TIA::scanlinePos(uInt16& x, uInt16& y) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void TIA::enableBits(bool mode)
+void TIA::enableBits(Bool mode)
 {
   toggleBit(P0Bit, mode ? 1 : 0);
   toggleBit(P1Bit, mode ? 1 : 0);
@@ -712,11 +712,11 @@ void TIA::enableBits(bool mode)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool TIA::toggleBit(TIABit b, uInt8 mode)
+Bool TIA::toggleBit(TIABit b, uInt8 mode)
 {
   // If mode is 0 or 1, use it as a boolean (off or on)
   // Otherwise, flip the state
-  bool on = (mode == 0 || mode == 1) ? bool(mode) : !(myDisabledObjects & b);
+  Bool on = (mode == 0 || mode == 1) ? Bool(mode) : !(myDisabledObjects & b);
   if(on)  myDisabledObjects |= b;
   else    myDisabledObjects &= ~b;
 
@@ -724,7 +724,7 @@ bool TIA::toggleBit(TIABit b, uInt8 mode)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool TIA::toggleBits()
+Bool TIA::toggleBits()
 {
   myBitsEnabled = !myBitsEnabled;
   enableBits(myBitsEnabled);
@@ -732,7 +732,7 @@ bool TIA::toggleBits()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void TIA::enableCollisions(bool mode)
+void TIA::enableCollisions(Bool mode)
 {
   toggleCollision(P0Bit, mode ? 1 : 0);
   toggleCollision(P1Bit, mode ? 1 : 0);
@@ -743,13 +743,13 @@ void TIA::enableCollisions(bool mode)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool TIA::toggleCollision(TIABit b, uInt8 mode)
+Bool TIA::toggleCollision(TIABit b, uInt8 mode)
 {
   uInt16 enabled = myCollisionEnabledMask >> 16;
 
   // If mode is 0 or 1, use it as a boolean (off or on)
   // Otherwise, flip the state
-  bool on = (mode == 0 || mode == 1) ? bool(mode) : !(enabled & b);
+  Bool on = (mode == 0 || mode == 1) ? Bool(mode) : !(enabled & b);
   if(on)  enabled |= b;
   else    enabled &= ~b;
 
@@ -775,7 +775,7 @@ bool TIA::toggleCollision(TIABit b, uInt8 mode)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool TIA::toggleCollisions()
+Bool TIA::toggleCollisions()
 {
   myCollisionsEnabled = !myCollisionsEnabled;
   enableCollisions(myCollisionsEnabled);
@@ -783,18 +783,18 @@ bool TIA::toggleCollisions()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool TIA::toggleHMOVEBlank()
+Bool TIA::toggleHMOVEBlank()
 {
   myAllowHMOVEBlanks = myAllowHMOVEBlanks ? false : true;
   return myAllowHMOVEBlanks;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool TIA::toggleFixedColors(uInt8 mode)
+Bool TIA::toggleFixedColors(uInt8 mode)
 {
   // If mode is 0 or 1, use it as a boolean (off or on)
   // Otherwise, flip the state
-  bool on = (mode == 0 || mode == 1) ? bool(mode) :
+  Bool on = (mode == 0 || mode == 1) ? Bool(mode) :
             (myColorPtr == myColor ? true : false);
   if(on)  myColorPtr = myFixedColor;
   else    myColorPtr = myColor;
@@ -855,13 +855,13 @@ bool TIA::toggleFixedColors(uInt8 mode)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool TIA::driveUnusedPinsRandom(uInt8 mode)
+Bool TIA::driveUnusedPinsRandom(uInt8 mode)
 {
   // If mode is 0 or 1, use it as a boolean (off or on)
   // Otherwise, return the state
   if(mode == 0 || mode == 1)
   {
-    myTIAPinsDriven = bool(mode);
+    myTIAPinsDriven = Bool(mode);
     mySettings.setValue("tiadriven", myTIAPinsDriven);
   }
   return myTIAPinsDriven;
@@ -962,7 +962,7 @@ void TIA::updateFrame(Int32 clock)
     {
       // We're no longer concerned with previously issued HMOVE's
       myPreviousHMOVEPos = 0x7FFFFFFF;
-      bool posChanged = false;
+      Bool posChanged = false;
 
       // Apply pending motion clocks from a HMOVE initiated during the scanline
       if(myCurrentHMOVEPos != 0x7FFFFFFF)
@@ -1370,7 +1370,7 @@ uInt8 TIA::peek(uInt16 addr)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool TIA::poke(uInt16 addr, uInt8 value)
+Bool TIA::poke(uInt16 addr, uInt8 value)
 {
   addr = addr & 0x003f;
 

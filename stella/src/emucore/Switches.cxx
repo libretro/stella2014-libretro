@@ -109,7 +109,7 @@ void Switches::update()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool Switches::save(Serializer& out) const
+Bool Switches::save(Serializer& out) const
 {
   try
   {
@@ -124,7 +124,7 @@ bool Switches::save(Serializer& out) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool Switches::load(Serializer& in)
+Bool Switches::load(Serializer& in)
 {
   try
   {

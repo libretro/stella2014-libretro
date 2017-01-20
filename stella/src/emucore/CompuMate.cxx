@@ -42,7 +42,7 @@ CompuMate::CompuMate(CartridgeCM& cart, const Event& event,
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CompuMate::enableKeyHandling(bool enable)
+void CompuMate::enableKeyHandling(Bool enable)
 {
   if(enable)
     myKeyTable = myEvent.getKeys();

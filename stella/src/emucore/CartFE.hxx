@@ -88,7 +88,7 @@ class CartridgeFE : public Cartridge
 
       @param bank The bank that should be installed in the system
     */
-    bool bank(uInt16 bank);
+    Bool bank(uInt16 bank);
 
     /**
       Get the current bank.
@@ -106,7 +106,7 @@ class CartridgeFE : public Cartridge
 
       @return  Whether the bank was changed
     */
-    bool bankChanged();
+    Bool bankChanged();
 
     /**
       Patch the cartridge ROM.
@@ -115,7 +115,7 @@ class CartridgeFE : public Cartridge
       @param value    The value to place into the address
       @return    Success or failure of the patch operation
     */
-    bool patch(uInt16 address, uInt8 value);
+    Bool patch(uInt16 address, uInt8 value);
 
     /**
       Access the internal ROM image for this cartridge.
@@ -131,7 +131,7 @@ class CartridgeFE : public Cartridge
       @param out  The Serializer object to use
       @return  False on any errors, else true
     */
-    bool save(Serializer& out) const;
+    Bool save(Serializer& out) const;
 
     /**
       Load the current state of this cart from the given Serializer.
@@ -139,7 +139,7 @@ class CartridgeFE : public Cartridge
       @param in  The Serializer object to use
       @return  False on any errors, else true
     */
-    bool load(Serializer& in);
+    Bool load(Serializer& in);
 
     /**
       Get a descriptor for the device name (used in error checking).
@@ -175,7 +175,7 @@ class CartridgeFE : public Cartridge
       @param value The value to be stored at the address
       @return  True if the poke changed the device address space, else false
     */
-    bool poke(uInt16 address, uInt8 value);
+    Bool poke(uInt16 address, uInt8 value);
 
   private:
     /**
@@ -195,7 +195,7 @@ class CartridgeFE : public Cartridge
     uInt16 myLastAddress1, myLastAddress2;
 
     // Last two addresses have been modified by peek()
-    bool myLastAddressChanged;
+    Bool myLastAddressChanged;
 };
 
 #endif

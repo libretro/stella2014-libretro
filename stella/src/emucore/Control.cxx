@@ -103,7 +103,7 @@ uInt8 Controller::read()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Controller::read(DigitalPin pin)
+Bool Controller::read(DigitalPin pin)
 {
   return myDigitalPinState[pin];
 }
@@ -115,7 +115,7 @@ Int32 Controller::read(AnalogPin pin)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Controller::set(DigitalPin pin, bool value)
+void Controller::set(DigitalPin pin, Bool value)
 {
   myDigitalPinState[pin] = value;
 }
@@ -127,7 +127,7 @@ void Controller::set(AnalogPin pin, Int32 value)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Controller::save(Serializer& out) const
+Bool Controller::save(Serializer& out) const
 {
   try
   {
@@ -151,7 +151,7 @@ bool Controller::save(Serializer& out) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Controller::load(Serializer& in)
+Bool Controller::load(Serializer& in)
 {
   try
   {

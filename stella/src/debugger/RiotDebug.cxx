@@ -150,7 +150,7 @@ uInt8 RiotDebug::inpt(int x)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool RiotDebug::vblank(int bit)
+Bool RiotDebug::vblank(int bit)
 {
   if(bit == 6)       // latches
     return mySystem.tia().myVBLANK & 0x40;
@@ -204,7 +204,7 @@ Controller& RiotDebug::controller(Controller::Jack jack) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool RiotDebug::diffP0(int newVal)
+Bool RiotDebug::diffP0(int newVal)
 {
   uInt8& switches = myConsole.switches().mySwitches;
   if(newVal > -1)
@@ -214,7 +214,7 @@ bool RiotDebug::diffP0(int newVal)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool RiotDebug::diffP1(int newVal)
+Bool RiotDebug::diffP1(int newVal)
 {
   uInt8& switches = myConsole.switches().mySwitches;
   if(newVal > -1)
@@ -224,7 +224,7 @@ bool RiotDebug::diffP1(int newVal)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool RiotDebug::tvType(int newVal)
+Bool RiotDebug::tvType(int newVal)
 {
   uInt8& switches = myConsole.switches().mySwitches;
   if(newVal > -1)
@@ -234,7 +234,7 @@ bool RiotDebug::tvType(int newVal)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool RiotDebug::select(int newVal)
+Bool RiotDebug::select(int newVal)
 {
   uInt8& switches = myConsole.switches().mySwitches;
   if(newVal > -1)
@@ -244,7 +244,7 @@ bool RiotDebug::select(int newVal)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool RiotDebug::reset(int newVal)
+Bool RiotDebug::reset(int newVal)
 {
   uInt8& switches = myConsole.switches().mySwitches;
   if(newVal > -1)

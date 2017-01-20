@@ -36,8 +36,8 @@ class FixedStack
   public:
     FixedStack<T, MAX_SIZE>() : _size(0) {}
 	
-    bool empty() const { return _size <= 0; }
-    bool full() const {return _size >= MAX_SIZE; }
+    Bool empty() const { return _size <= 0; }
+    Bool full() const {return _size >= MAX_SIZE; }
     void clear() { _size = 0; }
     void push(const T& x)
     {

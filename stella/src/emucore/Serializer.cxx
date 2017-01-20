@@ -23,7 +23,7 @@
 #include "Serializer.hxx"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Serializer::Serializer(const string& filename, bool readonly)
+Serializer::Serializer(const string& filename, Bool readonly)
   : myStream(NULL),
     myUseFilestream(true)
 {
@@ -98,7 +98,7 @@ Serializer::~Serializer(void)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Serializer::isValid(void)
+Bool Serializer::isValid(void)
 {
   return myStream != NULL;
 }
@@ -168,7 +168,7 @@ string Serializer::getString(void)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Serializer::getBool(void)
+Bool Serializer::getBool(void)
 {
   return getByte() == TruePattern;
 }
@@ -218,7 +218,7 @@ void Serializer::putString(const string& str)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Serializer::putBool(bool b)
+void Serializer::putBool(Bool b)
 {
   putByte(b ? TruePattern: FalsePattern);
 }

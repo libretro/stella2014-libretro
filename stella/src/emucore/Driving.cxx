@@ -136,7 +136,7 @@ void Driving::update()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Driving::setMouseControl(
+Bool Driving::setMouseControl(
     Controller::Type xtype, int xid, Controller::Type ytype, int yid)
 {
   // When the mouse emulates a single driving controller, only the X-axis is

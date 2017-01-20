@@ -83,7 +83,7 @@ class CartDebug : public DebuggerSystem
       string disasm;
       string ccount;
       string bytes;
-      bool hllabel;
+      Bool hllabel;
     };
     typedef Common::Array<DisassemblyTag> DisassemblyList;
     struct Disassembly {
@@ -146,7 +146,7 @@ class CartDebug : public DebuggerSystem
 
       @return  True if disassembly changed from previous call, else false
     */
-    bool disassemble(bool force = false);
+    Bool disassemble(Bool force = false);
 
     /**
       Get the results from the most recent call to disassemble()
@@ -186,7 +186,7 @@ class CartDebug : public DebuggerSystem
 
       @return  True if directive was added, else false if it was removed
     */
-    bool addDirective(CartDebug::DisasmType type, uInt16 start, uInt16 end,
+    Bool addDirective(CartDebug::DisasmType type, uInt16 start, uInt16 end,
                       int bank = -1);
 
     // The following are convenience methods that query the cartridge object
@@ -210,13 +210,13 @@ class CartDebug : public DebuggerSystem
       Add a label and associated address.
       Labels that reference either TIA or RIOT spaces will not be processed.
     */
-    bool addLabel(const string& label, uInt16 address);
+    Bool addLabel(const string& label, uInt16 address);
 
     /**
       Remove the given label and its associated address.
       Labels that reference either TIA or RIOT spaces will not be processed.
     */
-    bool removeLabel(const string& label);
+    Bool removeLabel(const string& label);
 
     /**
       Accessor methods for labels and addresses
@@ -228,8 +228,8 @@ class CartDebug : public DebuggerSystem
       If places is not -1 and a label hasn't been defined, return a
       formatted hexidecimal address
     */
-    bool getLabel(ostream& buf, uInt16 addr, bool isRead, int places = -1) const;
-    string getLabel(uInt16 addr, bool isRead, int places = -1) const;
+    Bool getLabel(ostream& buf, uInt16 addr, Bool isRead, int places = -1) const;
+    string getLabel(uInt16 addr, Bool isRead, int places = -1) const;
     int getAddress(const string& label) const;
 
     /**
@@ -325,17 +325,17 @@ class CartDebug : public DebuggerSystem
 
     // Information on equates used in the disassembly
     struct ReservedEquates {
-      bool TIARead[16];
-      bool TIAWrite[64];
-      bool IOReadWrite[24];
-      bool ZPRAM[128];
+      Bool TIARead[16];
+      Bool TIAWrite[64];
+      Bool IOReadWrite[24];
+      Bool ZPRAM[128];
       AddrToLabel Label;
     };
     ReservedEquates myReserved;
 
     // Actually call DiStella to fill the DisassemblyList structure
     // Return whether the search address was actually in the list
-    bool fillDisassemblyList(BankInfo& bankinfo, uInt16 search);
+    Bool fillDisassemblyList(BankInfo& bankinfo, uInt16 search);
 
     // Analyze of bank of ROM, generating a list of Distella directives
     // based on its disassembly
@@ -366,7 +366,7 @@ class CartDebug : public DebuggerSystem
     // to corresponding lines of text in that display
     Disassembly myDisassembly;
     map<uInt16, int> myAddrToLineList;
-    bool myAddrToLineIsROM;
+    Bool myAddrToLineIsROM;
 
     // Mappings from label to address (and vice versa) for items
     // defined by the user (either through a DASM symbol file or manually

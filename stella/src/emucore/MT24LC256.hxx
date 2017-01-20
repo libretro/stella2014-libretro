@@ -51,11 +51,11 @@ class MT24LC256
 
   public:
     /** Read boolean data from the SDA line */
-    bool readSDA();
+    Bool readSDA();
 
     /** Write boolean data to the SDA and SCL lines */
-    void writeSDA(bool state);
-    void writeSCL(bool state);
+    void writeSDA(Bool state);
+    void writeSCL(Bool state);
 
     /**
       Notification method invoked by the system right before the
@@ -71,7 +71,7 @@ class MT24LC256
     void jpee_data_stop();
     void jpee_clock_fall();
     int  jpee_logproc(char const *st);
-    bool jpee_timercheck(int mode);
+    Bool jpee_timercheck(int mode);
 
     void update();
 
@@ -83,10 +83,10 @@ class MT24LC256
     uInt8 myData[32768];
 
     // Cached state of the SDA and SCL pins on the last write
-    bool mySDA, mySCL;
+    Bool mySDA, mySCL;
 
     // Indicates that a timer has been set and hasn't expired yet
-    bool myTimerActive;
+    Bool myTimerActive;
 
     // Indicates when the timer was set
     uInt32 myCyclesWhenTimerSet;
@@ -98,10 +98,10 @@ class MT24LC256
     string myDataFile;
 
     // Indicates if a valid EEPROM data file exists/was successfully loaded
-    bool myDataFileExists;
+    Bool myDataFileExists;
 
     // Indicates if the EEPROM has changed since class invocation
-    bool myDataChanged;
+    Bool myDataChanged;
 
     // Required for I2C functionality
     int jpee_mdat, jpee_sdat, jpee_mclk;

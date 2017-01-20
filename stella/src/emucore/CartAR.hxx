@@ -86,7 +86,7 @@ class CartridgeAR : public Cartridge
 
       @param bank The bank that should be installed in the system
     */
-    bool bank(uInt16 bank);
+    Bool bank(uInt16 bank);
 
     /**
       Get the current bank.
@@ -105,7 +105,7 @@ class CartridgeAR : public Cartridge
       @param value    The value to place into the address
       @return    Success or failure of the patch operation
     */
-    bool patch(uInt16 address, uInt8 value);
+    Bool patch(uInt16 address, uInt8 value);
 
     /**
       Access the internal ROM image for this cartridge.
@@ -121,7 +121,7 @@ class CartridgeAR : public Cartridge
       @param out  The Serializer object to use
       @return  False on any errors, else true
     */
-    bool save(Serializer& out) const;
+    Bool save(Serializer& out) const;
 
     /**
       Load the current state of this cart from the given Serializer.
@@ -129,7 +129,7 @@ class CartridgeAR : public Cartridge
       @param in  The Serializer object to use
       @return  False on any errors, else true
     */
-    bool load(Serializer& in);
+    Bool load(Serializer& in);
 
     /**
       Get a descriptor for the device name (used in error checking).
@@ -165,7 +165,7 @@ class CartridgeAR : public Cartridge
       @param value The value to be stored at the address
       @return  True if the poke changed the device address space, else false
     */
-    bool poke(uInt16 address, uInt8 value);
+    Bool poke(uInt16 address, uInt8 value);
 
   private:
     /**
@@ -178,7 +178,7 @@ class CartridgeAR : public Cartridge
     void setAccessFlags(uInt16 address, uInt8 flags);
 
     // Handle a change to the bank configuration
-    bool bankConfiguration(uInt8 configuration);
+    Bool bankConfiguration(uInt8 configuration);
 
     // Compute the sum of the array of bytes
     uInt8 checksum(uInt8* s, uInt16 length);
@@ -212,10 +212,10 @@ class CartridgeAR : public Cartridge
     uInt8 myNumberOfLoadImages;
 
     // Indicates if the RAM is write enabled
-    bool myWriteEnabled;
+    Bool myWriteEnabled;
 
     // Indicates if the ROM's power is on or off
-    bool myPower;
+    Bool myPower;
 
     // Indicates when the power was last turned on
     Int32 myPowerRomCycle;
@@ -227,7 +227,7 @@ class CartridgeAR : public Cartridge
     uInt32 myNumberOfDistinctAccesses;
 
     // Indicates if a write is pending or not
-    bool myWritePending;
+    Bool myWritePending;
 
     uInt16 myCurrentBank;
 

@@ -65,7 +65,7 @@ class RiotDebug : public DebuggerSystem
     /* TIA INPTx and VBLANK registers
        Techically not part of the RIOT, but more appropriately placed here */
     uInt8 inpt(int x);
-    bool vblank(int bit);
+    Bool vblank(int bit);
 
     /* Timer registers & associated clock */
     uInt8 tim1T(int newVal = -1);
@@ -81,11 +81,11 @@ class RiotDebug : public DebuggerSystem
     Controller& controller(Controller::Jack jack) const;
 
     /* Console switches */
-    bool diffP0(int newVal = -1);
-    bool diffP1(int newVal = -1);
-    bool tvType(int newVal = -1);
-    bool select(int newVal = -1);
-    bool reset(int newVal = -1);
+    Bool diffP0(int newVal = -1);
+    Bool diffP1(int newVal = -1);
+    Bool tvType(int newVal = -1);
+    Bool select(int newVal = -1);
+    Bool reset(int newVal = -1);
 
     /* Port A description */
     string dirP0String();

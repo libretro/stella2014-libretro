@@ -77,7 +77,7 @@ class OSystem
     /**
       Create all child objects which belong to this OSystem
     */
-    virtual bool create();
+    virtual Bool create();
 
   public:
     /**
@@ -207,7 +207,7 @@ class OSystem
 
       @return  True on successful creation, otherwise false
     */
-    bool createConsole(const string& romfile = "", const string& md5 = "");
+    Bool createConsole(const string& romfile = "", const string& md5 = "");
 
     /**
       Deletes the currently defined console, if it exists.
@@ -223,7 +223,7 @@ class OSystem
 
       @return  True on successful creation, otherwise false
     */
-    bool createLauncher(const string& startdir = "");
+    Bool createLauncher(const string& startdir = "");
 
     /**
       Gets all possible info about the ROM by creating a temporary
@@ -329,7 +329,7 @@ class OSystem
     /**
       Query the OSystem video hardware for resolution information.
     */
-    virtual bool queryVideoHardware();
+    virtual Bool queryVideoHardware();
 
     /**
       Set the base directory for all Stella files (these files may be

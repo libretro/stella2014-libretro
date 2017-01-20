@@ -178,7 +178,7 @@ class TIATables
 #endif
 
     // Indicates if HMOVE blanks should occur for the corresponding cycle
-    static const bool HMOVEBlankEnableCycles[76];
+    static const Bool HMOVEBlankEnableCycles[76];
 
     // Used to reflect a players graphics
     static uInt8 GRPReflect[256];

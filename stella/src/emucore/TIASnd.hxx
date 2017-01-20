@@ -66,7 +66,7 @@ class TIASound
 
       @return  Status of the channel configuration used
     */
-    string channels(uInt32 hardware, bool stereo);
+    string channels(uInt32 hardware, Bool stereo);
 
   public:
     /**
