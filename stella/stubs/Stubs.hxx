@@ -52,33 +52,7 @@ void OSystem::setFramerate(float framerate) { }
 
 uInt64 OSystem::getTicks() const
 {
-#if defined(__CELLOS_LV2__)
-	static uint64_t ulScale=0;
-	uint64_t ulTime;
-
-	if (ulScale==0)
-		ulScale = sys_time_get_timebase_frequency() / 1000;
-
-#ifdef __SNC__
-	ulTime=__builtin_mftb();
-#else
-	asm __volatile__ ("mftb %0" : "=r" (ulTime) : : "memory");
-#endif
-
-	return ulTime/ulScale;
-#elif defined(_WIN32)
-	LARGE_INTEGER freq;
-    QueryPerformanceFrequency(&freq);
-    unsigned long long ticksPerMillisecond = freq.QuadPart/1000;
-
-	LARGE_INTEGER counter;
-    QueryPerformanceCounter(&counter);
-    return (unsigned long)(counter.QuadPart/ticksPerMillisecond);
-#else
-   timeval tim;
-   gettimeofday(&tim, 0);
-   return (tim.tv_sec*1000u)+(long)(tim.tv_usec/1000.0);
-#endif
+    return myConsole->tia().getMilliSeconds();
 }
 
 EventHandler::EventHandler(OSystem*)
