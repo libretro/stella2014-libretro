@@ -192,6 +192,18 @@ class Serializer
     */
     void putBool(bool b);
 
+    std::string get()
+    {
+        stringstream *s = (stringstream*)myStream;
+        return s->str();
+    }
+
+    void set(const std::string &data)
+    {
+        stringstream *s = (stringstream*)myStream;
+        s->str(data);
+    }
+
   private:
     // The stream to send the serialized data to.
     iostream* myStream;

@@ -44,6 +44,8 @@ static retro_audio_sample_t audio_cb;
 static retro_audio_sample_batch_t audio_batch_cb;
 static struct retro_system_av_info g_av_info;
 
+#define STATE_SIZE 512
+
 static void update_input()
 {
 
@@ -126,28 +128,26 @@ void retro_set_controller_port_device(unsigned port, unsigned device)
 
 size_t retro_serialize_size(void) 
 {
-   //return STATE_SIZE;
-   return 0;
+   return STATE_SIZE;
 }
 
 bool retro_serialize(void *data, size_t size)
 {
-   //Serializer state(filename, 0);
-   //if(stateManager.saveState(state))
-   //{
-   //   return true;
-   //}
-   return false;
+    Serializer state;
+    if(!stateManager.saveState(state))
+        return false;
+    std::string s = state.get();
+    memcpy(data, s.data(), s.size());
+    return true;
 }
 
 bool retro_unserialize(const void *data, size_t size)
 {
-   //if (size != STATE_SIZE)
-   //Serializer state(filename, 1);
-   //if(stateManager.loadState(state))
-   //{
-   //   return true;
-   //}
+    std::string s((const char*)data, size);
+    Serializer state;
+    state.set(s);
+   if(stateManager.loadState(state))
+      return true;
    return false;
 }
 
