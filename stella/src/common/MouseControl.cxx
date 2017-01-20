@@ -145,7 +145,7 @@ MouseControl::MouseControl(Console& console, const string& mode)
 
   // Now consider the possible modes for the mouse based on the left
   // and right controllers
-  Bool noswap = BSPF_equalsIgnoreCase(myProps.get(Console_SwapPorts), "NO");
+  bool noswap = BSPF_equalsIgnoreCase(myProps.get(Console_SwapPorts), "NO");
   if(noswap)
   {
     addLeftControllerModes(noswap);
@@ -185,7 +185,7 @@ const string& MouseControl::next()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void MouseControl::addLeftControllerModes(Bool noswap)
+void MouseControl::addLeftControllerModes(bool noswap)
 {
   if(controllerSupportsMouse(myLeftController))
   {
@@ -206,7 +206,7 @@ void MouseControl::addLeftControllerModes(Bool noswap)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void MouseControl::addRightControllerModes(Bool noswap)
+void MouseControl::addRightControllerModes(bool noswap)
 {
   if(controllerSupportsMouse(myRightController))
   {
@@ -251,7 +251,7 @@ void MouseControl::addPaddleModes(int lport, int rport, int lname, int rname)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool MouseControl::controllerSupportsMouse(Controller& controller)
+bool MouseControl::controllerSupportsMouse(Controller& controller)
 {
   // Test whether the controller uses the mouse at all
   // We can pass in dummy values here, since the controllers will be

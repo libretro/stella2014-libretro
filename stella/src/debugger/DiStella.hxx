@@ -46,11 +46,11 @@ class DiStella
     // standalone Distella
     typedef struct {
       Common::Base::Format gfx_format;
-      Bool resolve_code;    // Attempt to detect code vs. data sections
-      Bool show_addresses;  // Show PC addresses (always off for external output)
-      Bool aflag;  // Turns 'A' off in accumulator instructions (-a in Distella)
-      Bool fflag;  // Forces correct address length (-f in Distella)
-      Bool rflag;  // Relocate calls out of address range (-r in Distella)
+      bool resolve_code;    // Attempt to detect code vs. data sections
+      bool show_addresses;  // Show PC addresses (always off for external output)
+      bool aflag;  // Turns 'A' off in accumulator instructions (-a in Distella)
+      bool fflag;  // Forces correct address length (-f in Distella)
+      bool rflag;  // Relocate calls out of address range (-r in Distella)
       int bwidth;  // Number of bytes to use per line (with .byte xxx)
     } Settings;
     static Settings settings;  // Default settings
@@ -86,9 +86,9 @@ class DiStella
 
     // These functions are part of the original Distella code
     void disasm(uInt32 distart, int pass);
-    Bool check_range(uInt16 start, uInt16 end) const;
-    int mark(uInt32 address, uInt8 mask, Bool directive = false);
-    Bool check_bit(uInt16 address, uInt8 mask) const;
+    bool check_range(uInt16 start, uInt16 end) const;
+    int mark(uInt32 address, uInt8 mask, bool directive = false);
+    bool check_bit(uInt16 address, uInt8 mask) const;
 
     // Convenience methods to generate appropriate labels
     inline void labelA12High(stringstream& buf, uInt8 op, uInt16 addr, int labfound)

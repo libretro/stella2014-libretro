@@ -39,12 +39,12 @@ class Cheat
     }
     virtual ~Cheat() { }
 
-    Bool enabled() const { return myEnabled; }
+    bool enabled() const { return myEnabled; }
     const string& name() const { return myName; }
     const string& code() const { return myCode; }
 
-    virtual Bool enable() = 0;
-    virtual Bool disable() = 0;
+    virtual bool enable() = 0;
+    virtual bool disable() = 0;
 
     virtual void evaluate() = 0;
 
@@ -73,7 +73,7 @@ class Cheat
     string myName;
     string myCode;
 
-    Bool myEnabled;
+    bool myEnabled;
 };
 
 #endif

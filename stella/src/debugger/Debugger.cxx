@@ -189,7 +189,7 @@ FBInitStatus Debugger::initializeVideo()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Debugger::start(const string& message, int address)
+bool Debugger::start(const string& message, int address)
 {
   if(myOSystem->eventHandler().enterDebugMode())
   {
@@ -207,7 +207,7 @@ Bool Debugger::start(const string& message, int address)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Debugger::startWithFatalError(const string& message)
+bool Debugger::startWithFatalError(const string& message)
 {
   if(myOSystem->eventHandler().enterDebugMode())
   {
@@ -220,7 +220,7 @@ Bool Debugger::startWithFatalError(const string& message)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Debugger::quit(Bool exitrom)
+void Debugger::quit(bool exitrom)
 {
   if(exitrom)
     myOSystem->eventHandler().handleEvent(Event::LauncherMode, 1);
@@ -265,7 +265,7 @@ const string Debugger::invIfChanged(int reg, int oldReg)
 {
   string ret;
 
-  Bool changed = reg != oldReg;
+  bool changed = reg != oldReg;
   if(changed) ret += "\177";
   ret += Common::Base::toString(reg, Common::Base::F_16_2);
   if(changed) ret += "\177";
@@ -354,7 +354,7 @@ void Debugger::toggleBreakPoint(int bp)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Debugger::setBreakPoint(int bp, Bool set)
+void Debugger::setBreakPoint(int bp, bool set)
 {
   mySystem.m6502().setBreakPoints(myBreakPoints);
   if(bp < 0) bp = myCpuDebug->pc();
@@ -365,7 +365,7 @@ void Debugger::setBreakPoint(int bp, Bool set)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Debugger::breakPoint(int bp)
+bool Debugger::breakPoint(int bp)
 {
   if(bp < 0) bp = myCpuDebug->pc();
   return myBreakPoints->isSet(bp) != 0;
@@ -393,13 +393,13 @@ void Debugger::toggleTrap(int t)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Debugger::readTrap(int t)
+bool Debugger::readTrap(int t)
 {
   return myReadTraps->isSet(t) != 0;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Debugger::writeTrap(int t)
+bool Debugger::writeTrap(int t)
 {
   return myWriteTraps->isSet(t) != 0;
 }
@@ -441,12 +441,12 @@ void Debugger::nextFrame(int frames)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Debugger::rewindState()
+bool Debugger::rewindState()
 {
   mySystem.clearDirtyPages();
 
   unlockBankswitchState();
-  Bool result = myRewindManager->rewindState();
+  bool result = myRewindManager->rewindState();
   lockBankswitchState();
 
   return result;
@@ -477,12 +477,12 @@ string Debugger::showWatches()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Debugger::setBank(int bank)
+bool Debugger::setBank(int bank)
 {
   if(myConsole.cartridge().bankCount() > 1)
   {
     myConsole.cartridge().unlockBank();
-    Bool status = myConsole.cartridge().bank(bank);
+    bool status = myConsole.cartridge().bank(bank);
     myConsole.cartridge().lockBank();
     return status;
   }
@@ -490,13 +490,13 @@ Bool Debugger::setBank(int bank)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Debugger::patchROM(int addr, int value)
+bool Debugger::patchROM(int addr, int value)
 {
   return myConsole.cartridge().patch(addr, value);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Debugger::saveOldState(Bool addrewind)
+void Debugger::saveOldState(bool addrewind)
 {
   myCartDebug->saveOldState();
   myCpuDebug->saveOldState();
@@ -537,8 +537,8 @@ void Debugger::setQuitState()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Debugger::addFunction(const string& name, const string& definition,
-                           Expression* exp, Bool builtin)
+bool Debugger::addFunction(const string& name, const string& definition,
+                           Expression* exp, bool builtin)
 {
   functions.insert(make_pair(name, exp));
   if(!builtin)
@@ -548,7 +548,7 @@ Bool Debugger::addFunction(const string& name, const string& definition,
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Debugger::delFunction(const string& name)
+bool Debugger::delFunction(const string& name)
 {
   FunctionMap::iterator iter = functions.find(name);
   if(iter == functions.end())
@@ -686,7 +686,7 @@ Debugger::RewindManager::~RewindManager()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Debugger::RewindManager::addState()
+bool Debugger::RewindManager::addState()
 {
   // Create a new Serializer object if we need one
   if(myStateList[myTop] == NULL)
@@ -710,7 +710,7 @@ Bool Debugger::RewindManager::addState()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Debugger::RewindManager::rewindState()
+bool Debugger::RewindManager::rewindState()
 {
   if(mySize > 0)
   {
@@ -732,7 +732,7 @@ Bool Debugger::RewindManager::rewindState()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool Debugger::RewindManager::isEmpty()
+bool Debugger::RewindManager::isEmpty()
 {
   return mySize == 0;
 }
