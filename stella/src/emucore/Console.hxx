@@ -303,6 +303,12 @@ class Console : public Serializable
     */
     void toggleFixedColors() const;
 
+    /**
+      Returns a pointer to the palette data for the palette currently defined
+      by the ROM properties.
+    */
+    const uInt32* getPalette(int direction) const;
+
   private:
     /**
       Sets various properties of the TIA (YStart, Height, etc) based on
@@ -327,12 +333,6 @@ class Console : public Serializable
       'greying out' the frame in the debugger.
     */
     void setColorLossPalette();
-
-    /**
-      Returns a pointer to the palette data for the palette currently defined
-      by the ROM properties.
-    */
-    const uInt32* getPalette(int direction) const;
 
     void toggleTIABit(TIABit bit, const string& bitname, bool show = true) const;
     void toggleTIACollision(TIABit bit, const string& bitname, bool show = true) const;
@@ -384,6 +384,8 @@ class Console : public Serializable
 
     // Contains detailed info about this console
     ConsoleInfo myConsoleInfo;
+
+	const uInt32 *currentPalette;
 
     // Table of RGB values for NTSC, PAL and SECAM
     static uInt32 ourNTSCPalette[256];
