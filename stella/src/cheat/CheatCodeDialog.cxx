@@ -116,14 +116,14 @@ void CheatCodeDialog::loadConfig()
   for(unsigned int i = 0; i < list.size(); ++i)
   {
     l.push_back(list[i]->name());
-    b.push_back(Bool(list[i]->enabled()));
+    b.push_back(bool(list[i]->enabled()));
   }
   myCheatList->setList(l, b);
 
   // Redraw the list, auto-selecting the first item if possible
   myCheatList->setSelected(l.size() > 0 ? 0 : -1);
 
-  Bool enabled = (list.size() > 0);
+  bool enabled = (list.size() > 0);
   myEditButton->setEnabled(enabled);
   myRemoveButton->setEnabled(enabled);
 }
@@ -236,7 +236,7 @@ void CheatCodeDialog::handleCommand(CommandSender* sender, int cmd,
     {
       const string& name = myCheatInput->getResult(0);
       const string& code = myCheatInput->getResult(1);
-      Bool enable = myCheatList->getSelectedState();
+      bool enable = myCheatList->getSelectedState();
       int idx = myCheatList->getSelected();
       if(instance().cheat().isValidCode(code))
       {

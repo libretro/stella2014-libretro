@@ -41,14 +41,14 @@ CheetahCheat::~CheetahCheat()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CheetahCheat::enable()
+bool CheetahCheat::enable()
 {
   evaluate();
   return myEnabled;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool CheetahCheat::disable()
+bool CheetahCheat::disable()
 {
   for(int i = 0; i < count; ++i)
     myOSystem->console().cartridge().patch(address + i, savedRom[i]);

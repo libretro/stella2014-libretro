@@ -28,8 +28,8 @@ class RamCheat : public Cheat
     RamCheat(OSystem* os, const string& name, const string& code);
     virtual ~RamCheat();
 
-    virtual Bool enable();
-    virtual Bool disable();
+    virtual bool enable();
+    virtual bool disable();
 
     virtual void evaluate();
 

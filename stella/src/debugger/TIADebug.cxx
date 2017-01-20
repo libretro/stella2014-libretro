@@ -181,102 +181,102 @@ void TIADebug::saveOldState()
    so the GUI and/or TIADebug don't have to duplicate logic from TIA::poke().
 */
 
-//   Bool vdelP0(int newVal = -1);
-//   Bool vdelP1(int newVal = -1);
-//   Bool vdelBL(int newVal = -1);
+//   bool vdelP0(int newVal = -1);
+//   bool vdelP1(int newVal = -1);
+//   bool vdelBL(int newVal = -1);
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool TIADebug::vdelP0(int newVal)
+bool TIADebug::vdelP0(int newVal)
 {
   if(newVal > -1)
-    mySystem.poke(VDELP0, ((Bool)newVal));
+    mySystem.poke(VDELP0, ((bool)newVal));
 
   return myTIA.myVDELP0;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool TIADebug::vdelP1(int newVal)
+bool TIADebug::vdelP1(int newVal)
 {
   if(newVal > -1)
-    mySystem.poke(VDELP1, ((Bool)newVal));
+    mySystem.poke(VDELP1, ((bool)newVal));
 
   return myTIA.myVDELP1;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool TIADebug::vdelBL(int newVal)
+bool TIADebug::vdelBL(int newVal)
 {
   if(newVal > -1)
-    mySystem.poke(VDELBL, ((Bool)newVal));
+    mySystem.poke(VDELBL, ((bool)newVal));
 
   return myTIA.myVDELBL;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool TIADebug::enaM0(int newVal)
+bool TIADebug::enaM0(int newVal)
 {
   if(newVal > -1)
-    mySystem.poke(ENAM0, ((Bool)newVal) << 1);
+    mySystem.poke(ENAM0, ((bool)newVal) << 1);
 
   return myTIA.myENAM0;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool TIADebug::enaM1(int newVal)
+bool TIADebug::enaM1(int newVal)
 {
   if(newVal > -1)
-    mySystem.poke(ENAM1, ((Bool)newVal) << 1);
+    mySystem.poke(ENAM1, ((bool)newVal) << 1);
 
   return myTIA.myENAM1;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool TIADebug::enaBL(int newVal)
+bool TIADebug::enaBL(int newVal)
 {
   if(newVal > -1)
-    mySystem.poke(ENABL, ((Bool)newVal) << 1);
+    mySystem.poke(ENABL, ((bool)newVal) << 1);
 
   return myTIA.myENABL;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool TIADebug::resMP0(int newVal)
+bool TIADebug::resMP0(int newVal)
 {
   if(newVal > -1)
-    mySystem.poke(RESMP0, ((Bool)newVal) << 1);
+    mySystem.poke(RESMP0, ((bool)newVal) << 1);
 
   return myTIA.myRESMP0;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool TIADebug::resMP1(int newVal)
+bool TIADebug::resMP1(int newVal)
 {
   if(newVal > -1)
-    mySystem.poke(RESMP1, ((Bool)newVal) << 1);
+    mySystem.poke(RESMP1, ((bool)newVal) << 1);
 
   return myTIA.myRESMP1;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool TIADebug::refP0(int newVal)
+bool TIADebug::refP0(int newVal)
 {
   if(newVal > -1)
-    mySystem.poke(REFP0, ((Bool)newVal) << 3);
+    mySystem.poke(REFP0, ((bool)newVal) << 3);
 
   return myTIA.myREFP0;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool TIADebug::refP1(int newVal)
+bool TIADebug::refP1(int newVal)
 {
   if(newVal > -1)
-    mySystem.poke(REFP1, ((Bool)newVal) << 3);
+    mySystem.poke(REFP1, ((bool)newVal) << 3);
 
   return myTIA.myREFP1;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool TIADebug::refPF(int newVal)
+bool TIADebug::refPF(int newVal)
 {
   if(newVal > -1)
   {
@@ -292,7 +292,7 @@ Bool TIADebug::refPF(int newVal)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool TIADebug::scorePF(int newVal)
+bool TIADebug::scorePF(int newVal)
 {
   if(newVal > -1)
   {
@@ -308,7 +308,7 @@ Bool TIADebug::scorePF(int newVal)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool TIADebug::priorityPF(int newVal)
+bool TIADebug::priorityPF(int newVal)
 {
   if(newVal > -1)
   {
@@ -324,7 +324,7 @@ Bool TIADebug::priorityPF(int newVal)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool TIADebug::collision(int collID, int newVal)
+bool TIADebug::collision(int collID, int newVal)
 {
   unsigned int mask = 1 << collID;
 
@@ -675,13 +675,13 @@ int TIADebug::clocksThisLine()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool TIADebug::vsync()
+bool TIADebug::vsync()
 {
   return (myTIA.myVSYNC & 2) == 2;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool TIADebug::vblank()
+bool TIADebug::vblank()
 {
   return (myTIA.myVBLANK & 2) == 2;
 }
@@ -714,7 +714,7 @@ string TIADebug::audFreq(uInt8 div)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-string TIADebug::booleanWithLabel(string label, Bool value)
+string TIADebug::booleanWithLabel(string label, bool value)
 {
   char buf[64];
   string ret;

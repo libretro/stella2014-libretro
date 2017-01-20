@@ -28,8 +28,8 @@ class BankRomCheat : public Cheat
     BankRomCheat(OSystem* os, const string& name, const string& code);
     ~BankRomCheat();
 
-    virtual Bool enable();
-    virtual Bool disable();
+    virtual bool enable();
+    virtual bool disable();
 
     virtual void evaluate();
 

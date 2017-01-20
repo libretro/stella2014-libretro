@@ -45,14 +45,14 @@ BankRomCheat::~BankRomCheat()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool BankRomCheat::enable()
+bool BankRomCheat::enable()
 {
   evaluate();
   return myEnabled;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Bool BankRomCheat::disable()
+bool BankRomCheat::disable()
 {
   int oldBank = myOSystem->console().cartridge().bank();
   myOSystem->console().cartridge().bank(bank);
