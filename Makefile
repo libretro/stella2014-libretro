@@ -30,6 +30,11 @@ else ifneq ($(findstring MINGW,$(shell uname -a)),)
    system_platform = win
 endif
 
+prefix := /usr
+libdir := $(prefix)/lib
+
+LIBRETRO_INSTALL_DIR := libretro
+
 TARGET_NAME := stella
 GIT_VERSION := " $(shell git rev-parse --short HEAD || echo unknown)"
 ifneq ($(GIT_VERSION)," unknown")
@@ -372,5 +377,11 @@ endif
 clean:
 	rm -f $(TARGET) $(OBJECTS)
 
-.PHONY: clean
+install:
+	install -D -m 755 $(TARGET) $(DESTDIR)$(libdir)/$(LIBRETRO_INSTALL_DIR)/$(TARGET)
+
+uninstall:
+	rm $(DESTDIR)$(libdir)/$(LIBRETRO_INSTALL_DIR)/$(TARGET)
+
+.PHONY: clean install uninstall
 endif
