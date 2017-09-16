@@ -1,4 +1,4 @@
-LIBRETRO_COMM_DIR := $(CORE_DIR)/libretro-common
+LIBRETRO_COMM_DIR = $(CORE_DIR)/../libretro-common
 INCFLAGS := -I. -I$(CORE_DIR) -I$(CORE_DIR)/src -I$(CORE_DIR)/stubs -I$(CORE_DIR)/src/emucore -I$(CORE_DIR)/src/common -I$(CORE_DIR)/src/gui
 
 ifneq (,$(findstring msvc2003,$(platform)))
