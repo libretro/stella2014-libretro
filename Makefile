@@ -215,6 +215,37 @@ else ifeq ($(platform), gcw0)
 	FLAGS += -ffast-math -march=mips32 -mtune=mips32r2 -mhard-float
 	fpic := -fPIC
 
+# Windows MSVC 2003 Xbox 1
+else ifeq ($(platform), xbox1_msvc2003)
+TARGET := $(TARGET_NAME)_libretro_xdk1.lib
+MSVCBINDIRPREFIX = $(XDK)/xbox/bin/vc71
+CC  = "$(MSVCBINDIRPREFIX)/CL.exe"
+CXX  = "$(MSVCBINDIRPREFIX)/CL.exe"
+LD   = "$(MSVCBINDIRPREFIX)/lib.exe"
+
+export INCLUDE := $(XDK)/xbox/include
+export LIB := $(XDK)/xbox/lib
+PSS_STYLE :=2
+CFLAGS   += -D_XBOX -D_XBOX1
+CXXFLAGS += -D_XBOX -D_XBOX1
+STATIC_LINKING=1
+HAS_GCC := 0
+# Windows MSVC 2010 Xbox 360
+else ifeq ($(platform), xbox360_msvc2010)
+TARGET := $(TARGET_NAME)_libretro_xdk360.lib
+MSVCBINDIRPREFIX = $(XEDK)/bin/win32
+CC  = "$(MSVCBINDIRPREFIX)/cl.exe"
+CXX  = "$(MSVCBINDIRPREFIX)/cl.exe"
+LD   = "$(MSVCBINDIRPREFIX)/lib.exe"
+
+export INCLUDE := $(XEDK)/include/xbox
+export LIB := $(XEDK)/lib/xbox
+PSS_STYLE :=2
+CFLAGS   += -D_XBOX -D_XBOX360
+CXXFLAGS += -D_XBOX -D_XBOX360
+STATIC_LINKING=1
+HAS_GCC := 0
+
 # Windows MSVC 2010 x64
 else ifeq ($(platform), windows_msvc2010_x64)
 	CC  = cl.exe
@@ -298,10 +329,38 @@ include Makefile.common
 
 OBJECTS := $(SOURCES_CXX:.cxx=.o)
 
-ifeq ($(DEBUG),1)
-FLAGS += -O0 -g
+ifeq ($(DEBUG), 1)
+ifneq (,$(findstring msvc,$(platform)))
+	ifeq ($(STATIC_LINKING),1)
+	CFLAGS += -MTd
+	CXXFLAGS += -MTd
 else
-FLAGS += -O2 -DNDEBUG
+	CFLAGS += -MDd
+	CXXFLAGS += -MDd
+endif
+
+CFLAGS += -Od -Zi -DDEBUG -D_DEBUG
+CXXFLAGS += -Od -Zi -DDEBUG -D_DEBUG
+	else
+	CFLAGS += -O0 -g -DDEBUG
+	CXXFLAGS += -O0 -g -DDEBUG
+endif
+else
+ifneq (,$(findstring msvc,$(platform)))
+ifeq ($(STATIC_LINKING),1)
+	CFLAGS += -MT
+	CXXFLAGS += -MT
+else
+	CFLAGS += -MD
+	CXXFLAGS += -MD
+endif
+
+CFLAGS += -O2 -DNDEBUG
+CXXFLAGS += -O2 -DNDEBUG
+else
+	CFLAGS += -O2 -DNDEBUG
+	CXXFLAGS += -O2 -DNDEBUG
+endif
 endif
 
 ifeq (,$(findstring msvc,$(platform)))
