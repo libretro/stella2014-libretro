@@ -35,4 +35,6 @@ LOCAL_CPP_EXTENSION := .cxx .cpp
 
 LOCAL_C_INCLUDES = $(INCFLAGS)
 
+LOCAL_LDLIBS := -latomic
+
 include $(BUILD_SHARED_LIBRARY)
