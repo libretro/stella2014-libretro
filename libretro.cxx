@@ -31,6 +31,7 @@
 
 static Console *console = 0;
 static Cartridge *cartridge = 0;
+static Settings *settings = 0;
 static OSystem osystem;
 static StateManager stateManager(&osystem);
 
@@ -211,7 +212,7 @@ bool retro_load_game(const struct retro_game_info *info)
    // Load the cart
    string cartType = props.get(Cartridge_Type);
    string cartId;//, romType("AUTO-DETECT");
-   Settings *settings = new Settings(&osystem);
+   settings = new Settings(&osystem);
    settings->setValue("romloadcount", false);
    cartridge = Cartridge::create((const uInt8*)info->data, (uInt32)info->size, cartMD5, cartType, cartId, osystem, *settings);
 
@@ -248,6 +249,21 @@ bool retro_load_game_special(unsigned game_type, const struct retro_game_info *i
 
 void retro_unload_game(void) 
 {
+   if (console)
+   {
+      delete console;
+      console = 0;
+   }
+   else if (cartridge)
+   {
+      delete cartridge;
+      cartridge = 0;
+   }
+   if (settings)
+   {
+      delete settings;
+      settings = 0;
+   }
 }
 
 unsigned retro_get_region(void)

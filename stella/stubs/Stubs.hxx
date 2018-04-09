@@ -16,7 +16,11 @@ OSystem::OSystem()
 
 OSystem::~OSystem()
 {
-    
+    delete myFrameBuffer;
+    delete mySound;
+    delete mySerialPort;
+    delete myEventHandler;
+    delete myPropSet;
 }
 
 bool OSystem::create() { return 1; }
@@ -56,7 +60,15 @@ EventHandler::~EventHandler()
     
 }
 
-FrameBuffer::FrameBuffer() { }
+FrameBuffer::FrameBuffer()
+{
+
+}
+
+FrameBuffer::~FrameBuffer()
+{
+
+}
 
 FBInitStatus FrameBuffer::initialize(const string& title, uInt32 width, uInt32 height)
 {
