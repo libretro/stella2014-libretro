@@ -46,8 +46,6 @@ static retro_audio_sample_t audio_cb;
 static retro_audio_sample_batch_t audio_batch_cb;
 static struct retro_system_av_info g_av_info;
 
-#define STATE_SIZE 512
-
 static void update_input()
 {
 
@@ -130,7 +128,10 @@ void retro_set_controller_port_device(unsigned port, unsigned device)
 
 size_t retro_serialize_size(void) 
 {
-   return STATE_SIZE;
+   Serializer state;
+   if(!stateManager.saveState(state))
+      return 0;
+   return state.get().size();
 }
 
 bool retro_serialize(void *data, size_t size)
