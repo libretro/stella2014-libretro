@@ -35,7 +35,7 @@ libdir := $(prefix)/lib
 
 LIBRETRO_INSTALL_DIR := libretro
 
-TARGET_NAME := stella
+TARGET_NAME := stella2014
 GIT_VERSION := " $(shell git rev-parse --short HEAD || echo unknown)"
 ifneq ($(GIT_VERSION)," unknown")
 	CXXFLAGS += -DGIT_VERSION=\"$(GIT_VERSION)\"
