@@ -10,7 +10,7 @@
 #define snprintf _snprintf
 #endif
 
-#include "libretro.h"
+#include <libretro.h>
 
 #include "Console.hxx"
 #include "Cart.hxx"
@@ -99,7 +99,7 @@ void retro_set_input_state(retro_input_state_t cb) { input_state_cb = cb; }
 void retro_get_system_info(struct retro_system_info *info)
 {
    memset(info, 0, sizeof(*info));
-   info->library_name = "Stella";
+   info->library_name = "Stella 2014";
 #ifndef GIT_VERSION
 #define GIT_VERSION ""
 #endif
