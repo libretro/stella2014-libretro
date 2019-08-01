@@ -239,6 +239,28 @@ else ifeq ($(platform), rpi3)
 	FLAGS += -marm -mcpu=cortex-a53 -mfpu=neon-fp-armv8 -mfloat-abi=hard
 	FLAGS += -fomit-frame-pointer -ffast-math
 
+# ARM
+else ifneq (,$(findstring armv,$(platform)))
+	TARGET := $(TARGET_NAME)_libretro.so
+	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
+	FLAGS += -fomit-frame-pointer -ffast-math
+	fpic := -fPIC
+	CC = gcc
+	ifneq (,$(findstring cortexa8,$(platform)))
+		FLAGS += -marm -mcpu=cortex-a8
+	else ifneq (,$(findstring cortexa9,$(platform)))
+		FLAGS += -marm -mcpu=cortex-a9
+	endif
+		FLAGS += -marm
+	ifneq (,$(findstring neon,$(platform)))
+		FLAGS += -mfpu=neon
+	endif
+	ifneq (,$(findstring softfloat,$(platform)))
+		FLAGS += -mfloat-abi=softfp
+	else ifneq (,$(findstring hardfloat,$(platform)))
+		FLAGS += -mfloat-abi=hard
+	endif
+
 # Classic Platforms ####################
 # Platform affix = classic_<ISA>_<µARCH>
 # Help at https://modmyclassic.com/comp
