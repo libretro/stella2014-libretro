@@ -162,7 +162,7 @@ include $(DEVKITPRO)/libnx/switch_rules
     CFLAGS  :=  $(DEFINES) -g -O3 -fPIE -I$(LIBNX)/include/ -ffunction-sections -fdata-sections -ftls-model=local-exec -Wl,--allow-multiple-definition -specs=$(LIBNX)/switch.specs
     CFLAGS += $(INCDIRS)
     CFLAGS  += $(INCLUDE)  -D__SWITCH__
-    CXXFLAGS := $(ASFLAGS) $(CFLAGS) -fexceptions -fno-rtti -std=gnu++11 
+    CXXFLAGS := $(ASFLAGS) $(CFLAGS) -fexceptions -fno-rtti -std=gnu++11
     CFLAGS += -std=gnu11
     STATIC_LINKING = 1
 
@@ -239,6 +239,14 @@ else ifeq ($(platform), rpi3)
 	FLAGS += -marm -mcpu=cortex-a53 -mfpu=neon-fp-armv8 -mfloat-abi=hard
 	FLAGS += -fomit-frame-pointer -ffast-math
 
+	# Raspberry Pi 4
+	else ifeq ($(platform), rpi4)
+		TARGET := $(TARGET_NAME)_libretro.so
+		fpic := -fPIC
+		SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
+		FLAGS += -marm -mcpu=cortex-a72 -mfpu=neon-fp-armv8 -mfloat-abi=hard
+		FLAGS += -fomit-frame-pointer -ffast-math
+
 # ARM
 else ifneq (,$(findstring armv,$(platform)))
 	TARGET := $(TARGET_NAME)_libretro.so
@@ -264,9 +272,9 @@ else ifneq (,$(findstring armv,$(platform)))
 # Classic Platforms ####################
 # Platform affix = classic_<ISA>_<µARCH>
 # Help at https://modmyclassic.com/comp
-	
-# (armv7 a7, hard point, neon based) ### 
-# NESC, SNESC, C64 mini 
+
+# (armv7 a7, hard point, neon based) ###
+# NESC, SNESC, C64 mini
 else ifeq ($(platform), classic_armv7_a7)
 	TARGET := $(TARGET_NAME)_libretro.so
 	fpic := -fPIC
@@ -291,7 +299,7 @@ else ifeq ($(platform), classic_armv7_a7)
 	  endif
 	endif
 #######################################
-  
+
 # emscripten
 else ifeq ($(platform), emscripten)
 	TARGET := $(TARGET_NAME)_libretro_$(platform).bc
@@ -516,7 +524,7 @@ else ifneq (,$(findstring windows_msvc2017,$(platform)))
 	ifneq (,$(findstring uwp,$(PlatformSuffix)))
 		LIB := $(shell IFS=$$'\n'; cygpath -w "$(LIB)/store")
 	endif
-    
+
 	export INCLUDE := $(INCLUDE);$(WindowsSDKSharedIncludeDir);$(WindowsSDKUCRTIncludeDir);$(WindowsSDKUMIncludeDir)
 	export LIB := $(LIB);$(WindowsSDKUCRTLibDir);$(WindowsSDKUMLibDir)
 	TARGET := $(TARGET_NAME)_libretro.dll
@@ -604,7 +612,7 @@ CXXFLAGS += $(FLAGS) -DTHUMB_SUPPORT -DSOUND_SUPPORT
 CFLAGS += $(FLAGS)   -DTHUMB_SUPPORT -DSOUND_SUPPORT
 
 OBJOUT   = -o
-LINKOUT  = -o 
+LINKOUT  = -o
 
 ifneq (,$(findstring msvc,$(platform)))
 	OBJOUT = -Fo
@@ -642,7 +650,7 @@ ifeq ($(STATIC_LINKING), 1)
 else
 	$(LD) $(LINKOUT)$@ $^ $(LDFLAGS) $(LIBS)
 endif
-  
+
 clean:
 	rm -f $(TARGET) $(OBJECTS)
 
