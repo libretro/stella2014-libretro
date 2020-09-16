@@ -46,8 +46,12 @@ static retro_audio_sample_t audio_cb;
 static retro_audio_sample_batch_t audio_batch_cb;
 static struct retro_system_av_info g_av_info;
 
+static bool libretro_supports_bitmasks = false;
+
 static void update_input()
 {
+   unsigned i, j;
+   int16_t joy_bits[2] = {0};
 
    if (!input_poll_cb)
       return;
@@ -56,27 +60,38 @@ static void update_input()
 
    Event &ev = osystem.eventHandler().event();
 
+   for(i = 0; i < 2; i++)
+   {
+      if (libretro_supports_bitmasks)
+         joy_bits[i] = input_state_cb(i, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_MASK);
+      else
+      {
+         for (j = 0; j < (RETRO_DEVICE_ID_JOYPAD_R3+1); j++)
+            joy_bits[i] |= input_state_cb(i, RETRO_DEVICE_JOYPAD, 0, j) ? (1 << j) : 0;
+      }
+   }
+
    //Update stella's event structure
-   ev.set(Event::Type(Event::JoystickZeroUp), input_state_cb(Controller::Left, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP));
-   ev.set(Event::Type(Event::JoystickZeroDown), input_state_cb(Controller::Left, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN));
-   ev.set(Event::Type(Event::JoystickZeroLeft), input_state_cb(Controller::Left, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT));
-   ev.set(Event::Type(Event::JoystickZeroRight), input_state_cb(Controller::Left, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT));
-   ev.set(Event::Type(Event::JoystickZeroFire), input_state_cb(Controller::Left, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B));
-   ev.set(Event::Type(Event::ConsoleLeftDiffA), input_state_cb(Controller::Left, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L));
-   ev.set(Event::Type(Event::ConsoleLeftDiffB), input_state_cb(Controller::Left, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2));
-   ev.set(Event::Type(Event::ConsoleColor), input_state_cb(Controller::Left, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L3));
-   ev.set(Event::Type(Event::ConsoleRightDiffA), input_state_cb(Controller::Left, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R));
-   ev.set(Event::Type(Event::ConsoleRightDiffB), input_state_cb(Controller::Left, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2));
-   ev.set(Event::Type(Event::ConsoleBlackWhite), input_state_cb(Controller::Left, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R3));
-   ev.set(Event::Type(Event::ConsoleSelect), input_state_cb(Controller::Left, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT));
-   ev.set(Event::Type(Event::ConsoleReset), input_state_cb(Controller::Left, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START));
+   ev.set(Event::Type(Event::JoystickZeroUp), joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_UP));
+   ev.set(Event::Type(Event::JoystickZeroDown), joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_DOWN));
+   ev.set(Event::Type(Event::JoystickZeroLeft), joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_LEFT));
+   ev.set(Event::Type(Event::JoystickZeroRight), joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_RIGHT));
+   ev.set(Event::Type(Event::JoystickZeroFire), joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_B));
+   ev.set(Event::Type(Event::ConsoleLeftDiffA), joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_L));
+   ev.set(Event::Type(Event::ConsoleLeftDiffB), joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_L2));
+   ev.set(Event::Type(Event::ConsoleColor), joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_L3));
+   ev.set(Event::Type(Event::ConsoleRightDiffA), joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_R));
+   ev.set(Event::Type(Event::ConsoleRightDiffB), joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_R2));
+   ev.set(Event::Type(Event::ConsoleBlackWhite), joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_R3));
+   ev.set(Event::Type(Event::ConsoleSelect), joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_SELECT));
+   ev.set(Event::Type(Event::ConsoleReset), joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_START));
 
    //Events for right player's joystick 
-   ev.set(Event::Type(Event::JoystickOneUp), input_state_cb(Controller::Right, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP));
-   ev.set(Event::Type(Event::JoystickOneDown), input_state_cb(Controller::Right, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN));
-   ev.set(Event::Type(Event::JoystickOneLeft), input_state_cb(Controller::Right, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT));
-   ev.set(Event::Type(Event::JoystickOneRight), input_state_cb(Controller::Right, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT));
-   ev.set(Event::Type(Event::JoystickOneFire), input_state_cb(Controller::Right, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B));
+   ev.set(Event::Type(Event::JoystickOneUp), joy_bits[Controller::Right] & (1 << RETRO_DEVICE_ID_JOYPAD_UP));
+   ev.set(Event::Type(Event::JoystickOneDown), joy_bits[Controller::Right] & (1 << RETRO_DEVICE_ID_JOYPAD_DOWN));
+   ev.set(Event::Type(Event::JoystickOneLeft), joy_bits[Controller::Right] & (1 << RETRO_DEVICE_ID_JOYPAD_LEFT));
+   ev.set(Event::Type(Event::JoystickOneRight), joy_bits[Controller::Right] & (1 << RETRO_DEVICE_ID_JOYPAD_RIGHT));
+   ev.set(Event::Type(Event::JoystickOneFire), joy_bits[Controller::Right] & (1 << RETRO_DEVICE_ID_JOYPAD_B));
 
    //Tell all input devices to read their state from the event structure
    console->controller(Controller::Left).update();
@@ -307,10 +322,14 @@ void retro_init(void)
       log_cb = NULL;
 
    environ_cb(RETRO_ENVIRONMENT_SET_PERFORMANCE_LEVEL, &level);
+
+   if (environ_cb(RETRO_ENVIRONMENT_GET_INPUT_BITMASKS, NULL))
+      libretro_supports_bitmasks = true;
 }
 
 void retro_deinit(void)
 {
+   libretro_supports_bitmasks = false;
 }
 
 void retro_reset(void)
