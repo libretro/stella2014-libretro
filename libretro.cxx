@@ -1,8 +1,6 @@
 #ifndef _MSC_VER
 #include <stdbool.h>
-#if !defined(PS2)
 #include <sched.h>
-#endif
 #endif
 #include <stddef.h>
 #include <stdio.h>
