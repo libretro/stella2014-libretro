@@ -172,6 +172,16 @@ else ifeq ($(platform), psl1ght)
 	FLAGS += -DMSB_FIRST
 	OLD_GCC = 1
 
+# PS2
+else ifeq ($(platform), ps2)
+   TARGET := $(TARGET_NAME)_libretro_$(platform).a
+   CC = ee-gcc$(EXE_EXT)
+   CXX = ee-g++$(EXE_EXT)
+   AR = ee-ar$(EXE_EXT)
+   STATIC_LINKING = 1
+   OLD_GCC = 1
+   FLAGS += -G0 -DPS2 -DXBGR8888
+
 # PSP
 else ifeq ($(platform), psp1)
    TARGET := $(TARGET_NAME)_libretro_$(platform).a
