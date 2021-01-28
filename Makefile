@@ -71,7 +71,7 @@ endif
 ifeq ($(OSX_LT_MAVERICKS),"YES")
    fpic += -mmacosx-version-min=10.1
 else
-   fpic += -mmacosx-version-min=10.7 -stdlib=libc++
+   fpic += -stdlib=libc++
 endif
    ifeq ($(CROSS_COMPILE),1)
 		TARGET_RULE   = -target $(LIBRETRO_APPLE_PLATFORM) -isysroot $(LIBRETRO_APPLE_ISYSROOT)
@@ -79,6 +79,8 @@ endif
 		CPPFLAGS += $(TARGET_RULE)
 		CXXFLAGS += $(TARGET_RULE)
 		LDFLAGS  += $(TARGET_RULE)
+   else ifneq ($(OSX_LT_MAVERICKS),"YES")
+	        fpic     += -mmacosx-version-min=10.7
    endif
 
 # iOS
