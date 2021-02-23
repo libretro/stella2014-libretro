@@ -16,6 +16,7 @@ xcuserdata
 profile
 *.moved-aside
 *.o
+*.so
 *.bc
 *.js
 *.json

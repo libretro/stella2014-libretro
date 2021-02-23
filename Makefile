@@ -323,7 +323,7 @@ else ifeq ($(platform), gcw0)
 	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
 	LDFLAGS += $(PTHREAD_FLAGS) -lrt
 	FLAGS += $(PTHREAD_FLAGS) -DHAVE_MKDIR
-	FLAGS += -ffast-math -march=mips32 -mtune=mips32r2 -mhard-float
+	FLAGS += -fomit-frame-pointer -ffast-math -march=mips32 -mtune=mips32r2 -mhard-float
 	fpic := -fPIC
 
 # Windows MSVC 2003 Xbox 1
