@@ -11,6 +11,7 @@
 #endif
 
 #include <libretro.h>
+#include "libretro_core_options.h"
 
 #include "Console.hxx"
 #include "Cart.hxx"
@@ -29,6 +30,11 @@
 
 #include "Stubs.hxx"
 
+#ifdef _3DS
+extern "C" void* linearMemAlign(size_t size, size_t alignment);
+extern "C" void linearFree(void* mem);
+#endif
+
 static Console *console = 0;
 static Cartridge *cartridge = 0;
 static Settings *settings = 0;
@@ -36,6 +42,13 @@ static OSystem osystem;
 static StateManager stateManager(&osystem);
 
 static int videoWidth, videoHeight;
+
+#define FRAME_BUFFER_SIZE (256 * 160 * 4)
+static uint8_t *frameBuffer = NULL;
+static uint8_t *frameBufferPrev = NULL;
+static uint8_t framePixelBytes = 2;
+static const uint32_t *currentPalette32 = NULL;
+static uint16_t currentPalette16[256] = {0};
 
 static retro_log_printf_t log_cb;
 static retro_video_refresh_t video_cb;
@@ -47,6 +60,310 @@ static retro_audio_sample_batch_t audio_batch_cb;
 static struct retro_system_av_info g_av_info;
 
 static bool libretro_supports_bitmasks = false;
+
+/************************************
+ * Interframe blending
+ ************************************/
+
+enum frame_blend_method
+{
+   FRAME_BLEND_NONE = 0,
+   FRAME_BLEND_MIX,
+   FRAME_BLEND_GHOST_65,
+   FRAME_BLEND_GHOST_75,
+   FRAME_BLEND_GHOST_85,
+   FRAME_BLEND_GHOST_95
+};
+
+/* It would be more flexible to have 'persistence'
+ * as a core option, but using a variable parameter
+ * reduces performance by ~15%. We therefore offer
+ * fixed values, and use macros to avoid excessive
+ * duplication of code...
+ * Note: persistence fraction is (persistence/128),
+ * using a power of 2 like this further increases
+ * performance by ~15% */
+#define BLEND_FRAMES_GHOST_16(persistence)                                                         \
+{                                                                                                  \
+   const uint32_t *palette32 = console->getPalette(0);                                             \
+   uint16_t *palette16       = currentPalette16;                                                   \
+   uInt8 *in                 = stella_fb;                                                          \
+   uint16_t *prev            = (uint16_t*)frameBufferPrev;                                         \
+   uint16_t *out             = (uint16_t*)frameBuffer;                                             \
+   int i;                                                                                          \
+                                                                                                   \
+   /* If palette has changed, re-cache converted                                                   \
+    * RGB565 values */                                                                             \
+   if (palette32 != currentPalette32)                                                              \
+   {                                                                                               \
+      currentPalette32 = palette32;                                                                \
+      convert_palette(palette32, palette16);                                                       \
+   }                                                                                               \
+                                                                                                   \
+   for (i = 0; i < width * height; i++)                                                            \
+   {                                                                                               \
+      /* Get colours from current + previous frames */                                             \
+      uint16_t color_curr = *(palette16 + *(in + i));                                              \
+      uint16_t color_prev = *(prev + i);                                                           \
+                                                                                                   \
+      /* Unpack colours */                                                                         \
+      uint16_t r_curr     = (color_curr >> 11) & 0x1F;                                             \
+      uint16_t g_curr     = (color_curr >>  6) & 0x1F;                                             \
+      uint16_t b_curr     = (color_curr      ) & 0x1F;                                             \
+                                                                                                   \
+      uint16_t r_prev     = (color_prev >> 11) & 0x1F;                                             \
+      uint16_t g_prev     = (color_prev >>  6) & 0x1F;                                             \
+      uint16_t b_prev     = (color_prev      ) & 0x1F;                                             \
+                                                                                                   \
+      /* Mix colors */                                                                             \
+      uint16_t r_mix      = ((r_curr * (128 - persistence)) >> 7) + ((r_prev * persistence) >> 7); \
+      uint16_t g_mix      = ((g_curr * (128 - persistence)) >> 7) + ((g_prev * persistence) >> 7); \
+      uint16_t b_mix      = ((b_curr * (128 - persistence)) >> 7) + ((b_prev * persistence) >> 7); \
+                                                                                                   \
+      /* Output colour is the maximum of the input                                                 \
+       * and decayed values */                                                                     \
+      uint16_t r_out      = (r_mix > r_curr) ? r_mix : r_curr;                                     \
+      uint16_t g_out      = (g_mix > g_curr) ? g_mix : g_curr;                                     \
+      uint16_t b_out      = (b_mix > b_curr) ? b_mix : b_curr;                                     \
+      uint16_t color_out  = r_out << 11 | g_out << 6 | b_out;                                      \
+                                                                                                   \
+      /* Assign colour and store for next frame */                                                 \
+      *(out++)            = color_out;                                                             \
+      *(prev + i)         = color_out;                                                             \
+   }                                                                                               \
+}
+
+#define BLEND_FRAMES_GHOST_32(persistence)                                                         \
+{                                                                                                  \
+   const uint32_t *palette = console->getPalette(0);                                               \
+   uInt8 *in               = stella_fb;                                                            \
+   uint32_t *prev          = (uint32_t*)frameBufferPrev;                                           \
+   uint32_t *out           = (uint32_t*)frameBuffer;                                               \
+   int i;                                                                                          \
+                                                                                                   \
+   for (i = 0; i < width * height; i++)                                                            \
+   {                                                                                               \
+      /* Get colours from current + previous frames */                                             \
+      uint32_t color_curr = *(palette + *(in + i));                                                \
+      uint32_t color_prev = *(prev + i);                                                           \
+                                                                                                   \
+      /* Unpack colours */                                                                         \
+      uint32_t r_curr     = (color_curr >> 16) & 0xFF;                                             \
+      uint32_t g_curr     = (color_curr >>  8) & 0xFF;                                             \
+      uint32_t b_curr     = (color_curr      ) & 0xFF;                                             \
+                                                                                                   \
+      uint32_t r_prev     = (color_prev >> 16) & 0xFF;                                             \
+      uint32_t g_prev     = (color_prev >>  8) & 0xFF;                                             \
+      uint32_t b_prev     = (color_prev      ) & 0xFF;                                             \
+                                                                                                   \
+      /* Mix colors */                                                                             \
+      uint32_t r_mix      = ((r_curr * (128 - persistence)) >> 7) + ((r_prev * persistence) >> 7); \
+      uint32_t g_mix      = ((g_curr * (128 - persistence)) >> 7) + ((g_prev * persistence) >> 7); \
+      uint32_t b_mix      = ((b_curr * (128 - persistence)) >> 7) + ((b_prev * persistence) >> 7); \
+                                                                                                   \
+      /* Output colour is the maximum of the input                                                 \
+       * and decayed values */                                                                     \
+      uint32_t r_out      = (r_mix > r_curr) ? r_mix : r_curr;                                     \
+      uint32_t g_out      = (g_mix > g_curr) ? g_mix : g_curr;                                     \
+      uint32_t b_out      = (b_mix > b_curr) ? b_mix : b_curr;                                     \
+      uint32_t color_out  = r_out << 16 | g_out << 8 | b_out;                                      \
+                                                                                                   \
+      /* Assign colour and store for next frame */                                                 \
+      *(out++)            = color_out;                                                             \
+      *(prev + i)         = color_out;                                                             \
+   }                                                                                               \
+}
+
+static void convert_palette(const uint32_t *palette32, uint16_t *palette16)
+{
+   size_t i;
+   for (i = 0; i < 256; i++)
+   {
+      uint32_t color32 = *(palette32 + i);
+      *(palette16 + i) = ((color32 & 0xF80000) >> 8) |
+                         ((color32 & 0x00F800) >> 5) |
+                         ((color32 & 0x0000F8) >> 3);
+   }
+}
+
+static void blend_frames_null_16(uInt8 *stella_fb, int width, int height)
+{
+   const uint32_t *palette32 = console->getPalette(0);
+   uint16_t *palette16       = currentPalette16;
+   uInt8 *in                 = stella_fb;
+   uint16_t *out             = (uint16_t*)frameBuffer;
+   int i;
+
+   /* If palette has changed, re-cache converted
+    * RGB565 values */
+   if (palette32 != currentPalette32)
+   {
+      currentPalette32 = palette32;
+      convert_palette(palette32, palette16);
+   }
+
+   for (i = 0; i < width * height; i++)
+      *(out++) = *(palette16 + *(in++));
+}
+
+static void blend_frames_null_32(uInt8 *stella_fb, int width, int height)
+{
+   const uint32_t *palette = console->getPalette(0);
+   uInt8 *in               = stella_fb;
+   uint32_t *out           = (uint32_t*)frameBuffer;
+   int i;
+
+   for (i = 0; i < width * height; i++)
+      *(out++) = *(palette + *(in++));
+}
+
+static void blend_frames_mix_16(uInt8 *stella_fb, int width, int height)
+{
+   const uint32_t *palette32 = console->getPalette(0);
+   uint16_t *palette16       = currentPalette16;
+   uInt8 *in                 = stella_fb;
+   uint16_t *prev            = (uint16_t*)frameBufferPrev;
+   uint16_t *out             = (uint16_t*)frameBuffer;
+   int i;
+
+   /* If palette has changed, re-cache converted
+    * RGB565 values */
+   if (palette32 != currentPalette32)
+   {
+      currentPalette32 = palette32;
+      convert_palette(palette32, palette16);
+   }
+
+   for (i = 0; i < width * height; i++)
+   {
+      /* Get colours from current + previous frames */
+      uint16_t color_curr = *(palette16 + *(in + i));
+      uint16_t color_prev = *(prev + i);
+
+      /* Store colours for next frame */
+      *(prev + i) = color_curr;
+
+      /* Mix colours */
+      *(out++) = (color_curr + color_prev + ((color_curr ^ color_prev) & 0x821)) >> 1;
+   }
+}
+
+static void blend_frames_mix_32(uInt8 *stella_fb, int width, int height)
+{
+   const uint32_t *palette = console->getPalette(0);
+   uInt8 *in               = stella_fb;
+   uint32_t *prev          = (uint32_t*)frameBufferPrev;
+   uint32_t *out           = (uint32_t*)frameBuffer;
+   int i;
+
+   for (i = 0; i < width * height; i++)
+   {
+      /* Get colours from current + previous frames */
+      uint32_t color_curr = *(palette + *(in + i));
+      uint32_t color_prev = *(prev + i);
+
+      /* Store colours for next frame */
+      *(prev + i) = color_curr;
+
+      /* Mix colours */
+      *(out++) = (color_curr + color_prev + ((color_curr ^ color_prev) & 0x1010101)) >> 1;
+   }
+}
+
+static void blend_frames_ghost65_16(uInt8 *stella_fb, int width, int height)
+{
+   /* 65% = 83 / 128 */
+   BLEND_FRAMES_GHOST_16(83);
+}
+
+static void blend_frames_ghost65_32(uInt8 *stella_fb, int width, int height)
+{
+   BLEND_FRAMES_GHOST_32(83);
+}
+
+static void blend_frames_ghost75_16(uInt8 *stella_fb, int width, int height)
+{
+   /* 75% = 95 / 128 */
+   BLEND_FRAMES_GHOST_16(95);
+}
+
+static void blend_frames_ghost75_32(uInt8 *stella_fb, int width, int height)
+{
+   BLEND_FRAMES_GHOST_32(95);
+}
+
+static void blend_frames_ghost85_16(uInt8 *stella_fb, int width, int height)
+{
+   /* 85% ~= 109 / 128 */
+   BLEND_FRAMES_GHOST_16(109);
+}
+
+static void blend_frames_ghost85_32(uInt8 *stella_fb, int width, int height)
+{
+   BLEND_FRAMES_GHOST_32(109);
+}
+
+static void blend_frames_ghost95_16(uInt8 *stella_fb, int width, int height)
+{
+   /* 95% ~= 122 / 128 */
+   BLEND_FRAMES_GHOST_16(122);
+}
+
+static void blend_frames_ghost95_32(uInt8 *stella_fb, int width, int height)
+{
+   BLEND_FRAMES_GHOST_32(122);
+}
+
+static void (*blend_frames_16)(uInt8 *stella_fb, int width, int height) = blend_frames_null_16;
+static void (*blend_frames_32)(uInt8 *stella_fb, int width, int height) = blend_frames_null_32;
+
+static void init_frame_blending(enum frame_blend_method blend_method)
+{
+   /* Allocate/zero out buffer, if required */
+   if (blend_method != FRAME_BLEND_NONE)
+   {
+      if (!frameBufferPrev)
+#ifdef _3DS
+         frameBufferPrev = (uint8_t*)linearMemAlign(FRAME_BUFFER_SIZE, 128);
+#else
+         frameBufferPrev = (uint8_t*)malloc(FRAME_BUFFER_SIZE);
+#endif
+      memset(frameBufferPrev, 0, FRAME_BUFFER_SIZE);
+   }
+
+   /* Assign function pointers */
+   switch (blend_method)
+   {
+      case FRAME_BLEND_MIX:
+         blend_frames_16 = blend_frames_mix_16;
+         blend_frames_32 = blend_frames_mix_32;
+         break;
+      case FRAME_BLEND_GHOST_65:
+         blend_frames_16 = blend_frames_ghost65_16;
+         blend_frames_32 = blend_frames_ghost65_32;
+         break;
+      case FRAME_BLEND_GHOST_75:
+         blend_frames_16 = blend_frames_ghost75_16;
+         blend_frames_32 = blend_frames_ghost75_32;
+         break;
+      case FRAME_BLEND_GHOST_85:
+         blend_frames_16 = blend_frames_ghost85_16;
+         blend_frames_32 = blend_frames_ghost85_32;
+         break;
+      case FRAME_BLEND_GHOST_95:
+         blend_frames_16 = blend_frames_ghost95_16;
+         blend_frames_32 = blend_frames_ghost95_32;
+         break;
+      default:
+         blend_frames_16 = blend_frames_null_16;
+         blend_frames_32 = blend_frames_null_32;
+         break;
+   }
+}
+
+/************************************
+ * Auxiliary functions
+ ************************************/
 
 static void update_input()
 {
@@ -99,17 +416,61 @@ static void update_input()
    console->switches().update();
 }
 
+void check_variables(bool first_run)
+{
+   struct retro_variable var            = {0};
+   enum frame_blend_method blend_method = FRAME_BLEND_NONE;
+
+   /* Only read colour depth option on first run */
+   if (first_run)
+   {
+      var.key   = "stella2014_color_depth";
+      var.value = NULL;
+
+      /* Set 16bpp by default */
+      framePixelBytes = 2;
+
+      if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+         if (strcmp(var.value, "24bit") == 0)
+            framePixelBytes = 4;
+   }
+
+   /* Read interframe blending option */
+   var.key   = "stella2014_mix_frames";
+   var.value = NULL;
+
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+   {
+      if (!strcmp(var.value, "mix"))
+         blend_method = FRAME_BLEND_MIX;
+      else if (!strcmp(var.value, "ghost_65"))
+         blend_method = FRAME_BLEND_GHOST_65;
+      else if (!strcmp(var.value, "ghost_75"))
+         blend_method = FRAME_BLEND_GHOST_75;
+      else if (!strcmp(var.value, "ghost_85"))
+         blend_method = FRAME_BLEND_GHOST_85;
+      else if (!strcmp(var.value, "ghost_95"))
+         blend_method = FRAME_BLEND_GHOST_95;
+   }
+
+   init_frame_blending(blend_method);
+}
+
 /************************************
  * libretro implementation
  ************************************/
 
-
-void retro_set_environment(retro_environment_t cb) { environ_cb = cb; }
 void retro_set_video_refresh(retro_video_refresh_t cb) { video_cb = cb; }
 void retro_set_audio_sample(retro_audio_sample_t cb) { audio_cb = cb; }
 void retro_set_audio_sample_batch(retro_audio_sample_batch_t cb) { audio_batch_cb = cb; }
 void retro_set_input_poll(retro_input_poll_t cb) { input_poll_cb = cb; }
 void retro_set_input_state(retro_input_state_t cb) { input_state_cb = cb; }
+
+void retro_set_environment(retro_environment_t cb)
+{
+   environ_cb = cb;
+   libretro_set_core_options(environ_cb);
+}
 
 void retro_get_system_info(struct retro_system_info *info)
 {
@@ -181,7 +542,7 @@ void retro_cheat_set(unsigned index, bool enabled, const char *code)
 
 bool retro_load_game(const struct retro_game_info *info)
 {
-   enum retro_pixel_format fmt = RETRO_PIXEL_FORMAT_XRGB8888;
+   enum retro_pixel_format fmt;
 
    struct retro_input_descriptor desc[] = {
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,   "Left" },
@@ -212,13 +573,32 @@ bool retro_load_game(const struct retro_game_info *info)
 
    environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, desc);
 
-   if (!environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &fmt))
+   // Set color depth
+   check_variables(true);
+
+   if (framePixelBytes == 4)
    {
-      if (log_cb)
-         log_cb(RETRO_LOG_INFO, "[Stella]: XRGB8888 is not supported.\n");
-      return false;
+      fmt = RETRO_PIXEL_FORMAT_XRGB8888;
+      if (!environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &fmt))
+      {
+         if (log_cb)
+            log_cb(RETRO_LOG_INFO, "[Stella]: XRGB8888 is not supported - trying RGB565...\n");
+
+         /* Fallback to RETRO_PIXEL_FORMAT_RGB565 */
+         framePixelBytes = 2;
+      }
    }
 
+   if (framePixelBytes == 2)
+   {
+      fmt = RETRO_PIXEL_FORMAT_RGB565;
+      if (!environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &fmt))
+      {
+         if (log_cb)
+            log_cb(RETRO_LOG_INFO, "[Stella]: RGB565 is not supported.\n");
+         return false;
+      }
+   }
 
    // Get the game properties
    string cartMD5 = MD5((const uInt8*)info->data, (uInt32)info->size);
@@ -325,11 +705,38 @@ void retro_init(void)
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_INPUT_BITMASKS, NULL))
       libretro_supports_bitmasks = true;
+
+#ifdef _3DS
+   frameBuffer = (uint8_t*)linearMemAlign(FRAME_BUFFER_SIZE, 128);
+#else
+   frameBuffer = (uint8_t*)malloc(FRAME_BUFFER_SIZE);
+#endif
 }
 
 void retro_deinit(void)
 {
    libretro_supports_bitmasks = false;
+   currentPalette32           = NULL;
+
+   if (frameBuffer)
+   {
+#ifdef _3DS
+      linearFree(frameBuffer);
+#else
+      free(frameBuffer);
+#endif
+      frameBuffer = NULL;
+   }
+
+   if (frameBufferPrev)
+   {
+#ifdef _3DS
+      linearFree(frameBufferPrev);
+#else
+      free(frameBufferPrev);
+#endif
+      frameBufferPrev = NULL;
+   }
 }
 
 void retro_reset(void)
@@ -339,10 +746,14 @@ void retro_reset(void)
 
 void retro_run(void)
 {
-    static int16_t *sampleBuffer[2048];
-    static uint32_t frameBuffer[256*160];
-    //Get the number of samples in a frame
-    static uint32_t tiaSamplesPerFrame = (uint32_t)(31400.0f/console->getFramerate());
+   static int16_t *sampleBuffer[2048];
+   //Get the number of samples in a frame
+   static uint32_t tiaSamplesPerFrame = (uint32_t)(31400.0f/console->getFramerate());
+
+   //CORE OPTIONS
+   bool updated = false;
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE_UPDATE, &updated) && updated)
+      check_variables(false);
 
    //INPUT
    update_input();
@@ -356,12 +767,13 @@ void retro_run(void)
    videoWidth = tia.width();
    videoHeight = tia.height();
 
-   const uint32_t *palette = console->getPalette(0);
    //Copy the frame from stella to libretro
-   for (int i = 0; i < videoHeight * videoWidth; ++i)
-      frameBuffer[i] = palette[tia.currentFrameBuffer()[i]];
+   if (framePixelBytes == 2)
+      blend_frames_16(tia.currentFrameBuffer(), videoWidth, videoHeight);
+   else
+      blend_frames_32(tia.currentFrameBuffer(), videoWidth, videoHeight);
 
-   video_cb(frameBuffer, videoWidth, videoHeight, videoWidth << 2);
+   video_cb(frameBuffer, videoWidth, videoHeight, videoWidth * framePixelBytes);
 
    //AUDIO
    //Process one frame of audio from stella
