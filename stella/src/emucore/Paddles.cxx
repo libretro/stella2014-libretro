@@ -419,11 +419,18 @@ bool Paddles::setMouseControl(
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Paddles::setDigitalSensitivity(int sensitivity)
 {
-  if(sensitivity < 1)       sensitivity = 1;
-  else if(sensitivity > 10) sensitivity = 10;
+  float sensitivity_factor;
 
-  _DIGITAL_SENSITIVITY = sensitivity;
-  _DIGITAL_DISTANCE = 20 + (sensitivity << 3);
+  if(sensitivity < 10)       sensitivity = 10;
+  else if(sensitivity > 100) sensitivity = 100;
+
+  _DIGITAL_SENSITIVITY = sensitivity / 10;
+
+  /* Distance has a quadratic response */
+  sensitivity_factor = (float)sensitivity / 100.0f;
+  sensitivity_factor = sensitivity_factor * sensitivity_factor;
+
+  _DIGITAL_DISTANCE = (int)((sensitivity_factor * 100.0f) + 0.5f);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
