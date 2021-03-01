@@ -10,7 +10,7 @@ OSystem::OSystem()
     mySerialPort = new SerialPort();
     myEventHandler = new EventHandler(this);
     myPropSet = new PropertiesSet(this);
-    Paddles::setDigitalSensitivity(5);
+    Paddles::setDigitalSensitivity(50);
     Paddles::setMouseSensitivity(5);
 }
 

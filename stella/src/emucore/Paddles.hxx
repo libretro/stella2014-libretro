@@ -86,7 +86,7 @@ class Paddles : public Controller
       or digital joystick axis events); Stelladaptors or the mouse are
       not modified.
 
-      @param sensitivity  Value from 1 to 10, with larger values
+      @param sensitivity  Value from 10 to 100, with larger values
                           causing more movement
     */
     static void setDigitalSensitivity(int sensitivity);
@@ -95,7 +95,7 @@ class Paddles : public Controller
       Sets the sensitivity for analog emulation of paddle movement
       using a mouse.
 
-      @param sensitivity  Value from 1 to 10, with larger values
+      @param sensitivity  Value from 1 to 15, with larger values
                           causing more movement
     */
     static void setMouseSensitivity(int sensitivity);

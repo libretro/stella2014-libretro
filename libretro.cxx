@@ -50,6 +50,8 @@ static uint8_t framePixelBytes = 2;
 static const uint32_t *currentPalette32 = NULL;
 static uint16_t currentPalette16[256] = {0};
 
+static int paddle_digital_sensitivity = 50;
+
 static retro_log_printf_t log_cb;
 static retro_video_refresh_t video_cb;
 static retro_input_poll_t input_poll_cb;
@@ -416,10 +418,18 @@ static void update_input()
    console->switches().update();
 }
 
-void check_variables(bool first_run)
+static void update_paddle_sensitivity(void)
+{
+   if ((console->controller(Controller::Left).type()  == Controller::Paddles) ||
+       (console->controller(Controller::Right).type() == Controller::Paddles))
+      Paddles::setDigitalSensitivity(paddle_digital_sensitivity);
+}
+
+static void check_variables(bool first_run)
 {
    struct retro_variable var            = {0};
    enum frame_blend_method blend_method = FRAME_BLEND_NONE;
+   int last_paddle_sensitivity;
 
    /* Only read colour depth option on first run */
    if (first_run)
@@ -454,6 +464,28 @@ void check_variables(bool first_run)
    }
 
    init_frame_blending(blend_method);
+
+   /* Read paddle digital sensitivity option */
+   var.key   = "stella2014_paddle_digital_sensitivity";
+   var.value = NULL;
+
+   last_paddle_sensitivity    = paddle_digital_sensitivity;
+   paddle_digital_sensitivity = 50;
+
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+   {
+      paddle_digital_sensitivity = atoi(var.value);
+      paddle_digital_sensitivity = (paddle_digital_sensitivity > 100) ?
+            100 : paddle_digital_sensitivity;
+      paddle_digital_sensitivity = (paddle_digital_sensitivity <  10) ?
+            10  : paddle_digital_sensitivity;
+   }
+
+   /* Only apply paddle sensitivity update if
+    * this is *not* the first run */
+   if (!first_run &&
+       (paddle_digital_sensitivity != last_paddle_sensitivity))
+      update_paddle_sensitivity();
 }
 
 /************************************
@@ -626,6 +658,9 @@ bool retro_load_game(const struct retro_game_info *info)
    // Init sound and video
    console->initializeVideo();
    console->initializeAudio();
+
+   // Set initial paddle sensitivity
+   update_paddle_sensitivity();
 
    // Get the ROM's width and height
    TIA& tia = console->tia();
