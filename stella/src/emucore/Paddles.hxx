@@ -129,6 +129,7 @@ class Paddles : public Controller
 
     static int _DIGITAL_SENSITIVITY, _DIGITAL_DISTANCE;
     static int _MOUSE_SENSITIVITY;
+    static int _MOUSE_DIRECTION;
 
     // Lookup table for associating paddle buttons with controller pins
     // Yes, this is hideously complex
