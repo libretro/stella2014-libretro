@@ -50,7 +50,18 @@ static uint8_t framePixelBytes = 2;
 static const uint32_t *currentPalette32 = NULL;
 static uint16_t currentPalette16[256] = {0};
 
+static Controller::Type left_controller_type = Controller::Joystick;
 static int paddle_digital_sensitivity = 50;
+
+#define PADDLE_ANALOG_RANGE 0x8000
+static float paddle_analog_sensitivity = 50.0f;
+static bool paddle_analog_is_quadratic = false;
+static int paddle_analog_deadzone = (int)(0.15f * (float)PADDLE_ANALOG_RANGE);
+
+static Event::Type MouseAxisValue0   = Event::MouseAxisXValue;
+static Event::Type MouseButtonValue0 = Event::MouseButtonLeftValue;
+static Event::Type MouseAxisValue1   = Event::MouseAxisYValue;
+static Event::Type MouseButtonValue1 = Event::MouseButtonRightValue;
 
 static retro_log_printf_t log_cb;
 static retro_video_refresh_t video_cb;
@@ -367,6 +378,44 @@ static void init_frame_blending(enum frame_blend_method blend_method)
  * Auxiliary functions
  ************************************/
 
+static void init_paddles(void)
+{
+   /* Check whether paddles are active */
+   left_controller_type = console->controller(Controller::Left).type();
+
+   if (left_controller_type == Controller::Paddles)
+   {
+      /* Set initial digital sensitivity */
+      Paddles::setDigitalSensitivity(paddle_digital_sensitivity);
+
+      /* Configure mouse control (mapped to
+       * gamepad analog sticks) */
+      console->controller(Controller::Left).setMouseControl(
+            Controller::Paddles, 0, Controller::Paddles, 1);
+
+      /* Stella internal mouse sensitivity is hard coded
+       * to a value of 1 - we handle 'actual' sensitivity
+       * via the libretro interface */
+      Paddles::setMouseSensitivity(1);
+
+      /* Check whether port 0/1 paddles should be swapped */
+      if (console->properties().get(Controller_SwapPaddles) == "YES")
+      {
+         MouseAxisValue1   = Event::MouseAxisXValue;
+         MouseButtonValue1 = Event::MouseButtonLeftValue;
+         MouseAxisValue0   = Event::MouseAxisYValue;
+         MouseButtonValue0 = Event::MouseButtonRightValue;
+      }
+      else
+      {
+         MouseAxisValue0   = Event::MouseAxisXValue;
+         MouseButtonValue0 = Event::MouseButtonLeftValue;
+         MouseAxisValue1   = Event::MouseAxisYValue;
+         MouseButtonValue1 = Event::MouseButtonRightValue;
+      }
+   }
+}
+
 static void update_input()
 {
    unsigned i, j;
@@ -390,39 +439,79 @@ static void update_input()
       }
    }
 
-   //Update stella's event structure
-   ev.set(Event::Type(Event::JoystickZeroUp), joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_UP));
-   ev.set(Event::Type(Event::JoystickZeroDown), joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_DOWN));
-   ev.set(Event::Type(Event::JoystickZeroLeft), joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_LEFT));
+   /* Update stella's event structure */
+
+   /* Events for left player's joystick */
+   ev.set(Event::Type(Event::JoystickZeroUp),    joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_UP));
+   ev.set(Event::Type(Event::JoystickZeroDown),  joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_DOWN));
+   ev.set(Event::Type(Event::JoystickZeroLeft),  joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_LEFT));
    ev.set(Event::Type(Event::JoystickZeroRight), joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_RIGHT));
-   ev.set(Event::Type(Event::JoystickZeroFire), joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_B));
-   ev.set(Event::Type(Event::ConsoleLeftDiffA), joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_L));
-   ev.set(Event::Type(Event::ConsoleLeftDiffB), joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_L2));
-   ev.set(Event::Type(Event::ConsoleColor), joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_L3));
+   ev.set(Event::Type(Event::JoystickZeroFire),  joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_B));
+   ev.set(Event::Type(Event::ConsoleLeftDiffA),  joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_L));
+   ev.set(Event::Type(Event::ConsoleLeftDiffB),  joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_L2));
+   ev.set(Event::Type(Event::ConsoleColor),      joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_L3));
    ev.set(Event::Type(Event::ConsoleRightDiffA), joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_R));
    ev.set(Event::Type(Event::ConsoleRightDiffB), joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_R2));
    ev.set(Event::Type(Event::ConsoleBlackWhite), joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_R3));
-   ev.set(Event::Type(Event::ConsoleSelect), joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_SELECT));
-   ev.set(Event::Type(Event::ConsoleReset), joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_START));
+   ev.set(Event::Type(Event::ConsoleSelect),     joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_SELECT));
+   ev.set(Event::Type(Event::ConsoleReset),      joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_START));
 
-   //Events for right player's joystick 
-   ev.set(Event::Type(Event::JoystickOneUp), joy_bits[Controller::Right] & (1 << RETRO_DEVICE_ID_JOYPAD_UP));
-   ev.set(Event::Type(Event::JoystickOneDown), joy_bits[Controller::Right] & (1 << RETRO_DEVICE_ID_JOYPAD_DOWN));
-   ev.set(Event::Type(Event::JoystickOneLeft), joy_bits[Controller::Right] & (1 << RETRO_DEVICE_ID_JOYPAD_LEFT));
+   /* > Update analog paddle events, if required */
+   if (left_controller_type == Controller::Paddles)
+   {
+      int paddles[2] = {0};
+
+      for (i = 0; i < 2; i++)
+      {
+         float paddle_amp = 0.0f;
+         int paddle       = input_state_cb(i, RETRO_DEVICE_ANALOG,
+               RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X);
+
+         /* Account for paddle deadzone, and convert
+          * analog stick input to an 'amplitude' value */
+         if ((paddle < -paddle_analog_deadzone) ||
+             (paddle > paddle_analog_deadzone))
+         {
+            paddle_amp = (float)((paddle > paddle_analog_deadzone) ?
+                  (paddle - paddle_analog_deadzone) :
+                        (paddle + paddle_analog_deadzone)) /
+                              (float)(PADDLE_ANALOG_RANGE - paddle_analog_deadzone);
+
+            /* Check whether paddle response is quadratic */
+            if (paddle_analog_is_quadratic)
+            {
+               if (paddle_amp < 0.0)
+                  paddle_amp = -(paddle_amp * paddle_amp);
+               else
+                  paddle_amp = paddle_amp * paddle_amp;
+            }
+         }
+
+         /* Convert paddle amplitude back to an integer,
+          * scaling by current analog sensitivity value
+          * > Note: Stella internally divides paddle value
+          *   by 2 - counter this by premultiplying */
+         paddles[i] = (int)(paddle_amp * paddle_analog_sensitivity) << 1;
+      }
+
+      ev.set(Event::Type(MouseAxisValue0), paddles[0]);
+      ev.set(Event::Type(MouseButtonValue0),  joy_bits[Controller::Left]  & (1 << RETRO_DEVICE_ID_JOYPAD_Y));
+
+      ev.set(Event::Type(MouseAxisValue1), paddles[1]);
+      ev.set(Event::Type(MouseButtonValue1), joy_bits[Controller::Right] & (1 << RETRO_DEVICE_ID_JOYPAD_Y));
+   }
+
+   /* Events for right player's joystick */
+   ev.set(Event::Type(Event::JoystickOneUp),    joy_bits[Controller::Right] & (1 << RETRO_DEVICE_ID_JOYPAD_UP));
+   ev.set(Event::Type(Event::JoystickOneDown),  joy_bits[Controller::Right] & (1 << RETRO_DEVICE_ID_JOYPAD_DOWN));
+   ev.set(Event::Type(Event::JoystickOneLeft),  joy_bits[Controller::Right] & (1 << RETRO_DEVICE_ID_JOYPAD_LEFT));
    ev.set(Event::Type(Event::JoystickOneRight), joy_bits[Controller::Right] & (1 << RETRO_DEVICE_ID_JOYPAD_RIGHT));
-   ev.set(Event::Type(Event::JoystickOneFire), joy_bits[Controller::Right] & (1 << RETRO_DEVICE_ID_JOYPAD_B));
+   ev.set(Event::Type(Event::JoystickOneFire),  joy_bits[Controller::Right] & (1 << RETRO_DEVICE_ID_JOYPAD_B));
 
-   //Tell all input devices to read their state from the event structure
+   /* Tell all input devices to read their state from the event structure */
    console->controller(Controller::Left).update();
    console->controller(Controller::Right).update();
    console->switches().update();
-}
-
-static void update_paddle_sensitivity(void)
-{
-   if ((console->controller(Controller::Left).type()  == Controller::Paddles) ||
-       (console->controller(Controller::Right).type() == Controller::Paddles))
-      Paddles::setDigitalSensitivity(paddle_digital_sensitivity);
 }
 
 static void check_variables(bool first_run)
@@ -484,8 +573,44 @@ static void check_variables(bool first_run)
    /* Only apply paddle sensitivity update if
     * this is *not* the first run */
    if (!first_run &&
+       (left_controller_type == Controller::Paddles) &&
        (paddle_digital_sensitivity != last_paddle_sensitivity))
-      update_paddle_sensitivity();
+      Paddles::setDigitalSensitivity(paddle_digital_sensitivity);
+
+   /* Read paddle analog sensitivity option */
+   var.key   = "stella2014_paddle_analog_sensitivity";
+   var.value = NULL;
+
+   paddle_analog_sensitivity = 50.0f;
+
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+   {
+      int analog_sensitivity = atoi(var.value);
+      analog_sensitivity = (analog_sensitivity > 150) ?
+            150 : analog_sensitivity;
+      analog_sensitivity = (analog_sensitivity <  10) ?
+            10  : analog_sensitivity;
+      paddle_analog_sensitivity = (float)analog_sensitivity;
+   }
+
+   /* Read paddle analog response option */
+   var.key   = "stella2014_paddle_analog_response";
+   var.value = NULL;
+
+   paddle_analog_is_quadratic = false;
+
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+      if (strcmp(var.value, "quadratic") == 0)
+         paddle_analog_is_quadratic = true;
+
+   /* Read paddle analog deadzone option */
+   var.key   = "stella2014_paddle_analog_deadzone";
+   var.value = NULL;
+
+   paddle_analog_deadzone = (int)(0.15f * (float)PADDLE_ANALOG_RANGE);
+
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+      paddle_analog_deadzone = (int)((float)atoi(var.value) * 0.01f * (float)PADDLE_ANALOG_RANGE);
 }
 
 /************************************
@@ -590,12 +715,16 @@ bool retro_load_game(const struct retro_game_info *info)
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R3,     "Black/White" },
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START,  "Reset" },
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y,      "Paddle Fire" },
+      { 0, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X, "Paddle Analog" },
 
       { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "Left" },
       { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,    "Up" },
       { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "Down" },
       { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "Right" },
       { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "Fire" },
+      { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y,     "Paddle Fire" },
+      { 1, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X, "Paddle Analog" },
 
       { 0 },
    };
@@ -659,8 +788,8 @@ bool retro_load_game(const struct retro_game_info *info)
    console->initializeVideo();
    console->initializeAudio();
 
-   // Set initial paddle sensitivity
-   update_paddle_sensitivity();
+   // Init paddle controls
+   init_paddles();
 
    // Get the ROM's width and height
    TIA& tia = console->tia();
@@ -751,6 +880,11 @@ void retro_init(void)
 void retro_deinit(void)
 {
    libretro_supports_bitmasks = false;
+   left_controller_type       = Controller::Joystick;
+   MouseAxisValue0            = Event::MouseAxisXValue;
+   MouseButtonValue0          = Event::MouseButtonLeftValue;
+   MouseAxisValue1            = Event::MouseAxisYValue;
+   MouseButtonValue1          = Event::MouseButtonRightValue;
    currentPalette32           = NULL;
 
    if (frameBuffer)

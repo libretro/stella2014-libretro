@@ -198,8 +198,9 @@ Paddles::Paddles(Jack jack, const Event& event, const System& system,
 
   // The following are independent of whether or not the port
   // is left or right
-  _MOUSE_SENSITIVITY = swapdir ? -abs(_MOUSE_SENSITIVITY) :
-                                  abs(_MOUSE_SENSITIVITY);
+  _MOUSE_DIRECTION   = swapdir ? -1 : 1;
+  _MOUSE_SENSITIVITY = _MOUSE_DIRECTION * abs(_MOUSE_SENSITIVITY);
+
   if(!swapaxis)
   {
     myAxisMouseMotion = Event::MouseAxisXValue;
@@ -439,13 +440,14 @@ void Paddles::setMouseSensitivity(int sensitivity)
   if(sensitivity < 1)       sensitivity = 1;
   else if(sensitivity > 15) sensitivity = 15;
 
-  _MOUSE_SENSITIVITY = sensitivity;
+  _MOUSE_SENSITIVITY = _MOUSE_DIRECTION * sensitivity;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int Paddles::_DIGITAL_SENSITIVITY = -1;
 int Paddles::_DIGITAL_DISTANCE = -1;
 int Paddles::_MOUSE_SENSITIVITY = -1;
+int Paddles::_MOUSE_DIRECTION = 1;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const Controller::DigitalPin Paddles::ourButtonPin[2] = { Four, Three };
