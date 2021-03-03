@@ -76,6 +76,45 @@ struct retro_core_option_definition option_defs_us[] = {
       "disabled"
    },
    {
+      "stella2014_low_pass_filter",
+      "Audio Filter",
+      "Enables a low pass audio filter to soften the 'harsh' sound produced by the Atari 2600's TIA chip.",
+      {
+         { "disabled", NULL },
+         { "enabled",  NULL },
+         { NULL, NULL },
+      },
+      "disabled"
+   },
+   {
+      "stella2014_low_pass_range",
+      "Audio Filter Level",
+      "Specifies the cut-off frequency of the low pass audio filter. A higher value increases the perceived 'strength' of the filter, since a wider range of the high frequency spectrum is attenuated.",
+      {
+         { "5",  "5%" },
+         { "10", "10%" },
+         { "15", "15%" },
+         { "20", "20%" },
+         { "25", "25%" },
+         { "30", "30%" },
+         { "35", "35%" },
+         { "40", "40%" },
+         { "45", "45%" },
+         { "50", "50%" },
+         { "55", "55%" },
+         { "60", "60%" },
+         { "65", "65%" },
+         { "70", "70%" },
+         { "75", "75%" },
+         { "80", "80%" },
+         { "85", "85%" },
+         { "90", "90%" },
+         { "95", "95%" },
+         { NULL, NULL },
+      },
+      "60"
+   },
+   {
       "stella2014_paddle_digital_sensitivity",
       "Paddle Sensitivity (Digital)",
       "Sets the sensitivity for digital emulation of paddle movement. Higher values increase paddle speed.",

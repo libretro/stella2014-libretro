@@ -63,6 +63,11 @@ static Event::Type MouseButtonValue0 = Event::MouseButtonLeftValue;
 static Event::Type MouseAxisValue1   = Event::MouseAxisYValue;
 static Event::Type MouseButtonValue1 = Event::MouseButtonRightValue;
 
+static bool low_pass_enabled       = false;
+static int32_t low_pass_range      = 0;
+static int32_t low_pass_left_prev  = 0;
+static int32_t low_pass_right_prev = 0;
+
 static retro_log_printf_t log_cb;
 static retro_video_refresh_t video_cb;
 static retro_input_poll_t input_poll_cb;
@@ -375,6 +380,78 @@ static void init_frame_blending(enum frame_blend_method blend_method)
 }
 
 /************************************
+ * Low pass audio filter
+ ************************************/
+
+static void apply_low_pass_filter_mono(int16_t *buf, int length)
+{
+   int samples      = length;
+   int16_t *out     = buf;
+
+   /* Restore previous sample */
+   int32_t low_pass = low_pass_left_prev;
+
+   /* Single-pole low-pass filter (6 dB/octave) */
+   int32_t factor_a = low_pass_range;
+   int32_t factor_b = 0x10000 - factor_a;
+
+   do
+   {
+      /* Apply low-pass filter */
+      low_pass = (low_pass * factor_a) + (*out * factor_b);
+
+      /* 16.16 fixed point */
+      low_pass >>= 16;
+
+      /* Update sound buffer
+       * > Converted to stereo by duplicating
+       *   the left/right channels */
+      *out++   = (int16_t)low_pass;
+      *out++   = (int16_t)low_pass;
+   }
+   while (--samples);
+
+   /* Save last sample for next frame */
+   low_pass_left_prev = low_pass;
+}
+
+static void apply_low_pass_filter_stereo(int16_t *buf, int length)
+{
+   int samples            = length;
+   int16_t *out           = buf;
+
+   /* Restore previous samples */
+   int32_t low_pass_left  = low_pass_left_prev;
+   int32_t low_pass_right = low_pass_right_prev;
+
+   /* Single-pole low-pass filter (6 dB/octave) */
+   int32_t factor_a       = low_pass_range;
+   int32_t factor_b       = 0x10000 - factor_a;
+
+   do
+   {
+      /* Apply low-pass filter */
+      low_pass_left  = (low_pass_left  * factor_a) + (*out       * factor_b);
+      low_pass_right = (low_pass_right * factor_a) + (*(out + 1) * factor_b);
+
+      /* 16.16 fixed point */
+      low_pass_left  >>= 16;
+      low_pass_right >>= 16;
+
+      /* Update sound buffer */
+      *out++ = (int16_t)low_pass_left;
+      *out++ = (int16_t)low_pass_right;
+   }
+   while (--samples);
+
+   /* Save last samples for next frame */
+   low_pass_left_prev  = low_pass_left;
+   low_pass_right_prev = low_pass_right;
+}
+
+static void (*apply_low_pass_filter)(int16_t *buf, int length) = apply_low_pass_filter_mono;
+
+/************************************
  * Auxiliary functions
  ************************************/
 
@@ -553,6 +630,24 @@ static void check_variables(bool first_run)
    }
 
    init_frame_blending(blend_method);
+
+   /* Read low pass audio filter settings */
+   var.key   = "stella2014_low_pass_filter";
+   var.value = NULL;
+
+   low_pass_enabled = false;
+
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+      if (strcmp(var.value, "enabled") == 0)
+         low_pass_enabled = true;
+
+   var.key   = "stella2014_low_pass_range";
+   var.value = NULL;
+
+   low_pass_range = (60 * 0x10000) / 100;
+
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+      low_pass_range = (strtol(var.value, NULL, 10) * 0x10000) / 100;
 
    /* Read paddle digital sensitivity option */
    var.key   = "stella2014_paddle_digital_sensitivity";
@@ -788,6 +883,12 @@ bool retro_load_game(const struct retro_game_info *info)
    console->initializeVideo();
    console->initializeAudio();
 
+   // Check number of audio channels
+   if (console->properties().get(Cartridge_Sound) == "STEREO")
+      apply_low_pass_filter = apply_low_pass_filter_stereo;
+   else
+      apply_low_pass_filter = apply_low_pass_filter_mono;
+
    // Init paddle controls
    init_paddles();
 
@@ -885,6 +986,9 @@ void retro_deinit(void)
    MouseButtonValue0          = Event::MouseButtonLeftValue;
    MouseAxisValue1            = Event::MouseAxisYValue;
    MouseButtonValue1          = Event::MouseButtonRightValue;
+   low_pass_enabled           = false;
+   low_pass_left_prev         = 0;
+   low_pass_right_prev        = 0;
    currentPalette32           = NULL;
 
    if (frameBuffer)
@@ -915,7 +1019,7 @@ void retro_reset(void)
 
 void retro_run(void)
 {
-   static int16_t *sampleBuffer[2048];
+   static int16_t sampleBuffer[2048];
    //Get the number of samples in a frame
    static uint32_t tiaSamplesPerFrame = (uint32_t)(31400.0f/console->getFramerate());
 
@@ -947,7 +1051,10 @@ void retro_run(void)
    //AUDIO
    //Process one frame of audio from stella
    SoundSDL *sound = (SoundSDL*)&osystem.sound();
-   sound->processFragment((int16_t*)sampleBuffer, tiaSamplesPerFrame);
+   sound->processFragment(sampleBuffer, tiaSamplesPerFrame);
 
-   audio_batch_cb((int16_t*)sampleBuffer, tiaSamplesPerFrame);
+   if (low_pass_enabled)
+      apply_low_pass_filter(sampleBuffer, tiaSamplesPerFrame);
+
+   audio_batch_cb(sampleBuffer, tiaSamplesPerFrame);
 }
