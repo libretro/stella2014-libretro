@@ -50,6 +50,128 @@ static uint8_t framePixelBytes = 2;
 static const uint32_t *currentPalette32 = NULL;
 static uint16_t currentPalette16[256] = {0};
 
+#define MAX_RETROPAD_DEVICES 2
+
+#define RETROPAD_STELLA_GAMEPAD RETRO_DEVICE_JOYPAD
+#define RETROPAD_STELLA_PADDLES RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_ANALOG, 1)
+
+static unsigned retropad_devices[MAX_RETROPAD_DEVICES] = {
+   RETROPAD_STELLA_GAMEPAD,
+   RETROPAD_STELLA_GAMEPAD,
+};
+
+static const struct retro_controller_description retropad_desc[] = {
+   { "Gamepad",                RETROPAD_STELLA_GAMEPAD },
+   { "Paddles (Stelladaptor)", RETROPAD_STELLA_PADDLES },
+   { NULL, 0 },
+};
+
+static const struct retro_controller_info retropad_port_info[] = {
+   { retropad_desc, 2 },
+   { retropad_desc, 2 },
+   { NULL, 0 },
+};
+
+static struct retro_input_descriptor retropad_inputs_gamepad0_gamepad1[] = {
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,   "Left" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,     "Up" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,   "Down" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT,  "Right" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,      "Fire" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L,      "Left Difficulty A" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2,     "Left Difficulty B" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L3,     "Color" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R,      "Right Difficulty A" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2,     "Right Difficulty B" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R3,     "Black/White" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START,  "Reset" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y,      "Paddle Fire" },
+   { 0, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X, "Paddle Analog" },
+
+   { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "Left" },
+   { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,    "Up" },
+   { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "Down" },
+   { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "Right" },
+   { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "Fire" },
+   { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y,     "Paddle Fire" },
+   { 1, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X, "Paddle Analog" },
+
+   { 0 },
+};
+
+static struct retro_input_descriptor retropad_inputs_gamepad0_paddles1[] = {
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,   "Left" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,     "Up" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,   "Down" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT,  "Right" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,      "Fire" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L,      "Left Difficulty A" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2,     "Left Difficulty B" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L3,     "Color" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R,      "Right Difficulty A" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2,     "Right Difficulty B" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R3,     "Black/White" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START,  "Reset" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y,      "Paddle Fire" },
+   { 0, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X, "Paddle Analog" },
+
+   { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,      "P3 Fire" },
+   { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,      "P4 Fire" },
+   { 1, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X, "P3 Wheel" },
+   { 1, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_Y, "P4 Wheel" },
+
+   { 0 },
+};
+
+static struct retro_input_descriptor retropad_inputs_paddles0_gamepad1[] = {
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,      "P1 Fire" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,      "P2 Fire" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L,      "Left Difficulty A" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2,     "Left Difficulty B" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L3,     "Color" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R,      "Right Difficulty A" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2,     "Right Difficulty B" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R3,     "Black/White" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START,  "Reset" },
+   { 0, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X, "P1 Wheel" },
+   { 0, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_Y, "P2 Wheel" },
+
+   { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "Left" },
+   { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,    "Up" },
+   { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "Down" },
+   { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "Right" },
+   { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "Fire" },
+   { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y,     "Paddle Fire" },
+   { 1, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X, "Paddle Analog" },
+
+   { 0 },
+};
+
+static struct retro_input_descriptor retropad_inputs_paddles0_paddles1[] = {
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,      "P1 Fire" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,      "P2 Fire" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L,      "Left Difficulty A" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2,     "Left Difficulty B" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L3,     "Color" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R,      "Right Difficulty A" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2,     "Right Difficulty B" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R3,     "Black/White" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START,  "Reset" },
+   { 0, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X, "P1 Wheel" },
+   { 0, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_Y, "P2 Wheel" },
+
+   { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,      "P3 Fire" },
+   { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,      "P4 Fire" },
+   { 1, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X, "P3 Wheel" },
+   { 1, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_Y, "P4 Wheel" },
+
+   { 0 },
+};
+
 static Controller::Type left_controller_type = Controller::Joystick;
 static int paddle_digital_sensitivity = 50;
 
@@ -495,95 +617,152 @@ static void init_paddles(void)
 
 static void update_input()
 {
-   unsigned i, j;
-   int16_t joy_bits[2] = {0};
+   unsigned i;
 
    if (!input_poll_cb)
       return;
 
    input_poll_cb();
-
    Event &ev = osystem.eventHandler().event();
 
-   for(i = 0; i < 2; i++)
+   /* Loop over input devices */
+   for (i = 0; i < MAX_RETROPAD_DEVICES; i++)
    {
+      int16_t joy_bits = 0;
+
+      /* Read button input (required in all cases) */
       if (libretro_supports_bitmasks)
-         joy_bits[i] = input_state_cb(i, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_MASK);
+         joy_bits = input_state_cb(i, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_MASK);
       else
       {
+         unsigned j;
          for (j = 0; j < (RETRO_DEVICE_ID_JOYPAD_R3+1); j++)
-            joy_bits[i] |= input_state_cb(i, RETRO_DEVICE_JOYPAD, 0, j) ? (1 << j) : 0;
+            joy_bits |= input_state_cb(i, RETRO_DEVICE_JOYPAD, 0, j) ? (1 << j) : 0;
       }
-   }
 
-   /* Update stella's event structure */
-
-   /* Events for left player's joystick */
-   ev.set(Event::Type(Event::JoystickZeroUp),    joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_UP));
-   ev.set(Event::Type(Event::JoystickZeroDown),  joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_DOWN));
-   ev.set(Event::Type(Event::JoystickZeroLeft),  joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_LEFT));
-   ev.set(Event::Type(Event::JoystickZeroRight), joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_RIGHT));
-   ev.set(Event::Type(Event::JoystickZeroFire),  joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_B));
-   ev.set(Event::Type(Event::ConsoleLeftDiffA),  joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_L));
-   ev.set(Event::Type(Event::ConsoleLeftDiffB),  joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_L2));
-   ev.set(Event::Type(Event::ConsoleColor),      joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_L3));
-   ev.set(Event::Type(Event::ConsoleRightDiffA), joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_R));
-   ev.set(Event::Type(Event::ConsoleRightDiffB), joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_R2));
-   ev.set(Event::Type(Event::ConsoleBlackWhite), joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_R3));
-   ev.set(Event::Type(Event::ConsoleSelect),     joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_SELECT));
-   ev.set(Event::Type(Event::ConsoleReset),      joy_bits[Controller::Left] & (1 << RETRO_DEVICE_ID_JOYPAD_START));
-
-   /* > Update analog paddle events, if required */
-   if (left_controller_type == Controller::Paddles)
-   {
-      int paddles[2] = {0};
-
-      for (i = 0; i < 2; i++)
+      if (retropad_devices[i] == RETROPAD_STELLA_PADDLES)
       {
-         float paddle_amp = 0.0f;
-         int paddle       = input_state_cb(i, RETRO_DEVICE_ANALOG,
+         /* Handle paddle devices */
+
+         /* Read analog input */
+         int paddle_a = input_state_cb(i, RETRO_DEVICE_ANALOG,
                RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X);
+         int paddle_b = input_state_cb(i, RETRO_DEVICE_ANALOG,
+               RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_Y);
 
-         /* Account for paddle deadzone, and convert
-          * analog stick input to an 'amplitude' value */
-         if ((paddle < -paddle_analog_deadzone) ||
-             (paddle > paddle_analog_deadzone))
+         if (i == 0)
          {
-            paddle_amp = (float)((paddle > paddle_analog_deadzone) ?
-                  (paddle - paddle_analog_deadzone) :
-                        (paddle + paddle_analog_deadzone)) /
-                              (float)(PADDLE_ANALOG_RANGE - paddle_analog_deadzone);
+            /* Events for left player's paddles */
 
-            /* Check whether paddle response is quadratic */
-            if (paddle_analog_is_quadratic)
-            {
-               if (paddle_amp < 0.0)
-                  paddle_amp = -(paddle_amp * paddle_amp);
-               else
-                  paddle_amp = paddle_amp * paddle_amp;
-            }
+            /* Paddle 0 */
+            ev.set(Event::Type(Event::SALeftAxis0Value), paddle_a);
+            ev.set(Event::Type(Event::PaddleZeroFire), joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_A));
+
+            /* Paddle 1 */
+            ev.set(Event::Type(Event::SALeftAxis1Value), paddle_b);
+            ev.set(Event::Type(Event::PaddleOneFire), joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_B));
+
+            /* Generic inputs */
+            ev.set(Event::Type(Event::ConsoleLeftDiffA),  joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_L));
+            ev.set(Event::Type(Event::ConsoleLeftDiffB),  joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_L2));
+            ev.set(Event::Type(Event::ConsoleColor),      joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_L3));
+            ev.set(Event::Type(Event::ConsoleRightDiffA), joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_R));
+            ev.set(Event::Type(Event::ConsoleRightDiffB), joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_R2));
+            ev.set(Event::Type(Event::ConsoleBlackWhite), joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_R3));
+            ev.set(Event::Type(Event::ConsoleSelect),     joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_SELECT));
+            ev.set(Event::Type(Event::ConsoleReset),      joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_START));
+         }
+         else
+         {
+            /* Events for right player's paddles */
+
+            /* Paddle 2 */
+            ev.set(Event::Type(Event::SARightAxis0Value), paddle_a);
+            ev.set(Event::Type(Event::PaddleTwoFire), joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_A));
+
+            /* Paddle 3 */
+            ev.set(Event::Type(Event::SARightAxis1Value), paddle_b);
+            ev.set(Event::Type(Event::PaddleThreeFire), joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_B));
+         }
+      }
+      else
+      {
+         /* Handle regular gamepad devices */
+         if (i == 0)
+         {
+            /* Events for left player's joystick */
+            ev.set(Event::Type(Event::JoystickZeroUp),    joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_UP));
+            ev.set(Event::Type(Event::JoystickZeroDown),  joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_DOWN));
+            ev.set(Event::Type(Event::JoystickZeroLeft),  joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_LEFT));
+            ev.set(Event::Type(Event::JoystickZeroRight), joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_RIGHT));
+            ev.set(Event::Type(Event::JoystickZeroFire),  joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_B));
+            ev.set(Event::Type(Event::ConsoleLeftDiffA),  joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_L));
+            ev.set(Event::Type(Event::ConsoleLeftDiffB),  joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_L2));
+            ev.set(Event::Type(Event::ConsoleColor),      joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_L3));
+            ev.set(Event::Type(Event::ConsoleRightDiffA), joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_R));
+            ev.set(Event::Type(Event::ConsoleRightDiffB), joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_R2));
+            ev.set(Event::Type(Event::ConsoleBlackWhite), joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_R3));
+            ev.set(Event::Type(Event::ConsoleSelect),     joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_SELECT));
+            ev.set(Event::Type(Event::ConsoleReset),      joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_START));
+         }
+         else
+         {
+            /* Events for right player's joystick */
+            ev.set(Event::Type(Event::JoystickOneUp),    joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_UP));
+            ev.set(Event::Type(Event::JoystickOneDown),  joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_DOWN));
+            ev.set(Event::Type(Event::JoystickOneLeft),  joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_LEFT));
+            ev.set(Event::Type(Event::JoystickOneRight), joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_RIGHT));
+            ev.set(Event::Type(Event::JoystickOneFire),  joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_B));
          }
 
-         /* Convert paddle amplitude back to an integer,
-          * scaling by current analog sensitivity value
-          * > Note: Stella internally divides paddle value
-          *   by 2 - counter this by premultiplying */
-         paddles[i] = (int)(paddle_amp * paddle_analog_sensitivity) << 1;
+         /* Read analog paddle input, if required */
+         if (left_controller_type == Controller::Paddles)
+         {
+            float paddle_amp = 0.0f;
+            int paddle       = input_state_cb(i, RETRO_DEVICE_ANALOG,
+                  RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X);
+
+            /* Account for paddle deadzone, and convert
+             * analog stick input to an 'amplitude' value */
+            if ((paddle < -paddle_analog_deadzone) ||
+                (paddle > paddle_analog_deadzone))
+            {
+               paddle_amp = (float)((paddle > paddle_analog_deadzone) ?
+                     (paddle - paddle_analog_deadzone) :
+                           (paddle + paddle_analog_deadzone)) /
+                                 (float)(PADDLE_ANALOG_RANGE - paddle_analog_deadzone);
+
+               /* Check whether paddle response is quadratic */
+               if (paddle_analog_is_quadratic)
+               {
+                  if (paddle_amp < 0.0)
+                     paddle_amp = -(paddle_amp * paddle_amp);
+                  else
+                     paddle_amp = paddle_amp * paddle_amp;
+               }
+            }
+
+            /* Convert paddle amplitude back to an integer,
+             * scaling by current analog sensitivity value
+             * > Note: Stella internally divides paddle value
+             *   by 2 - counter this by premultiplying */
+            paddle = (int)(paddle_amp * paddle_analog_sensitivity) << 1;
+
+            if (i == 0)
+            {
+               /* Events for left player's paddle */
+               ev.set(Event::Type(MouseAxisValue0), paddle);
+               ev.set(Event::Type(MouseButtonValue0), joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_Y));
+            }
+            else
+            {
+               /* Events for right player's paddle */
+               ev.set(Event::Type(MouseAxisValue1), paddle);
+               ev.set(Event::Type(MouseButtonValue1), joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_Y));
+            }
+         }
       }
-
-      ev.set(Event::Type(MouseAxisValue0), paddles[0]);
-      ev.set(Event::Type(MouseButtonValue0),  joy_bits[Controller::Left]  & (1 << RETRO_DEVICE_ID_JOYPAD_Y));
-
-      ev.set(Event::Type(MouseAxisValue1), paddles[1]);
-      ev.set(Event::Type(MouseButtonValue1), joy_bits[Controller::Right] & (1 << RETRO_DEVICE_ID_JOYPAD_Y));
    }
-
-   /* Events for right player's joystick */
-   ev.set(Event::Type(Event::JoystickOneUp),    joy_bits[Controller::Right] & (1 << RETRO_DEVICE_ID_JOYPAD_UP));
-   ev.set(Event::Type(Event::JoystickOneDown),  joy_bits[Controller::Right] & (1 << RETRO_DEVICE_ID_JOYPAD_DOWN));
-   ev.set(Event::Type(Event::JoystickOneLeft),  joy_bits[Controller::Right] & (1 << RETRO_DEVICE_ID_JOYPAD_LEFT));
-   ev.set(Event::Type(Event::JoystickOneRight), joy_bits[Controller::Right] & (1 << RETRO_DEVICE_ID_JOYPAD_RIGHT));
-   ev.set(Event::Type(Event::JoystickOneFire),  joy_bits[Controller::Right] & (1 << RETRO_DEVICE_ID_JOYPAD_B));
 
    /* Tell all input devices to read their state from the event structure */
    console->controller(Controller::Left).update();
@@ -722,6 +901,7 @@ void retro_set_environment(retro_environment_t cb)
 {
    environ_cb = cb;
    libretro_set_core_options(environ_cb);
+   environ_cb(RETRO_ENVIRONMENT_SET_CONTROLLER_INFO, (void*)retropad_port_info);
 }
 
 void retro_get_system_info(struct retro_system_info *info)
@@ -750,8 +930,41 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
 
 void retro_set_controller_port_device(unsigned port, unsigned device)
 {
-   (void)port;
-   (void)device;
+   if (port >= MAX_RETROPAD_DEVICES)
+      return;
+
+   switch (device)
+   {
+      case RETROPAD_STELLA_GAMEPAD:
+         retropad_devices[port] = RETROPAD_STELLA_GAMEPAD;
+         break;
+      case RETROPAD_STELLA_PADDLES:
+         retropad_devices[port] = RETROPAD_STELLA_PADDLES;
+         break;
+      default:
+         if (log_cb)
+            log_cb(RETRO_LOG_ERROR,
+                  "[Stella]: Invalid libretro controller device, using default: RETROPAD_STELLA_GAMEPAD\n");
+         retropad_devices[port] = RETROPAD_STELLA_GAMEPAD;
+         break;
+   }
+
+   /* Ugly workaround to support different input
+    * descriptors on different ports... */
+   if (retropad_devices[0] == RETROPAD_STELLA_PADDLES)
+   {
+      if (retropad_devices[1] == RETROPAD_STELLA_PADDLES)
+         environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, retropad_inputs_paddles0_paddles1);
+      else
+         environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, retropad_inputs_paddles0_gamepad1);
+   }
+   else
+   {
+      if (retropad_devices[1] == RETROPAD_STELLA_PADDLES)
+         environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, retropad_inputs_gamepad0_paddles1);
+      else
+         environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, retropad_inputs_gamepad0_gamepad1);
+   }
 }
 
 size_t retro_serialize_size(void) 
@@ -796,38 +1009,8 @@ bool retro_load_game(const struct retro_game_info *info)
 {
    enum retro_pixel_format fmt;
 
-   struct retro_input_descriptor desc[] = {
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,   "Left" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,     "Up" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,   "Down" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT,  "Right" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,      "Fire" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L,      "Left Difficulty A" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2,     "Left Difficulty B" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L3,     "Color" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R,      "Right Difficulty A" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2,     "Right Difficulty B" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R3,     "Black/White" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START,  "Reset" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y,      "Paddle Fire" },
-      { 0, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X, "Paddle Analog" },
-
-      { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "Left" },
-      { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,    "Up" },
-      { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "Down" },
-      { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "Right" },
-      { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "Fire" },
-      { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y,     "Paddle Fire" },
-      { 1, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X, "Paddle Analog" },
-
-      { 0 },
-   };
-
    if (!info || info->size >= 96*1024)
       return false;
-
-   environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, desc);
 
    // Set color depth
    check_variables(true);
