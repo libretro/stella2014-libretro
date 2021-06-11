@@ -5,6 +5,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #ifdef _MSC_VER
 #define snprintf _snprintf
@@ -172,6 +173,7 @@ static struct retro_input_descriptor retropad_inputs_paddles0_paddles1[] = {
    { 0 },
 };
 
+/* Regular gamepad-related parameters */
 static Controller::Type left_controller_type = Controller::Joystick;
 static int paddle_digital_sensitivity = 50;
 
@@ -185,6 +187,25 @@ static Event::Type MouseButtonValue0 = Event::MouseButtonLeftValue;
 static Event::Type MouseAxisValue1   = Event::MouseAxisYValue;
 static Event::Type MouseButtonValue1 = Event::MouseButtonRightValue;
 
+/* Stelladaptor-related parameters
+ * > This type of paddle control bears no resemblance
+ *   to regular gamepads, thus independent sensitivity
+ *   and offset options are required */
+#define STELLADAPTOR_ANALOG_SENSE_DEFAULT  20
+#define STELLADAPTOR_ANALOG_SENSE_FACTOR   0.148643628f
+#define STELLADAPTOR_ANALOG_SENSE_BASE     1.1f
+#define STELLADAPTOR_ANALOG_SENSE_MIN      0
+#define STELLADAPTOR_ANALOG_SENSE_MAX      30
+
+#define STELLADAPTOR_ANALOG_CENTER_DEFAULT 0
+#define STELLADAPTOR_ANALOG_CENTER_FACTOR  860.0f
+#define STELLADAPTOR_ANALOG_CENTER_MIN     -10
+#define STELLADAPTOR_ANALOG_CENTER_MAX     30
+
+static float stelladaptor_analog_sensitivity = 1.0f;
+static float stelladaptor_analog_center      = 0.0f;
+
+/* Low pass audio filter */
 static bool low_pass_enabled       = false;
 static int32_t low_pass_range      = 0;
 static int32_t low_pass_left_prev  = 0;
@@ -577,6 +598,35 @@ static void (*apply_low_pass_filter)(int16_t *buf, int length) = apply_low_pass_
  * Auxiliary functions
  ************************************/
 
+static float get_stelladaptor_analog_sensitivity(int sensitivity)
+{
+   /* STELLADAPTOR_ANALOG_SENSE_FACTOR *
+    *       (STELLADAPTOR_ANALOG_SENSE_BASE ^
+    *             STELLADAPTOR_ANALOG_SENSE_DEFAULT) = 1.0 */
+
+   int sense = (sensitivity > STELLADAPTOR_ANALOG_SENSE_MAX) ?
+         STELLADAPTOR_ANALOG_SENSE_MAX : sensitivity;
+
+   sense = (sense < STELLADAPTOR_ANALOG_SENSE_MIN) ?
+         STELLADAPTOR_ANALOG_SENSE_MIN : sense;
+
+   return STELLADAPTOR_ANALOG_SENSE_FACTOR * (float)pow(
+         (double)STELLADAPTOR_ANALOG_SENSE_BASE, (double)sense);
+}
+
+static float get_stelladaptor_analog_center(int center)
+{
+   /* Convert into ~5 pixel steps */
+
+   int offset = (center > STELLADAPTOR_ANALOG_CENTER_MAX) ?
+         STELLADAPTOR_ANALOG_CENTER_MAX : center;
+
+   offset = (offset < STELLADAPTOR_ANALOG_CENTER_MIN) ?
+         STELLADAPTOR_ANALOG_CENTER_MIN : offset;
+
+   return STELLADAPTOR_ANALOG_CENTER_FACTOR * (float)offset;
+}
+
 static void init_paddles(void)
 {
    /* Check whether paddles are active */
@@ -649,6 +699,17 @@ static void update_input()
                RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X);
          int paddle_b = input_state_cb(i, RETRO_DEVICE_ANALOG,
                RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_Y);
+
+         /* Apply sensitivity/offset factors */
+         paddle_a = (int)(((float)paddle_a * stelladaptor_analog_sensitivity) +
+               stelladaptor_analog_center);
+         paddle_a = (paddle_a >  0x7FFF) ?  0x7FFF : paddle_a;
+         paddle_a = (paddle_a < -0x7FFF) ? -0x7FFF : paddle_a;
+
+         paddle_b = (int)(((float)paddle_b * stelladaptor_analog_sensitivity) +
+               stelladaptor_analog_center);
+         paddle_b = (paddle_b >  0x7FFF) ?  0x7FFF : paddle_b;
+         paddle_b = (paddle_b < -0x7FFF) ? -0x7FFF : paddle_b;
 
          if (i == 0)
          {
@@ -775,6 +836,8 @@ static void check_variables(bool first_run)
    struct retro_variable var            = {0};
    enum frame_blend_method blend_method = FRAME_BLEND_NONE;
    int last_paddle_sensitivity;
+   int stelladaptor_sensitivity;
+   int stelladaptor_center;
 
    /* Only read colour depth option on first run */
    if (first_run)
@@ -885,6 +948,32 @@ static void check_variables(bool first_run)
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
       paddle_analog_deadzone = (int)((float)atoi(var.value) * 0.01f * (float)PADDLE_ANALOG_RANGE);
+
+   /* Read Stelladaptor analog sensitivity option */
+   var.key   = "stella2014_stelladaptor_analog_sensitivity";
+   var.value = NULL;
+
+   stelladaptor_sensitivity = STELLADAPTOR_ANALOG_SENSE_DEFAULT;
+
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+      stelladaptor_sensitivity = atoi(var.value);
+
+   stelladaptor_analog_sensitivity =
+         get_stelladaptor_analog_sensitivity(
+               stelladaptor_sensitivity);
+
+   /* Read Stelladaptor analog centre option */
+   var.key   = "stella2014_stelladaptor_analog_center";
+   var.value = NULL;
+
+   stelladaptor_center = STELLADAPTOR_ANALOG_CENTER_DEFAULT;
+
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+      stelladaptor_center = atoi(var.value);
+
+   stelladaptor_analog_center =
+         get_stelladaptor_analog_center(
+               stelladaptor_center);
 }
 
 /************************************
@@ -930,6 +1019,10 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
 
 void retro_set_controller_port_device(unsigned port, unsigned device)
 {
+   struct retro_core_option_display option_display;
+   bool show_gamepad_options;
+   bool show_stelladaptor_options;
+
    if (port >= MAX_RETROPAD_DEVICES)
       return;
 
@@ -965,6 +1058,39 @@ void retro_set_controller_port_device(unsigned port, unsigned device)
       else
          environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, retropad_inputs_gamepad0_gamepad1);
    }
+
+   /* Show/hide relevant controller-related core options */
+   show_gamepad_options =
+         (retropad_devices[0] == RETROPAD_STELLA_GAMEPAD) ||
+         (retropad_devices[1] == RETROPAD_STELLA_GAMEPAD);
+
+   show_stelladaptor_options =
+         (retropad_devices[0] == RETROPAD_STELLA_PADDLES) ||
+         (retropad_devices[1] == RETROPAD_STELLA_PADDLES);
+
+   /* > Gamepad */
+   option_display.visible = show_gamepad_options;
+
+   option_display.key = "stella2014_paddle_digital_sensitivity";
+   environ_cb(RETRO_ENVIRONMENT_SET_CORE_OPTIONS_DISPLAY, &option_display);
+
+   option_display.key = "stella2014_paddle_analog_sensitivity";
+   environ_cb(RETRO_ENVIRONMENT_SET_CORE_OPTIONS_DISPLAY, &option_display);
+
+   option_display.key = "stella2014_paddle_analog_response";
+   environ_cb(RETRO_ENVIRONMENT_SET_CORE_OPTIONS_DISPLAY, &option_display);
+
+   option_display.key = "stella2014_paddle_analog_deadzone";
+   environ_cb(RETRO_ENVIRONMENT_SET_CORE_OPTIONS_DISPLAY, &option_display);
+
+   /* > Stelladaptor */
+   option_display.visible = show_stelladaptor_options;
+
+   option_display.key = "stella2014_stelladaptor_analog_sensitivity";
+   environ_cb(RETRO_ENVIRONMENT_SET_CORE_OPTIONS_DISPLAY, &option_display);
+
+   option_display.key = "stella2014_stelladaptor_analog_center";
+   environ_cb(RETRO_ENVIRONMENT_SET_CORE_OPTIONS_DISPLAY, &option_display);
 }
 
 size_t retro_serialize_size(void) 
