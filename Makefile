@@ -326,6 +326,18 @@ else ifeq ($(platform), emscripten)
 	STATIC_LINKING = 1
 
 # GCW0
+else ifeq ($(platform), rs90)
+	TARGET := $(TARGET_NAME)_libretro.so
+	CC = /opt/rs90-toolchain/usr/bin/mipsel-linux-gcc
+	CXX = /opt/rs90-toolchain/usr/bin/mipsel-linux-g++
+	AR = /opt/rs90-toolchain/usr/bin/mipsel-linux-ar
+	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
+	LDFLAGS += $(PTHREAD_FLAGS) -lrt
+	FLAGS += $(PTHREAD_FLAGS) -DHAVE_MKDIR
+	FLAGS += -fomit-frame-pointer -ffast-math -march=mips32 -mtune=mips32
+	fpic := -fPIC
+
+# GCW0
 else ifeq ($(platform), gcw0)
 	TARGET := $(TARGET_NAME)_libretro.so
 	CC = /opt/gcw0-toolchain/usr/bin/mipsel-linux-gcc
