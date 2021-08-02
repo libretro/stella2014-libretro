@@ -349,6 +349,18 @@ else ifeq ($(platform), gcw0)
 	FLAGS += -fomit-frame-pointer -ffast-math -march=mips32 -mtune=mips32r2 -mhard-float
 	fpic := -fPIC
 
+# GCW0
+else ifeq ($(platform), retrofw)
+	TARGET := $(TARGET_NAME)_libretro.so
+	CC = /opt/retrofw-toolchain/usr/bin/mipsel-linux-gcc
+	CXX = /opt/retrofw-toolchain/usr/bin/mipsel-linux-g++
+	AR = /opt/retrofw-toolchain/usr/bin/mipsel-linux-ar
+	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
+	LDFLAGS += $(PTHREAD_FLAGS) -lrt
+	FLAGS += $(PTHREAD_FLAGS) -DHAVE_MKDIR
+	FLAGS += -fomit-frame-pointer -ffast-math -march=mips32 -mtune=mips32 -mhard-float
+	fpic := -fPIC
+
 # Windows MSVC 2003 Xbox 1
 else ifeq ($(platform), xbox1_msvc2003)
 TARGET := $(TARGET_NAME)_libretro_xdk1.lib
