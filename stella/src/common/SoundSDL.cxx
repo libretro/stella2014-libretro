@@ -80,16 +80,6 @@ void SoundSDL::open()
   myVolume = myOSystem->settings().getInt("volume");
   setVolume(myVolume);
 
-  // Show some info
-  ostringstream buf;
-  buf << "Sound enabled:"  << endl
-      << "  Volume:      " << (int)myVolume << endl
-      << "  Frag size:   " << (int)512 << endl
-      << "  Frequency:   " << (int)31400 << endl
-      << "  Channels:    " << (int)2
-                           << " (" << chanResult << ")" << endl
-      << endl;
-
   // And start the SDL sound subsystem ...
   myIsEnabled = true;
   mute(false);
