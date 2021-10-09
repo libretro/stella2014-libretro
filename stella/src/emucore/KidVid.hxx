@@ -21,6 +21,7 @@
 #define KIDVID_HXX
 
 #include <cstdio>
+#include <streams/file_stream.h>
 
 #include "bspf.hxx"
 #include "Control.hxx"
@@ -89,7 +90,7 @@ class KidVid : public Controller
     bool myEnabled;
 
     // The file handles for the WAV files
-    FILE *mySampleFile, *mySharedSampleFile;
+    RFILE *mySampleFile, *mySharedSampleFile;
 
     // Indicates if sample files have been successfully opened
     bool myFileOpened;

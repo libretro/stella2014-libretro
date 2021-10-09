@@ -12,6 +12,7 @@
 #endif
 
 #include <libretro.h>
+#include <streams/file_stream.h>
 #include "libretro_core_options.h"
 
 #include "Console.hxx"
@@ -988,9 +989,16 @@ void retro_set_input_state(retro_input_state_t cb) { input_state_cb = cb; }
 
 void retro_set_environment(retro_environment_t cb)
 {
+   struct retro_vfs_interface_info vfs_iface_info;
+
    environ_cb = cb;
    libretro_set_core_options(environ_cb);
    environ_cb(RETRO_ENVIRONMENT_SET_CONTROLLER_INFO, (void*)retropad_port_info);
+
+   vfs_iface_info.required_interface_version = 1;
+   vfs_iface_info.iface                      = NULL;
+   if (cb(RETRO_ENVIRONMENT_GET_VFS_INTERFACE, &vfs_iface_info))
+      filestream_vfs_init(&vfs_iface_info);
 }
 
 void retro_get_system_info(struct retro_system_info *info)

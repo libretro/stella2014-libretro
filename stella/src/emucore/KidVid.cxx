@@ -18,8 +18,24 @@
 //============================================================================
 
 #include <cstdlib>
+#include <streams/file_stream.h>
 
 #include "KidVid.hxx"
+
+extern "C" {
+
+/* forward declarations */
+RFILE* rfopen(const char *path, const char *mode);
+int rfclose(RFILE* stream);
+int64_t rftell(RFILE* stream);
+int rferror(RFILE* stream);
+int64_t rfread(void* buffer,
+   size_t elem_size, size_t elem_count, RFILE* stream);
+int64_t rfseek(RFILE* stream, int64_t offset, int origin);
+int rfeof(RFILE* stream);
+int rfgetc(RFILE* stream);
+
+}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 KidVid::KidVid(Jack jack, const Event& event, const System& system,
@@ -70,7 +86,6 @@ void KidVid::update()
     myBlockIdx = KVBLOCKBITS;
     myBlock = 0;
     openSampleFile();
-cerr << "myTape = " << myTape << endl;
   }
   else if(myEvent.get(Event::KeyboardZero2))
   {
@@ -79,7 +94,6 @@ cerr << "myTape = " << myTape << endl;
     myBlockIdx = KVBLOCKBITS;
     myBlock = 0;
     openSampleFile();
-cerr << "myTape = " << myTape << endl;
   }
   else if(myEvent.get(Event::KeyboardZero3))
   {
@@ -87,13 +101,11 @@ cerr << "myTape = " << myTape << endl;
     {
       myTape = 4;
       myIdx = KVBLOCKBITS;
-cerr << "myTape = " << myTape << endl;
     }
     else                    /* no, Smurf Save The Day */
     {
       myTape = 1;
       myIdx = 0;
-cerr << "myTape = " << myTape << endl;
     }
     myBlockIdx = KVBLOCKBITS;
     myBlock = 0;
@@ -173,22 +185,22 @@ void KidVid::openSampleFile()
   {
     int i = myGame == KVSMURFS ? 0 : 3;
     i += myTape - 1;
-    if(myTape == 4) i -= 3;
+    if(myTape == 4)
+       i -= 3;
 
-    mySampleFile = fopen(kvNameTable[i], "rb");
-    if(mySampleFile != NULL)
+    mySampleFile = rfopen(kvNameTable[i], "rb");
+
+    if(mySampleFile)
     {
-cerr << "opened file: " << kvNameTable[i] << endl;
-      mySharedSampleFile = fopen("kvshared.wav", "rb");
-      if(mySharedSampleFile == NULL)
+      mySharedSampleFile = rfopen("kvshared.wav", "rb");
+      if (!mySharedSampleFile)
       {
-        fclose(mySampleFile);
+        rfclose(mySampleFile);
         myFileOpened = false;
       }
       else
       {
-cerr << "opened file: " << "kvshared.wav" << endl;
-        fseek(mySampleFile, 45, SEEK_SET);
+        rfseek(mySampleFile, 45, SEEK_SET);
         myFileOpened = true;
       }
     }
@@ -206,8 +218,8 @@ void KidVid::closeSampleFile()
 {
   if(myFileOpened)
   {
-    fclose(mySampleFile);
-    fclose(mySharedSampleFile);
+    rfclose(mySampleFile);
+    rfclose(mySharedSampleFile);
     myFileOpened = false;
   }
 }
@@ -217,32 +229,30 @@ void KidVid::setNextSong()
 {
   if(myFileOpened)
   {
-    myBeep = (ourSongPositions[myFilePointer] & 0x80) ? false : true;
+    myBeep        = (ourSongPositions[myFilePointer] & 0x80) ? false : true;
 
-    uInt8 temp = ourSongPositions[myFilePointer] & 0x7f;
-    mySharedData = (temp < 10);
+    uInt8 temp    = ourSongPositions[myFilePointer] & 0x7f;
+    mySharedData  = (temp < 10);
     mySongCounter = ourSongStart[temp+1] - ourSongStart[temp];
 
     if(mySharedData)
-      fseek(mySharedSampleFile, ourSongStart[temp], SEEK_SET);
+      rfseek(mySharedSampleFile, ourSongStart[temp], SEEK_SET);
     else
-      fseek(mySampleFile, ourSongStart[temp], SEEK_SET);
+      rfseek(mySampleFile, ourSongStart[temp], SEEK_SET);
 
     myFilePointer++;
-    myTapeBusy = true;
   }
   else
   {
-    myBeep = true;
-    myTapeBusy = true;
+    myBeep        = true;
     mySongCounter = 80*262;   /* delay needed for Harmony without tape */
   }
+  myTapeBusy = true;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void KidVid::getNextSampleByte()
 {
-#if 1
   static int oddeven = 0;
   if(mySongCounter == 0)
     mySampleByte = 0x80;
@@ -257,9 +267,9 @@ void KidVid::getNextSampleByte()
       if(myFileOpened)
       {
         if(mySharedData)
-          mySampleByte = getc(mySharedSampleFile);
+          mySampleByte = rfgetc(mySharedSampleFile);
         else
-          mySampleByte = getc(mySampleFile);
+          mySampleByte = rfgetc(mySampleFile);
       }
       else
         mySampleByte = 0x80;
@@ -268,7 +278,6 @@ void KidVid::getNextSampleByte()
         setNextSong();
     }
   }
-#endif
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
