@@ -113,6 +113,7 @@ else ifeq ($(platform), tvos-arm64)
 	TARGET := $(TARGET_NAME)_libretro_tvos.dylib
 	fpic := -fPIC
 	SHARED := -dynamiclib
+	DEFINES := -DIOS -stdlib=libc++
 	ifeq ($(IOSSDK),)
 		IOSSDK := $(shell xcodebuild -version -sdk appletvos Path)
 	endif
