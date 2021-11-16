@@ -24,9 +24,6 @@ class System;
 
 #include "bspf.hxx"
 #include "Cart.hxx"
-#ifdef DEBUGGER_SUPPORT
-  #include "CartE0Widget.hxx"
-#endif
 
 /**
   This is the cartridge class for Parker Brothers' 8K games.  In 
@@ -133,18 +130,6 @@ class CartridgeE0 : public Cartridge
       @return The name of the object
     */
     string name() const { return "CartridgeE0"; }
-
-  #ifdef DEBUGGER_SUPPORT
-    /**
-      Get debugger widget responsible for accessing the inner workings
-      of the cart.
-    */
-    CartDebugWidget* debugWidget(GuiObject* boss, const GUI::Font& lfont,
-        const GUI::Font& nfont, int x, int y, int w, int h)
-    {
-      return new CartridgeE0Widget(boss, lfont, nfont, x, y, w, h, *this);
-    }
-  #endif
 
   public:
     /**

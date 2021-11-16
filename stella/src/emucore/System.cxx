@@ -216,14 +216,6 @@ uInt8 System::peek(uInt16 addr, uInt8 flags)
 {
   PageAccess& access = myPageAccessTable[(addr & myAddressMask) >> myPageShift];
 
-#ifdef DEBUGGER_SUPPORT
-  // Set access type
-  if(access.codeAccessBase)
-    *(access.codeAccessBase + (addr & myPageMask)) |= flags;
-  else
-    access.device->setAccessFlags(addr, flags);
-#endif
-
   // See if this page uses direct accessing or not 
   uInt8 result;
   if(access.directPeekBase)
@@ -231,9 +223,6 @@ uInt8 System::peek(uInt16 addr, uInt8 flags)
   else
     result = access.device->peek(addr);
 
-#ifdef DEBUGGER_SUPPORT
-  if(!myDataBusLocked)
-#endif
     myDataBusState = result;
 
   return result;
@@ -258,38 +247,18 @@ void System::poke(uInt16 addr, uInt8 value)
     myPageIsDirtyTable[page] = access.device->poke(addr, value);
   }
 
-#ifdef DEBUGGER_SUPPORT
-  if(!myDataBusLocked)
-#endif
-    myDataBusState = value;
+  myDataBusState = value;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 uInt8 System::getAccessFlags(uInt16 addr)
 {
-#ifdef DEBUGGER_SUPPORT
-  PageAccess& access = myPageAccessTable[(addr & myAddressMask) >> myPageShift];
-
-  if(access.codeAccessBase)
-    return *(access.codeAccessBase + (addr & myPageMask));
-  else
-    return access.device->getAccessFlags(addr);
-#else
   return 0;
-#endif
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void System::setAccessFlags(uInt16 addr, uInt8 flags)
 {
-#ifdef DEBUGGER_SUPPORT
-  PageAccess& access = myPageAccessTable[(addr & myAddressMask) >> myPageShift];
-
-  if(access.codeAccessBase)
-    *(access.codeAccessBase + (addr & myPageMask)) |= flags;
-  else
-    access.device->setAccessFlags(addr, flags);
-#endif
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -323,7 +292,6 @@ bool System::save(Serializer& out) const
   }
   catch(...)
   {
-    cerr << "ERROR: System::save" << endl;
     return false;
   }
 
@@ -352,7 +320,6 @@ bool System::load(Serializer& in)
   }
   catch(...)
   {
-    cerr << "ERROR: System::load" << endl;
     return false;
   }
 

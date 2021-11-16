@@ -29,27 +29,15 @@
 #endif
 
 #ifndef SET_LAST_PEEK
-  #ifdef DEBUGGER_SUPPORT
-    #define SET_LAST_PEEK(_addr1, _addr2) _addr1 = _addr2;
-  #else
     #define SET_LAST_PEEK(_addr1, _addr2)
-  #endif
 #endif
 
 #ifndef CLEAR_LAST_PEEK
-  #ifdef DEBUGGER_SUPPORT
-    #define CLEAR_LAST_PEEK(_addr) _addr = -1;
-  #else
     #define CLEAR_LAST_PEEK(_addr)
-  #endif
 #endif
 
 #ifndef SET_LAST_POKE
-  #ifdef DEBUGGER_SUPPORT
-    #define SET_LAST_POKE(_addr) myDataAddressForPoke = _addr;
-  #else
     #define SET_LAST_POKE(_addr)
-  #endif
 #endif
 
 

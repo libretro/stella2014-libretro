@@ -23,10 +23,6 @@
 
 #include "bspf.hxx"
 
-#ifdef DEBUGGER_SUPPORT
-  #include "CartDebug.hxx"
-#endif
-
 #include "Console.hxx"
 #include "Control.hxx"
 #include "Device.hxx"
@@ -361,7 +357,6 @@ bool TIA::save(Serializer& out) const
   }
   catch(...)
   {
-    cerr << "ERROR: TIA::save" << endl;
     return false;
   }
 
@@ -470,7 +465,6 @@ bool TIA::load(Serializer& in)
   }
   catch(...)
   {
-    cerr << "ERROR: TIA::load" << endl;
     return false;
   }
 
@@ -488,7 +482,6 @@ bool TIA::saveDisplay(Serializer& out) const
   }
   catch(...)
   {
-    cerr << "ERROR: TIA::saveDisplay" << endl;
     return false;
   }
 
@@ -516,7 +509,6 @@ bool TIA::loadDisplay(Serializer& in)
   }
   catch(...)
   {
-    cerr << "ERROR: TIA::loadDisplay" << endl;
     return false;
   }
 
@@ -866,73 +858,6 @@ bool TIA::driveUnusedPinsRandom(uInt8 mode)
   }
   return myTIAPinsDriven;
 }
-
-#ifdef DEBUGGER_SUPPORT
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void TIA::updateScanline()
-{
-  // Start a new frame if the old one was finished
-  if(!myPartialFrameFlag)
-    startFrame();
-
-  // true either way:
-  myPartialFrameFlag = true;
-
-  int totalClocks = (mySystem->cycles() * 3) - myClockWhenFrameStarted;
-  int endClock = ((totalClocks + 228) / 228) * 228;
-
-  int clock;
-  do {
-    mySystem->m6502().execute(1);
-    clock = mySystem->cycles() * 3;
-    updateFrame(clock);
-  } while(clock < endClock);
-
-  // if we finished the frame, get ready for the next one
-  if(!myPartialFrameFlag)
-    endFrame();
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void TIA::updateScanlineByStep()
-{
-  // Start a new frame if the old one was finished
-  if(!myPartialFrameFlag)
-    startFrame();
-
-  // true either way:
-  myPartialFrameFlag = true;
-
-  // Update frame by one CPU instruction/color clock
-  mySystem->m6502().execute(1);
-  updateFrame(mySystem->cycles() * 3);
-
-  // if we finished the frame, get ready for the next one
-  if(!myPartialFrameFlag)
-    endFrame();
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void TIA::updateScanlineByTrace(int target)
-{
-  // Start a new frame if the old one was finished
-  if(!myPartialFrameFlag)
-    startFrame();
-
-  // true either way:
-  myPartialFrameFlag = true;
-
-  while(mySystem->m6502().getPC() != target)
-  {
-    mySystem->m6502().execute(1);
-    updateFrame(mySystem->cycles() * 3);
-  }
-
-  // if we finished the frame, get ready for the next one
-  if(!myPartialFrameFlag)
-    endFrame();
-}
-#endif
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void TIA::updateFrame(Int32 clock)
@@ -1580,11 +1505,6 @@ bool TIA::poke(uInt16 addr, uInt8 value)
       else
         myEnabledObjects |= PFBit;
 
-    #ifdef DEBUGGER_SUPPORT
-      uInt16 dataAddr = mySystem->m6502().lastDataAddressForPoke();
-      if(dataAddr)
-        mySystem->setAccessFlags(dataAddr, CartDebug::PGFX);
-    #endif
       break;
     }
 
@@ -1597,11 +1517,6 @@ bool TIA::poke(uInt16 addr, uInt8 value)
       else
         myEnabledObjects |= PFBit;
 
-    #ifdef DEBUGGER_SUPPORT
-      uInt16 dataAddr = mySystem->m6502().lastDataAddressForPoke();
-      if(dataAddr)
-        mySystem->setAccessFlags(dataAddr, CartDebug::PGFX);
-    #endif
       break;
     }
 
@@ -1614,11 +1529,6 @@ bool TIA::poke(uInt16 addr, uInt8 value)
       else
         myEnabledObjects |= PFBit;
 
-    #ifdef DEBUGGER_SUPPORT
-      uInt16 dataAddr = mySystem->m6502().lastDataAddressForPoke();
-      if(dataAddr)
-        mySystem->setAccessFlags(dataAddr, CartDebug::PGFX);
-    #endif
       break;
     }
 
@@ -1858,11 +1768,6 @@ bool TIA::poke(uInt16 addr, uInt8 value)
       else
         myEnabledObjects &= ~P1Bit;
 
-    #ifdef DEBUGGER_SUPPORT
-      uInt16 dataAddr = mySystem->m6502().lastDataAddressForPoke();
-      if(dataAddr)
-        mySystem->setAccessFlags(dataAddr, CartDebug::GFX);
-    #endif
       break;
     }
 
@@ -1901,11 +1806,6 @@ bool TIA::poke(uInt16 addr, uInt8 value)
       else
         myEnabledObjects &= ~BLBit;
 
-    #ifdef DEBUGGER_SUPPORT
-      uInt16 dataAddr = mySystem->m6502().lastDataAddressForPoke();
-      if(dataAddr)
-        mySystem->setAccessFlags(dataAddr, CartDebug::GFX);
-    #endif
       break;
     }
 
@@ -2176,9 +2076,6 @@ bool TIA::poke(uInt16 addr, uInt8 value)
 
     default:
     {
-#ifdef DEBUG_ACCESSES
-      cerr << "BAD TIA Poke: " << hex << addr << endl;
-#endif
       break;
     }
   }

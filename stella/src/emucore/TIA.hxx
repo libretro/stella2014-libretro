@@ -330,25 +330,6 @@ class TIA : public Device
     */
     bool driveUnusedPinsRandom(uInt8 mode = 2);
 
-#ifdef DEBUGGER_SUPPORT
-    /**
-      This method should be called to update the TIA with a new scanline.
-    */
-    void updateScanline();
-
-    /**
-      This method should be called to update the TIA with a new partial
-      scanline by stepping one CPU instruction.
-    */
-    void updateScanlineByStep();
-
-    /**
-      This method should be called to update the TIA with a new partial
-      scanline by tracing to target address.
-    */
-    void updateScanlineByTrace(int target);
-#endif
-
   private:
     /**
       Enables/disables all TIABit bits.  Note that disabling a graphical

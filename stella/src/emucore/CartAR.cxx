@@ -385,12 +385,6 @@ void CartridgeAR::loadIntoRAM(uInt8 load)
       // Copy the load's header
       memcpy(myHeader, myLoadImages + (image * 8448) + 8192, 256);
 
-      // Verify the load's header 
-      if(checksum(myHeader, 8) != 0x55)
-      {
-        cerr << "WARNING: The Supercharger header checksum is invalid...\n";
-      }
-
       // Load all of the pages from the load
       bool invalidPageChecksumSeen = false;
       for(uInt32 j = 0; j < myHeader[3]; ++j)
@@ -401,10 +395,7 @@ void CartridgeAR::loadIntoRAM(uInt8 load)
         uInt8 sum = checksum(src, 256) + myHeader[16 + j] + myHeader[64 + j];
 
         if(!invalidPageChecksumSeen && (sum != 0x55))
-        {
-          cerr << "WARNING: Some Supercharger page checksums are invalid...\n";
           invalidPageChecksumSeen = true;
-        }
 
         // Copy page to Supercharger RAM (don't allow a copy into ROM area)
         if(bank < 3)
@@ -423,10 +414,6 @@ void CartridgeAR::loadIntoRAM(uInt8 load)
       return;
     }
   }
-
-  // TODO: Should probably switch to an internal ROM routine to display
-  // this message to the user...
-  cerr << "ERROR: Supercharger load is missing from ROM image...\n";
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -434,8 +421,7 @@ bool CartridgeAR::bank(uInt16 bank)
 {
   if(!bankLocked())
     return bankConfiguration(bank);
-  else
-    return false;
+  return false;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

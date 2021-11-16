@@ -21,6 +21,14 @@
 
 #include "KidVid.hxx"
 
+/* Forward declarations */
+extern "C" {
+RFILE* rfopen(const char *path, const char *mode);
+int rfclose(RFILE* stream);
+int64_t rfseek(RFILE* stream, int64_t offset, int origin);
+int rfgetc(RFILE* stream);
+};
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 KidVid::KidVid(Jack jack, const Event& event, const System& system,
                const string& rommd5)
@@ -70,7 +78,6 @@ void KidVid::update()
     myBlockIdx = KVBLOCKBITS;
     myBlock = 0;
     openSampleFile();
-cerr << "myTape = " << myTape << endl;
   }
   else if(myEvent.get(Event::KeyboardZero2))
   {
@@ -79,7 +86,6 @@ cerr << "myTape = " << myTape << endl;
     myBlockIdx = KVBLOCKBITS;
     myBlock = 0;
     openSampleFile();
-cerr << "myTape = " << myTape << endl;
   }
   else if(myEvent.get(Event::KeyboardZero3))
   {
@@ -87,13 +93,11 @@ cerr << "myTape = " << myTape << endl;
     {
       myTape = 4;
       myIdx = KVBLOCKBITS;
-cerr << "myTape = " << myTape << endl;
     }
     else                    /* no, Smurf Save The Day */
     {
       myTape = 1;
       myIdx = 0;
-cerr << "myTape = " << myTape << endl;
     }
     myBlockIdx = KVBLOCKBITS;
     myBlock = 0;
@@ -171,33 +175,31 @@ void KidVid::openSampleFile()
 
   if(!myFileOpened)
   {
-    int i = myGame == KVSMURFS ? 0 : 3;
-    i += myTape - 1;
+    int i  = myGame == KVSMURFS ? 0 : 3;
+    i     += myTape - 1;
     if(myTape == 4) i -= 3;
 
-    mySampleFile = fopen(kvNameTable[i], "rb");
-    if(mySampleFile != NULL)
+    mySampleFile = rfopen(kvNameTable[i], "rb");
+    if(mySampleFile)
     {
-cerr << "opened file: " << kvNameTable[i] << endl;
-      mySharedSampleFile = fopen("kvshared.wav", "rb");
-      if(mySharedSampleFile == NULL)
+      mySharedSampleFile = rfopen("kvshared.wav", "rb");
+      if(!mySharedSampleFile)
       {
-        fclose(mySampleFile);
+        rfclose(mySampleFile);
         myFileOpened = false;
       }
       else
       {
-cerr << "opened file: " << "kvshared.wav" << endl;
-        fseek(mySampleFile, 45, SEEK_SET);
+        rfseek(mySampleFile, 45, SEEK_SET);
         myFileOpened = true;
       }
     }
     else
       myFileOpened = false;
 
-    mySongCounter = 0;
-    myTapeBusy = false;
-    myFilePointer = StartSong[i];
+    mySongCounter  = 0;
+    myTapeBusy     = false;
+    myFilePointer  = StartSong[i];
   }
 }
 
@@ -206,8 +208,8 @@ void KidVid::closeSampleFile()
 {
   if(myFileOpened)
   {
-    fclose(mySampleFile);
-    fclose(mySharedSampleFile);
+    rfclose(mySampleFile);
+    rfclose(mySharedSampleFile);
     myFileOpened = false;
   }
 }
@@ -224,9 +226,9 @@ void KidVid::setNextSong()
     mySongCounter = ourSongStart[temp+1] - ourSongStart[temp];
 
     if(mySharedData)
-      fseek(mySharedSampleFile, ourSongStart[temp], SEEK_SET);
+      rfseek(mySharedSampleFile, ourSongStart[temp], SEEK_SET);
     else
-      fseek(mySampleFile, ourSongStart[temp], SEEK_SET);
+      rfseek(mySampleFile, ourSongStart[temp], SEEK_SET);
 
     myFilePointer++;
     myTapeBusy = true;
@@ -257,9 +259,9 @@ void KidVid::getNextSampleByte()
       if(myFileOpened)
       {
         if(mySharedData)
-          mySampleByte = getc(mySharedSampleFile);
+          mySampleByte = rfgetc(mySharedSampleFile);
         else
-          mySampleByte = getc(mySampleFile);
+          mySampleByte = rfgetc(mySampleFile);
       }
       else
         mySampleByte = 0x80;

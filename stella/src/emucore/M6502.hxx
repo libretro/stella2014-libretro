@@ -206,25 +206,6 @@ class M6502 : public Serializable
     */
     string name() const { return "M6502"; }
 
-#ifdef DEBUGGER_SUPPORT
-  public:
-    /**
-      Attach the specified debugger.
-
-      @param debugger The debugger to attach to the microprocessor.
-    */
-    void attach(Debugger& debugger);
-
-    void setBreakPoints(PackedBitArray* bp);
-    void setTraps(PackedBitArray* read, PackedBitArray* write);
-
-    uInt32 addCondBreak(Expression* e, const string& name);
-    void delCondBreak(uInt32 brk);
-    void clearCondBreaks();
-    const StringList& getCondBreakNames() const;
-    Int32 evalCondBreaks();
-#endif
-
   private:
     /**
       Get the byte at the specified address and update the cycle count.
@@ -356,26 +337,6 @@ class M6502 : public Serializable
     /// If an address wasn't used (ie, as in immediate mode), the address
     /// is set to zero
     uInt16 myDataAddressForPoke;
-
-#ifdef DEBUGGER_SUPPORT
-    /// Pointer to the debugger for this processor or the null pointer
-    Debugger* myDebugger;
-
-    PackedBitArray* myBreakPoints;
-    PackedBitArray* myReadTraps;
-    PackedBitArray* myWriteTraps;
-
-    // Did we just now hit a trap?
-    bool myJustHitTrapFlag;
-    struct HitTrapInfo {
-      string message;
-      int address;
-    };
-    HitTrapInfo myHitTrapInfo;
-
-    StringList myBreakCondNames;
-    ExpressionList myBreakConds;
-#endif
 
   private:
     /**

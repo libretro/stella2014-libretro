@@ -136,20 +136,6 @@ class OSystem
     */
     SerialPort& serialPort() const { return *mySerialPort; }
 
-#ifdef DEBUGGER_SUPPORT
-    /**
-      Create all child objects which belong to this OSystem
-    */
-    void createDebugger(Console& console);
-
-    /**
-      Get the ROM debugger of the system.
-
-      @return The debugger object
-    */
-    Debugger& debugger() const { return *myDebugger; }
-#endif
-
 #ifdef CHEATCODE_SUPPORT
     /**
       Get the cheat manager of the system.

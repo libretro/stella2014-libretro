@@ -24,9 +24,6 @@ class System;
 
 #include "bspf.hxx"
 #include "Cart.hxx"
-#ifdef DEBUGGER_SUPPORT
-  #include "CartFA2Widget.hxx"
-#endif
 
 /**
   This is an extended version of the CBS RAM Plus bankswitching scheme
@@ -140,18 +137,6 @@ class CartridgeFA2 : public Cartridge
       @param name  The properties file name of the ROM
     */
     void setRomName(const string& name);
-
-  #ifdef DEBUGGER_SUPPORT
-    /**
-      Get debugger widget responsible for accessing the inner workings
-      of the cart.
-    */
-    CartDebugWidget* debugWidget(GuiObject* boss, const GUI::Font& lfont,
-        const GUI::Font& nfont, int x, int y, int w, int h)
-    {
-      return new CartridgeFA2Widget(boss, lfont, nfont, x, y, w, h, *this);
-    }
-  #endif
 
   public:
     /**

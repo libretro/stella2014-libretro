@@ -114,11 +114,6 @@ class Properties
     void save(ostream& out) const;
 
     /**
-      Print the attributes of this properties object
-    */
-    void print() const;
-
-    /**
       Resets all properties to their defaults
     */
     void setDefaults();
@@ -166,13 +161,6 @@ class Properties
       @param name  The PropertyType key associated with the given string
     */ 
     static PropertyType getPropertyType(const string& name);
-
-    /**
-      When printing each collection of ROM properties, it is useful to
-      see which columns correspond to the output fields; this method
-      provides that output.
-    */ 
-    static void printHeader();
 
   private:
     // The array of properties

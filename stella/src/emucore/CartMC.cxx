@@ -259,7 +259,6 @@ bool CartridgeMC::save(Serializer& out) const
   }
   catch(...)
   {
-    cerr << "ERROR: CartridgeMC::save" << endl;
     return false;
   }
 
@@ -282,7 +281,6 @@ bool CartridgeMC::load(Serializer& in)
   }
   catch(...)
   {
-    cerr << "ERROR: CartridgeMC::load" << endl;
     return false;
   }
 

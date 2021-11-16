@@ -24,9 +24,6 @@ class System;
 
 #include "bspf.hxx"
 #include "Cart.hxx"
-#ifdef DEBUGGER_SUPPORT
-  #include "CartF6Widget.hxx"
-#endif
 
 /**
   Cartridge class used for Atari's 16K bankswitched games.  There
@@ -124,18 +121,6 @@ class CartridgeF6 : public Cartridge
       @return The name of the object
     */
     string name() const { return "CartridgeF6"; }
-
-  #ifdef DEBUGGER_SUPPORT
-    /**
-      Get debugger widget responsible for accessing the inner workings
-      of the cart.
-    */
-    CartDebugWidget* debugWidget(GuiObject* boss, const GUI::Font& lfont,
-        const GUI::Font& nfont, int x, int y, int w, int h)
-    {
-      return new CartridgeF6Widget(boss, lfont, nfont, x, y, w, h, *this);
-    }
-  #endif
 
   public:
     /**

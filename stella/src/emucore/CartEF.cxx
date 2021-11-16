@@ -150,7 +150,6 @@ bool CartridgeEF::save(Serializer& out) const
   }
   catch(...)
   {
-    cerr << "ERROR: CartridgeEF::save" << endl;
     return false;
   }
 
@@ -169,7 +168,6 @@ bool CartridgeEF::load(Serializer& in)
   }
   catch(...)
   {
-    cerr << "ERROR: CartridgeEF::load" << endl;
     return false;
   }
 

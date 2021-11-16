@@ -142,39 +142,3 @@ void PropertiesSet::removeMD5(const string& md5)
   // We only remove from the external list
   myExternalProps.erase(md5);
 }
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void PropertiesSet::print() const
-{
-  // We only look at the external properties and the built-in ones;
-  // the temp properties are ignored
-  // Also, any properties entries in the external file override the built-in
-  // ones
-  // The easiest way to merge the lists is to create another temporary one
-  // This isn't fast, but I suspect this method isn't used too often (or at all)
-
-  PropsList list;
-
-  // First insert all external props
-  list = myExternalProps;
-
-  // Now insert all the built-in ones
-  // Note that if we try to insert a duplicate, the insertion will fail
-  // This is fine, since a duplicate in the built-in list means it should
-  // be overrided anyway (and insertion shouldn't be done)
-  Properties properties;
-  for(int i = 0; i < DEF_PROPS_SIZE; ++i)
-  {
-    properties.setDefaults();
-    for(int p = 0; p < LastPropType; ++p)
-      if(DefProps[i][p][0] != 0)
-        properties.set((PropertyType)p, DefProps[i][p]);
-
-    list.insert(make_pair(DefProps[i][Cartridge_MD5], properties));
-  }
-
-  // Now, print the resulting list
-  Properties::printHeader();
-  for(PropsList::const_iterator i = list.begin(); i != list.end(); ++i)
-    i->second.print();
-}

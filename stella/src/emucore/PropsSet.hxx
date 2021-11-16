@@ -84,11 +84,6 @@ class PropertiesSet
     */
     void removeMD5(const string& md5);
 
-    /**
-      Prints the contents of the PropertiesSet as a flat file.
-    */
-    void print() const;
-
   private:
     typedef map<string, Properties> PropsList;
 

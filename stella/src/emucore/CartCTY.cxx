@@ -201,7 +201,6 @@ bool CartridgeCTY::poke(uInt16 address, uInt8 value)
 {
   address &= 0x0FFF;
 
-//cerr << "POKE: address=" << HEX4 << address << ", value=" << HEX2 << value << endl;
   if(address < 0x0040)  // Write port is at $1000 - $103F (64 bytes)
   {
     switch(address)  // FIXME for functionality
@@ -488,7 +487,6 @@ void CartridgeCTY::saveScore(uInt8 index)
     catch(...)
     {
       // Maybe add logging here that save failed?
-      cerr << name() << ": ERROR saving score table " << (int)index << endl;
     }
   }
 }
@@ -509,7 +507,6 @@ void CartridgeCTY::wipeAllScores()
     catch(...)
     {
       // Maybe add logging here that save failed?
-      cerr << name() << ": ERROR wiping score tables" << endl;
     }
   }
 }

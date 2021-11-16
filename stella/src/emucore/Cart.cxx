@@ -19,7 +19,6 @@
 
 #include <cassert>
 #include <cstring>
-#include <sstream>
 
 #include "bspf.hxx"
 #include "Cart.hxx"
@@ -61,10 +60,6 @@
 #include "MD5.hxx"
 #include "Props.hxx"
 #include "Settings.hxx"
-#ifdef DEBUGGER_SUPPORT
-  #include "Debugger.hxx"
-  #include "CartDebug.hxx"
-#endif
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Cartridge* Cartridge::create(const uInt8* image, uInt32 size, string& md5,
@@ -83,10 +78,7 @@ Cartridge* Cartridge::create(const uInt8* image, uInt32 size, string& md5,
   {
     const string& detected = autodetectType(image, size);
     autodetect = "*";
-    if(type != "AUTO" && type != detected)
-      cerr << "Auto-detection not consistent: " << type << ", " << detected << endl;
-
-    type = detected;
+    type       = detected;
   }
   buf << type << autodetect;
 
@@ -314,10 +306,7 @@ bool Cartridge::save(ofstream& out)
 
   const uInt8* image = getImage(size);
   if(image == 0 || size <= 0)
-  {
-    cerr << "save not supported" << endl;
     return false;
-  }
 
   for(int i=0; i<size; i++)
     out << image[i];
@@ -343,7 +332,7 @@ bool Cartridge::bankChanged()
 void Cartridge::registerRamArea(uInt16 start, uInt16 size,
                                 uInt16 roffset, uInt16 woffset)
 {
-#ifdef DEBUGGER_SUPPORT
+#if 0
   RamArea area;
   area.start   = start;
   area.size    = size;
@@ -356,21 +345,12 @@ void Cartridge::registerRamArea(uInt16 start, uInt16 size,
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Cartridge::triggerReadFromWritePort(uInt16 address)
 {
-#ifdef DEBUGGER_SUPPORT
-  if(!mySystem->autodetectMode())
-    Debugger::debugger().cartDebug().triggerReadFromWritePort(address);
-#endif
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Cartridge::createCodeAccessBase(uInt32 size)
 {
-#ifdef DEBUGGER_SUPPORT
-  myCodeAccessBase = new uInt8[size];
-  memset(myCodeAccessBase, CartDebug::ROW, size);
-#else
   myCodeAccessBase = NULL;
-#endif
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

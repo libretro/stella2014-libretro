@@ -224,12 +224,6 @@ int Settings::setInternal(const string& key, const Variant& value,
     myInternalSettings[idx].key   = key;
     myInternalSettings[idx].value = value;
     if(useAsInitial) myInternalSettings[idx].initialValue = value;
-
-    /*cerr << "modify internal: key = " << key
-         << ", value  = " << value
-         << ", ivalue = " << myInternalSettings[idx].initialValue
-         << " @ index = " << idx
-         << endl;*/
   }
   else
   {
@@ -240,12 +234,6 @@ int Settings::setInternal(const string& key, const Variant& value,
 
     myInternalSettings.push_back(setting);
     idx = myInternalSettings.size() - 1;
-
-    /*cerr << "insert internal: key = " << key
-         << ", value  = " << value
-         << ", ivalue = " << setting.initialValue
-         << " @ index = " << idx
-         << endl;*/
   }
 
   return idx;
@@ -279,11 +267,6 @@ int Settings::setExternal(const string& key, const Variant& value,
     myExternalSettings[idx].key   = key;
     myExternalSettings[idx].value = value;
     if(useAsInitial) myExternalSettings[idx].initialValue = value;
-
-    /*cerr << "modify external: key = " << key
-         << ", value = " << value
-         << " @ index = " << idx
-         << endl;*/
   }
   else
   {
@@ -294,11 +277,6 @@ int Settings::setExternal(const string& key, const Variant& value,
 
     myExternalSettings.push_back(setting);
     idx = myExternalSettings.size() - 1;
-
-    /*cerr << "insert external: key = " << key
-         << ", value = " << value
-         << " @ index = " << idx
-         << endl;*/
   }
 
   return idx;

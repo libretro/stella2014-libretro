@@ -24,9 +24,6 @@ class System;
 
 #include "bspf.hxx"
 #include "Cart.hxx"
-#ifdef DEBUGGER_SUPPORT
-  #include "CartEFSCWidget.hxx"
-#endif
 
 /**
   Cartridge class used for Homestar Runner by Paul Slocum.
@@ -128,18 +125,6 @@ class CartridgeEFSC : public Cartridge
       @return The name of the object
     */
     string name() const { return "CartridgeEFSC"; }
-
-  #ifdef DEBUGGER_SUPPORT
-    /**
-      Get debugger widget responsible for accessing the inner workings
-      of the cart.
-    */
-    CartDebugWidget* debugWidget(GuiObject* boss, const GUI::Font& lfont,
-        const GUI::Font& nfont, int x, int y, int w, int h)
-    {
-      return new CartridgeEFSCWidget(boss, lfont, nfont, x, y, w, h, *this);
-    }
-  #endif
 
   public:
     /**

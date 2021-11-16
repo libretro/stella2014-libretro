@@ -144,7 +144,6 @@ bool Controller::save(Serializer& out) const
   }
   catch(...)
   {
-    cerr << "ERROR: Controller::save() exception\n";
     return false;
   }
   return true;
@@ -168,7 +167,6 @@ bool Controller::load(Serializer& in)
   }
   catch(...)
   {
-    cerr << "ERROR: Controller::load() exception\n";
     return false;
   }
   return true;

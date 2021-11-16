@@ -94,7 +94,6 @@ bool StateManager::saveState(Serializer& out)
   }
   catch(...)
   {
-    cerr << "ERROR: StateManager::saveState(Serializer&)" << endl;
   }
   return false;
 }

@@ -360,7 +360,6 @@ bool MT24LC256::jpee_timercheck(int mode)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int MT24LC256::jpee_logproc(char const *st)
 {
-  cerr << "    " << st << endl;
   return 0;
 }
 

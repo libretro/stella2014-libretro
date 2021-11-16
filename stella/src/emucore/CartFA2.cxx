@@ -319,7 +319,6 @@ bool CartridgeFA2::save(Serializer& out) const
   }
   catch(...)
   {
-    cerr << "ERROR: CartridgeFA2::save" << endl;
     return false;
   }
 
@@ -339,7 +338,6 @@ bool CartridgeFA2::load(Serializer& in)
   }
   catch(...)
   {
-    cerr << "ERROR: CartridgeFA2::load" << endl;
     return false;
   }
 
@@ -408,7 +406,6 @@ uInt8 CartridgeFA2::ramReadWrite()
         catch(...)
         {
           // Maybe add logging here that save failed?
-          cerr << name() << ": ERROR saving score table" << endl;
         }
         myRamAccessTimeout += 101000;  // Add 101 ms delay for write
       }
@@ -471,7 +468,6 @@ void CartridgeFA2::flash(uInt8 operation)
       catch(...)
       {
         // Maybe add logging here that save failed?
-        cerr << name() << ": ERROR saving score table" << endl;
       }
     }
   }

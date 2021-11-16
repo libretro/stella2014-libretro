@@ -117,7 +117,6 @@ bool Switches::save(Serializer& out) const
   }
   catch(...)
   {
-    cerr << "ERROR: Switches::save() exception\n";
     return false;
   }
   return true;
@@ -132,7 +131,6 @@ bool Switches::load(Serializer& in)
   }
   catch(...)
   {
-    cerr << "ERROR: Switches::load() exception\n";
     return false;
   }
   return true;

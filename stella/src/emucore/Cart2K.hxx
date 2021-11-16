@@ -24,9 +24,6 @@ class System;
 
 #include "bspf.hxx"
 #include "Cart.hxx"
-#ifdef DEBUGGER_SUPPORT
-  #include "Cart2KWidget.hxx"
-#endif
 
 /**
   This is the standard Atari 2K cartridge.  These cartridges 
@@ -125,18 +122,6 @@ class Cartridge2K : public Cartridge
       @return The name of the object
     */
     string name() const { return "Cartridge2K"; }
-
-  #ifdef DEBUGGER_SUPPORT
-    /**
-      Get debugger widget responsible for accessing the inner workings
-      of the cart.
-    */
-    CartDebugWidget* debugWidget(GuiObject* boss, const GUI::Font& lfont,
-        const GUI::Font& nfont, int x, int y, int w, int h)
-    {
-      return new Cartridge2KWidget(boss, lfont, nfont, x, y, w, h, *this);
-    }
-  #endif
 
   public:
     /**

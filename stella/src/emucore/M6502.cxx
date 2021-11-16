@@ -17,23 +17,6 @@
 // $Id: M6502.cxx 2838 2014-01-17 23:34:03Z stephena $
 //============================================================================
 
-//#define DEBUG_OUTPUT
-#define debugStream cout
-
-#ifdef DEBUGGER_SUPPORT
-  #include "Debugger.hxx"
-  #include "Expression.hxx"
-  #include "CartDebug.hxx"
-  #include "PackedBitArray.hxx"
-
-  // Flags for disassembly types
-  #define DISASM_CODE  CartDebug::CODE
-  #define DISASM_GFX   CartDebug::GFX
-  #define DISASM_PGFX  CartDebug::PGFX
-  #define DISASM_DATA  CartDebug::DATA
-  #define DISASM_ROW   CartDebug::ROW
-  #define DISASM_NONE  0
-#else
   // Flags for disassembly types
   #define DISASM_CODE  0
   #define DISASM_GFX   0
@@ -41,7 +24,6 @@
   #define DISASM_DATA  0
   #define DISASM_ROW   0
   #define DISASM_NONE  0
-#endif
 #include "Settings.hxx"
 
 #include "M6502.hxx"
@@ -64,14 +46,6 @@ M6502::M6502(uInt32 systemCyclesPerProcessorCycle, const Settings& settings)
     myLastSrcAddressY(-1),
     myDataAddressForPoke(0)
 {
-#ifdef DEBUGGER_SUPPORT
-  myDebugger    = NULL;
-  myBreakPoints = NULL;
-  myReadTraps   = NULL;
-  myWriteTraps  = NULL;
-
-  myJustHitTrapFlag = false;
-#endif
 
   // Compute the System Cycle table
   for(uInt32 t = 0; t < 256; ++t)
@@ -79,21 +53,11 @@ M6502::M6502(uInt32 systemCyclesPerProcessorCycle, const Settings& settings)
     myInstructionSystemCycleTable[t] = ourInstructionCycleTable[t] *
         mySystemCyclesPerProcessorCycle;
   }
-
-#ifdef DEBUG_OUTPUT
-debugStream << "( Fm  Ln Cyc Clk) ( P0  P1  M0  M1  BL)  "
-            << "flags   A  X  Y SP  Code           Disasm" << endl
-            << endl;
-#endif
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 M6502::~M6502()
 {
-#ifdef DEBUGGER_SUPPORT
-  myBreakConds.clear();
-  myBreakCondNames.clear();
-#endif
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -151,16 +115,6 @@ inline uInt8 M6502::peek(uInt16 address, uInt8 flags)
   ////////////////////////////////////////////////
   mySystem->incrementCycles(mySystemCyclesPerProcessorCycle);
 
-#ifdef DEBUGGER_SUPPORT
-  if(myReadTraps != NULL && myReadTraps->isSet(address))
-  {
-    myJustHitTrapFlag = true;
-    myHitTrapInfo.message = "RTrap: ";
-    myHitTrapInfo.address = address;
-  }
-//cerr << "addr = " << HEX4 << address << ", flags = " << Debugger::to_bin_8(flags) << endl;
-#endif
-
   uInt8 result = mySystem->peek(address, flags);
   myLastAccessWasRead = true;
   myLastPeekAddress = address;
@@ -180,15 +134,6 @@ inline void M6502::poke(uInt16 address, uInt8 value)
   ////////////////////////////////////////////////
   mySystem->incrementCycles(mySystemCyclesPerProcessorCycle);
 
-#ifdef DEBUGGER_SUPPORT
-  if(myWriteTraps != NULL && myWriteTraps->isSet(address))
-  {
-    myJustHitTrapFlag = true;
-    myHitTrapInfo.message = "WTrap: ";
-    myHitTrapInfo.address = address;
-  }
-#endif
-
   mySystem->poke(address, value);
   myLastAccessWasRead = false;
   myLastPokeAddress = address;
@@ -205,33 +150,6 @@ bool M6502::execute(uInt32 number)
   {
     for(; !myExecutionStatus && (number != 0); --number)
     {
-#ifdef DEBUGGER_SUPPORT
-      if(myJustHitTrapFlag)
-      {
-        if(myDebugger && myDebugger->start(myHitTrapInfo.message, myHitTrapInfo.address))
-        {
-          myJustHitTrapFlag = false;
-          return true;
-        }
-      }
-
-      if(myBreakPoints != NULL)
-      {
-        if(myBreakPoints->isSet(PC))
-        {
-          if(myDebugger && myDebugger->start("BP: ", PC))
-            return true;
-        }
-      }
-
-      int cond = evalCondBreaks();
-      if(cond > -1)
-      {
-        string buf = "CBP: " + myBreakCondNames[cond];
-        if(myDebugger && myDebugger->start(buf))
-          return true;
-      }
-#endif
       uInt16 operandAddress = 0, intermediateAddress = 0;
       uInt8 operand = 0;
 
@@ -240,23 +158,6 @@ bool M6502::execute(uInt32 number)
 
       // Fetch instruction at the program counter
       IR = peek(PC++, DISASM_CODE);  // This address represents a code section
-
-#ifdef DEBUG_OUTPUT
-      debugStream << ::hex << setw(2) << (int)A << " "
-                  << ::hex << setw(2) << (int)X << " "
-                  << ::hex << setw(2) << (int)Y << " "
-                  << ::hex << setw(2) << (int)SP << "  "
-                  << setw(4) << (PC-1) << ": "
-                  << setw(2) << (int)IR << "       "
-//      << "<" << ourAddressingModeTable[IR] << " ";
-//      debugStream << hex << setw(4) << operandAddress << " ";
-//                  << setw(3) << ourInstructionMnemonicTable[IR]
-
-//      debugStream << "PS=" << ::hex << setw(2) << (int)PS() << " ";
-
-//      debugStream << "Cyc=" << dec << mySystem->cycles();
-                  << endl;
-#endif
 
       // Call code to execute the instruction
       switch(IR)
@@ -370,7 +271,6 @@ bool M6502::save(Serializer& out) const
   }
   catch(...)
   {
-    cerr << "ERROR: M6502::save" << endl;
     return false;
   }
 
@@ -418,79 +318,11 @@ bool M6502::load(Serializer& in)
   }
   catch(...)
   {
-    cerr << "ERROR: M6502::laod" << endl;
     return false;
   }
 
   return true;
 }
-
-#ifdef DEBUGGER_SUPPORT
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void M6502::attach(Debugger& debugger)
-{
-  // Remember the debugger for this microprocessor
-  myDebugger = &debugger;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt32 M6502::addCondBreak(Expression *e, const string& name)
-{
-  myBreakConds.push_back(e);
-  myBreakCondNames.push_back(name);
-  return myBreakConds.size() - 1;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void M6502::delCondBreak(uInt32 brk)
-{
-  if(brk < myBreakConds.size())
-  {
-    delete myBreakConds[brk];
-    myBreakConds.remove_at(brk);
-    myBreakCondNames.remove_at(brk);
-  }
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void M6502::clearCondBreaks()
-{
-  for(uInt32 i = 0; i < myBreakConds.size(); i++)
-    delete myBreakConds[i];
-
-  myBreakConds.clear();
-  myBreakCondNames.clear();
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const StringList& M6502::getCondBreakNames() const
-{
-  return myBreakCondNames;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Int32 M6502::evalCondBreaks()
-{
-  for(uInt32 i = 0; i < myBreakConds.size(); i++)
-    if(myBreakConds[i]->evaluate())
-      return i;
-
-  return -1; // no break hit
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void M6502::setBreakPoints(PackedBitArray *bp)
-{
-  myBreakPoints = bp;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void M6502::setTraps(PackedBitArray *read, PackedBitArray *write)
-{
-  myReadTraps = read;
-  myWriteTraps = write;
-}
-#endif
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 uInt32 M6502::ourInstructionCycleTable[256] = {

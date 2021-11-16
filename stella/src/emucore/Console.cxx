@@ -18,9 +18,6 @@
 //============================================================================
 
 #include <cassert>
-#include <iostream>
-#include <sstream>
-#include <fstream>
 
 #include "AtariVox.hxx"
 #include "Booster.hxx"
@@ -54,10 +51,6 @@
 //#include "CommandMenu.hxx"
 #include "Serializable.hxx"
 #include "Version.hxx"
-
-#ifdef DEBUGGER_SUPPORT
-  #include "Debugger.hxx"
-#endif
 
 #ifdef CHEATCODE_SUPPORT
   #include "CheatManager.hxx"
@@ -209,7 +202,6 @@ bool Console::save(Serializer& out) const
   }
   catch(...)
   {
-    cerr << "ERROR: Console::save" << endl;
     return false;
   }
 
@@ -232,7 +224,6 @@ bool Console::load(Serializer& in)
   }
   catch(...)
   {
-    cerr << "ERROR: Console::load" << endl;
     return false;
   }
 
@@ -794,7 +785,6 @@ void Console::loadUserPalette()
   if(length < 128 * 3 * 2 + 8 * 3)
   {
     in.close();
-    cerr << "ERROR: invalid palette file " << palette << endl;
     return;
   }
 
@@ -933,10 +923,6 @@ void Console::toggleFixedColors() const
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Console::addDebugger()
 {
-#ifdef DEBUGGER_SUPPORT
-  myOSystem->createDebugger(*this);
-  mySystem->m6502().attach(myOSystem->debugger());
-#endif
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

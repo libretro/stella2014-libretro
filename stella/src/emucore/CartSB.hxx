@@ -23,9 +23,6 @@
 #include "bspf.hxx"
 #include "Cart.hxx"
 #include "System.hxx"
-#ifdef DEBUGGER_SUPPORT
-  #include "CartSBWidget.hxx"
-#endif
 
 /**
   Cartridge class used for SB "SUPERbanking" 128k-256k bankswitched games.
@@ -124,18 +121,6 @@ class CartridgeSB : public Cartridge
       @return The name of the object
     */
     string name() const { return "CartridgeSB"; }
-
-  #ifdef DEBUGGER_SUPPORT
-    /**
-      Get debugger widget responsible for accessing the inner workings
-      of the cart.
-    */
-    CartDebugWidget* debugWidget(GuiObject* boss, const GUI::Font& lfont,
-        const GUI::Font& nfont, int x, int y, int w, int h)
-    {
-      return new CartridgeSBWidget(boss, lfont, nfont, x, y, w, h, *this);
-    }
-  #endif
 
   public:
     /**

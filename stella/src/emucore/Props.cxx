@@ -230,33 +230,6 @@ void Properties::copy(const Properties& properties)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Properties::print() const
-{
-  cout << get(Cartridge_MD5)          << "|"
-       << get(Cartridge_Name)         << "|"
-       << get(Cartridge_Manufacturer) << "|"
-       << get(Cartridge_ModelNo)      << "|"
-       << get(Cartridge_Note)         << "|"
-       << get(Cartridge_Rarity)       << "|"
-       << get(Cartridge_Sound)        << "|"
-       << get(Cartridge_Type)         << "|"
-       << get(Console_LeftDifficulty) << "|"
-       << get(Console_RightDifficulty)<< "|"
-       << get(Console_TelevisionType) << "|"
-       << get(Console_SwapPorts)      << "|"
-       << get(Controller_Left)        << "|"
-       << get(Controller_Right)       << "|"
-       << get(Controller_SwapPaddles) << "|"
-       << get(Controller_MouseAxis)   << "|"
-       << get(Display_Format)         << "|"
-       << get(Display_YStart)         << "|"
-       << get(Display_Height)         << "|"
-       << get(Display_Phosphor)       << "|"
-       << get(Display_PPBlend)
-       << endl;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Properties::setDefaults()
 {
   for(int i = 0; i < LastPropType; ++i)
@@ -272,33 +245,6 @@ PropertyType Properties::getPropertyType(const string& name)
 
   // Otherwise, indicate that the item wasn't found
   return LastPropType;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Properties::printHeader()
-{
-  cout << "Cartridge_MD5|"
-       << "Cartridge_Name|"
-       << "Cartridge_Manufacturer|"
-       << "Cartridge_ModelNo|"
-       << "Cartridge_Note|"
-       << "Cartridge_Rarity|"
-       << "Cartridge_Sound|"
-       << "Cartridge_Type|"
-       << "Console_LeftDifficulty|"
-       << "Console_RightDifficulty|"
-       << "Console_TelevisionType|"
-       << "Console_SwapPorts|"
-       << "Controller_Left|"
-       << "Controller_Right|"
-       << "Controller_SwapPaddles|"
-       << "Controller_MouseAxis|"
-       << "Display_Format|"
-       << "Display_YStart|"
-       << "Display_Height|"
-       << "Display_Phosphor|"
-       << "Display_PPBlend"
-       << endl;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

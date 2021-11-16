@@ -20,9 +20,6 @@
 #include <cassert>
 #include <cstring>
 
-#ifdef DEBUGGER_SUPPORT
-  #include "Debugger.hxx"
-#endif
 #include "System.hxx"
 #include "Thumbulator.hxx"
 #include "CartDPCPlus.hxx"
@@ -213,14 +210,6 @@ inline void CartridgeDPCPlus::callFunction(uInt8 value)
         myThumbEmulator->run();
       }
       catch(const string& error) {
-        if(!mySystem->autodetectMode())
-        {
-      #ifdef DEBUGGER_SUPPORT
-          Debugger::debugger().startWithFatalError(error);
-      #else
-          cout << error << endl;
-      #endif
-        }
       }
       break;
   #endif

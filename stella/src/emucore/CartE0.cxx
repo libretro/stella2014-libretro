@@ -239,7 +239,6 @@ bool CartridgeE0::save(Serializer& out) const
   }
   catch(...)
   {
-    cerr << "ERROR: CartridgeE0::save" << endl;
     return false;
   }
 
@@ -258,7 +257,6 @@ bool CartridgeE0::load(Serializer& in)
   }
   catch(...)
   {
-    cerr << "ERROR: CartridgeE0::load" << endl;
     return false;
   }
 

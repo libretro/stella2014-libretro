@@ -113,25 +113,17 @@ class Thumbulator
     int fatalError(const char* opcode, uInt32 v1, const char* msg);
     int fatalError(const char* opcode, uInt32 v1, uInt32 v2, const char* msg);
 
-    void dump_counters ( void );
-    void dump_regs( void );
     int execute ( void );
     int reset ( void );
 
   private:
     const uInt16* rom;
     uInt16* ram;
-    //Int32 copydata;
 
     uInt32 halfadd;
     uInt32 cpsr;
-    //uInt32 reg_usr[16]; //User mode
     uInt32 reg_sys[16]; //System mode
     uInt32 reg_svc[16]; //Supervisor mode
-    //uInt32 reg_abt[16]; //Abort mode
-    //uInt32 reg_und[16]; //Undefined mode
-    //uInt32 reg_irq[16]; //Interrupt mode
-    //uInt32 reg_fiq[16]; //Fast Interrupt mode
     uInt32 mamcr;
 
     uInt64 instructions;
