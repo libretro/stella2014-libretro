@@ -56,14 +56,12 @@ class Variant
     Variant(float f) { buf().str(""); buf() << f; data = buf().str(); }
     Variant(double d) { buf().str(""); buf() << d; data = buf().str(); }
     Variant(bool b) { buf().str(""); buf() << b; data = buf().str(); }
-    Variant(const GUI::Size& s) { buf().str(""); buf() << s; data = buf().str(); }
 
     // Conversion methods
     const string& toString() const { return data; }
     int toInt() const { return atoi(data.c_str()); }
     float toFloat() const { return (float)atof(data.c_str()); }
     bool toBool() const { return data == "1" || data == "true"; }
-    const GUI::Size toSize() const { return GUI::Size(data); }
 
     // Comparison
     bool operator==(const Variant& v) const { return data == v.data; };

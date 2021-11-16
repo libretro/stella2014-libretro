@@ -33,22 +33,10 @@ class SerialPort;
 class Settings;
 class Sound;
 class StateManager;
-class VideoDialog;
-
-namespace GUI {
-  class Font;
-}
 
 #include "Array.hxx"
 #include "FrameBuffer.hxx"
 #include "bspf.hxx"
-
-struct Resolution {
-  uInt32 width;
-  uInt32 height;
-  string name;
-};
-typedef Common::Array<Resolution> ResolutionList;
 
 /**
   This class provides an interface for accessing operating system specific
@@ -61,7 +49,6 @@ typedef Common::Array<Resolution> ResolutionList;
 class OSystem
 {
   friend class EventHandler;
-  friend class VideoDialog;
 
   public:
     /**

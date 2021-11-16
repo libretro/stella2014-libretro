@@ -110,15 +110,12 @@ Settings::Settings(OSystem* osystem)
 
   // ROM browser options
   setInternal("exitlauncher", "false");
-  setInternal("launcherres", GUI::Size(640, 480));
   setInternal("launcherfont", "medium");
   setInternal("launcherexts", "allroms");
   setInternal("romviewer", "0");
   setInternal("lastrom", "");
 
   // UI-related options
-//  setInternal("dbg.res",
-//    GUI::Size(DebuggerDialog::kMediumFontMinW, DebuggerDialog::kMediumFontMinH));
   setInternal("uipalette", "0");
   setInternal("listdelay", "300");
   setInternal("mwheel", "4");

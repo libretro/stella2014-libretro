@@ -436,8 +436,8 @@ FBInitStatus Console::initializeVideo(bool full)
   setPalette(myOSystem->settings().getString("palette"));
 
   // Set the correct framerate based on the format of the ROM
-  // This can be overridden by changing the framerate in the
-  // VideoDialog box or on the commandline, but it can't be saved
+  // This can be overridden by changing the framerate on the
+  // commandline, but it can't be saved
   // (ie, framerate is now determined based on number of scanlines).
   //float framerate = myOSystem->settings().getFloat("framerate");
   //if(framerate > 0) myFramerate = float(framerate);

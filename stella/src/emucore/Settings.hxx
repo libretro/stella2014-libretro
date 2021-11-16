@@ -74,7 +74,6 @@ class Settings
     float getFloat(const string& key) const { return value(key).toFloat(); }
     bool getBool(const string& key) const   { return value(key).toBool();  }
     const string& getString(const string& key) const { return value(key).toString(); }
-    const GUI::Size getSize(const string& key) const { return value(key).toSize();   }
 
   private:
     // Copy constructor isn't supported by this class so make it private
