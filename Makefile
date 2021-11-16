@@ -119,7 +119,7 @@ else ifeq ($(platform), tvos-arm64)
 	endif
 
         CC = clang -arch arm64 -isysroot $(IOSSDK)
-        CCX = clang++ -arch arm64 -isysroot $(IOSSDK)
+        CXX = clang++ -arch arm64 -isysroot $(IOSSDK)
 
 else ifeq ($(platform), theos_ios)
 DEPLOYMENT_IOSVERSION = 5.0
