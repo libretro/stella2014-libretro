@@ -41,7 +41,7 @@ LIBRETRO_INSTALL_DIR := libretro
 TARGET_NAME := stella2014
 GIT_VERSION := " $(shell git rev-parse --short HEAD || echo unknown)"
 ifneq ($(GIT_VERSION)," unknown")
-	CXXFLAGS += -DGIT_VERSION=\"$(GIT_VERSION)\"
+	FLAGS += -DGIT_VERSION=\"$(GIT_VERSION)\"
 endif
 
 SPACE :=
@@ -384,8 +384,7 @@ export INCLUDE := $(XDK)/xbox/include
 export LIB := $(XDK)/xbox/lib
 PATH := $(call unixcygpath,$(XDK)/xbox/bin/vc71):$(PATH)
 PSS_STYLE :=2
-CFLAGS   += -D_XBOX -D_XBOX1
-CXXFLAGS += -D_XBOX -D_XBOX1
+FLAGS   += -D_XBOX -D_XBOX1
 STATIC_LINKING=1
 HAS_GCC := 0
 # Windows MSVC 2010 Xbox 360
@@ -400,8 +399,7 @@ export INCLUDE := $(XEDK)/include/xbox
 export LIB := $(XEDK)/lib/xbox
 PSS_STYLE :=2
 FLAGS += -DMSB_FIRST
-CFLAGS   += -D_XBOX -D_XBOX360
-CXXFLAGS += -D_XBOX -D_XBOX360
+FLAGS   += -D_XBOX -D_XBOX360
 STATIC_LINKING=1
 HAS_GCC := 0
 
@@ -499,7 +497,7 @@ export LIB := $(LIB);$(WindowsSdkDir);$(INETSDK)/Lib
 TARGET := $(TARGET_NAME)_libretro.dll
 PSS_STYLE :=2
 LDFLAGS += -DLL
-CFLAGS += -D_CRT_SECURE_NO_DEPRECATE
+FLAGS += -D_CRT_SECURE_NO_DEPRECATE
 
 # Windows MSVC 2017 all architectures
 else ifneq (,$(findstring windows_msvc2017,$(platform)))
