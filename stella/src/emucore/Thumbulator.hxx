@@ -26,6 +26,7 @@
 
 #ifdef THUMB_SUPPORT
 
+#include <sstream>
 #include "bspf.hxx"
 
 #define ROMADDMASK 0x7FFF

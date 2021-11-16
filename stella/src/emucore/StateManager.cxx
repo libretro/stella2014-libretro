@@ -111,6 +111,5 @@ StateManager::StateManager(const StateManager&)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StateManager& StateManager::operator = (const StateManager&)
 {
-  assert(false);
   return *this;
 }
