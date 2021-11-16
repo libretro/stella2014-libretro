@@ -95,10 +95,10 @@ ifeq ($(IOSSDK),)
 endif
 
 ifeq ($(platform),ios-arm64)
-	CC = cc -arch arm64 -isysroot $(IOSSDK)
+	CC = clang -arch arm64 -isysroot $(IOSSDK)
 	CXX = clang++ -arch arm64 -isysroot $(IOSSDK)
 else
-	CC = cc -arch armv7 -isysroot $(IOSSDK)
+	CC = clang -arch armv7 -isysroot $(IOSSDK)
 	CXX = clang++ -arch armv7 -isysroot $(IOSSDK)
 endif
 ifeq ($(platform),$(filter $(platform),ios9 ios-arm64))
@@ -117,8 +117,8 @@ else ifeq ($(platform), tvos-arm64)
 		IOSSDK := $(shell xcodebuild -version -sdk appletvos Path)
 	endif
 
-        CC = cc -arch arm64 -isysroot $(IOSSDK)
-        CCX = c++ -arch arm64 -isysroot $(IOSSDK)
+        CC = clang -arch arm64 -isysroot $(IOSSDK)
+        CCX = clang++ -arch arm64 -isysroot $(IOSSDK)
 
 else ifeq ($(platform), theos_ios)
 DEPLOYMENT_IOSVERSION = 5.0
