@@ -3,13 +3,13 @@
 
 OSystem::OSystem()
 {
-    myNVRamDir = ".";
-    mySettings = 0;
-    myFrameBuffer = new FrameBuffer();
-    mySound = new SoundSDL(this);
-    mySerialPort = new SerialPort();
+    myNVRamDir     = ".";
+    mySettings     = 0;
+    myFrameBuffer  = new FrameBuffer();
+    mySound        = new Sound(this);
+    mySerialPort   = new SerialPort();
     myEventHandler = new EventHandler(this);
-    myPropSet = new PropertiesSet(this);
+    myPropSet      = new PropertiesSet(this);
     Paddles::setDigitalSensitivity(50);
     Paddles::setMouseSensitivity(5);
 }

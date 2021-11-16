@@ -13,7 +13,7 @@ INCFLAGS += -I$(LIBRETRO_COMM_DIR)/include/compat/msvc
 endif
 
 SOURCES_CXX := $(CORE_DIR)/src/common/Base.cxx \
-	$(CORE_DIR)/src/common/SoundSDL.cxx \
+	$(CORE_DIR)/src/common/Sound.cxx \
 	$(CORE_DIR)/src/emucore/AtariVox.cxx \
 	$(CORE_DIR)/src/emucore/Booster.cxx \
 	$(CORE_DIR)/src/emucore/Cart.cxx \

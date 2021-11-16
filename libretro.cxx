@@ -24,7 +24,7 @@
 #include "StateManager.hxx"
 #include "PropsSet.hxx"
 #include "Paddles.hxx"
-#include "SoundSDL.hxx"
+#include "Sound.hxx"
 #include "M6532.hxx"
 #include "Version.hxx"
 
@@ -1356,10 +1356,7 @@ void retro_run(void)
 
    video_cb(frameBuffer, videoWidth, videoHeight, videoWidth * framePixelBytes);
 
-   //AUDIO
-   //Process one frame of audio from stella
-   SoundSDL *sound = (SoundSDL*)&osystem.sound();
-   sound->processFragment(sampleBuffer, tiaSamplesPerFrame);
+   osystem.sound().processFragment(sampleBuffer, tiaSamplesPerFrame);
 
    if (low_pass_enabled)
       apply_low_pass_filter(sampleBuffer, tiaSamplesPerFrame);

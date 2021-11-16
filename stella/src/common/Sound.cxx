@@ -14,10 +14,8 @@
 // See the file "License.txt" for information on usage and redistribution of
 // this file, and for a DISCLAIMER OF ALL WARRANTIES.
 //
-// $Id: SoundSDL.cxx 2838 2014-01-17 23:34:03Z stephena $
+// $Id: Sound.cxx 2838 2014-01-17 23:34:03Z stephena $
 //============================================================================
-
-#ifdef SOUND_SUPPORT
 
 #include <sstream>
 #include <cassert>
@@ -29,12 +27,11 @@
 #include "System.hxx"
 #include "OSystem.hxx"
 #include "Console.hxx"
-#include "SoundSDL.hxx"
+#include "Sound.hxx"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-SoundSDL::SoundSDL(OSystem* osystem)
-  : Sound(osystem),
-    myIsEnabled(false),
+Sound::Sound(OSystem* osystem)
+  : myIsEnabled(false),
     myIsInitializedFlag(false),
     myLastRegisterSetCycle(0),
     myNumChannels(0),
@@ -42,10 +39,11 @@ SoundSDL::SoundSDL(OSystem* osystem)
     myVolume(100)
 {
   myIsInitializedFlag = true;
+  myOSystem           = osystem;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-SoundSDL::~SoundSDL()
+Sound::~Sound()
 {
   // Close the SDL audio system if it's initialized
   if(myIsInitializedFlag)
@@ -56,13 +54,13 @@ SoundSDL::~SoundSDL()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SoundSDL::setEnabled(bool state)
+void Sound::setEnabled(bool state)
 {
   myOSystem->settings().setValue("sound", state);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SoundSDL::open()
+void Sound::open()
 {
   myIsEnabled = false;
   mute(true);
@@ -86,7 +84,7 @@ void SoundSDL::open()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SoundSDL::close()
+void Sound::close()
 {
   if(myIsInitializedFlag)
   {
@@ -99,7 +97,7 @@ void SoundSDL::close()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SoundSDL::mute(bool state)
+void Sound::mute(bool state)
 {
   if(myIsInitializedFlag)
   {
@@ -109,7 +107,7 @@ void SoundSDL::mute(bool state)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SoundSDL::reset()
+void Sound::reset()
 {
   if(myIsInitializedFlag)
   {
@@ -121,7 +119,7 @@ void SoundSDL::reset()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SoundSDL::setVolume(Int32 percent)
+void Sound::setVolume(Int32 percent)
 {
   if(myIsInitializedFlag && (percent >= 0) && (percent <= 100))
   {
@@ -132,7 +130,7 @@ void SoundSDL::setVolume(Int32 percent)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SoundSDL::adjustVolume(Int8 direction)
+void Sound::adjustVolume(Int8 direction)
 {
   ostringstream strval;
   string message;
@@ -158,25 +156,25 @@ void SoundSDL::adjustVolume(Int8 direction)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SoundSDL::adjustCycleCounter(Int32 amount)
+void Sound::adjustCycleCounter(Int32 amount)
 {
   myLastRegisterSetCycle += amount;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SoundSDL::setChannels(uInt32 channels)
+void Sound::setChannels(uInt32 channels)
 {
   if(channels == 1 || channels == 2)
     myNumChannels = channels;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SoundSDL::setFrameRate(float framerate)
+void Sound::setFrameRate(float framerate)
 {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SoundSDL::set(uInt16 addr, uInt8 value, Int32 cycle)
+void Sound::set(uInt16 addr, uInt8 value, Int32 cycle)
 {
   // First, calculate how many seconds would have past since the last
   // register write on a real 2600
@@ -198,7 +196,7 @@ void SoundSDL::set(uInt16 addr, uInt8 value, Int32 cycle)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SoundSDL::processFragment(Int16* stream, uInt32 length)
+void Sound::processFragment(Int16* stream, uInt32 length)
 {
     const uInt32 channels = 2;
     double streamLengthInSecs = (double)length/(double)31400;
@@ -331,9 +329,9 @@ void SoundSDL::processFragment(Int16* stream, uInt32 length)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SoundSDL::callback(void* udata, uInt8* stream, int len)
+void Sound::callback(void* udata, uInt8* stream, int len)
 {
-  SoundSDL* sound = (SoundSDL*)udata;
+  Sound* sound = (Sound*)udata;
   if(sound->myIsEnabled)
   {
     // The callback is requesting 8-bit (unsigned) data, but the TIA sound
@@ -344,7 +342,7 @@ void SoundSDL::callback(void* udata, uInt8* stream, int len)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool SoundSDL::save(Serializer& out) const
+bool Sound::save(Serializer& out) const
 {
    out.putString(name());
 
@@ -374,7 +372,7 @@ bool SoundSDL::save(Serializer& out) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool SoundSDL::load(Serializer& in)
+bool Sound::load(Serializer& in)
 {
    if(in.getString() != name())
       return false;
@@ -405,7 +403,7 @@ bool SoundSDL::load(Serializer& in)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-SoundSDL::RegWriteQueue::RegWriteQueue(uInt32 capacity)
+Sound::RegWriteQueue::RegWriteQueue(uInt32 capacity)
   : myCapacity(capacity),
     myBuffer(0),
     mySize(0),
@@ -416,19 +414,19 @@ SoundSDL::RegWriteQueue::RegWriteQueue(uInt32 capacity)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-SoundSDL::RegWriteQueue::~RegWriteQueue()
+Sound::RegWriteQueue::~RegWriteQueue()
 {
   delete[] myBuffer;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SoundSDL::RegWriteQueue::clear()
+void Sound::RegWriteQueue::clear()
 {
   myHead = myTail = mySize = 0;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SoundSDL::RegWriteQueue::dequeue()
+void Sound::RegWriteQueue::dequeue()
 {
   if(mySize > 0)
   {
@@ -438,7 +436,7 @@ void SoundSDL::RegWriteQueue::dequeue()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double SoundSDL::RegWriteQueue::duration()
+double Sound::RegWriteQueue::duration()
 {
   double duration = 0.0;
   for(uInt32 i = 0; i < mySize; ++i)
@@ -449,7 +447,7 @@ double SoundSDL::RegWriteQueue::duration()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SoundSDL::RegWriteQueue::enqueue(const RegWrite& info)
+void Sound::RegWriteQueue::enqueue(const RegWrite& info)
 {
   // If an attempt is made to enqueue more than the queue can hold then
   // we'll enlarge the queue's capacity.
@@ -462,20 +460,20 @@ void SoundSDL::RegWriteQueue::enqueue(const RegWrite& info)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-SoundSDL::RegWrite& SoundSDL::RegWriteQueue::front()
+Sound::RegWrite& Sound::RegWriteQueue::front()
 {
   assert(mySize != 0);
   return myBuffer[myHead];
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt32 SoundSDL::RegWriteQueue::size() const
+uInt32 Sound::RegWriteQueue::size() const
 {
   return mySize;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SoundSDL::RegWriteQueue::grow()
+void Sound::RegWriteQueue::grow()
 {
   RegWrite* buffer = new RegWrite[myCapacity * 2];
   for(uInt32 i = 0; i < mySize; ++i)
@@ -488,5 +486,3 @@ void SoundSDL::RegWriteQueue::grow()
   delete[] myBuffer;
   myBuffer = buffer;
 }
-
-#endif  // SOUND_SUPPORT
