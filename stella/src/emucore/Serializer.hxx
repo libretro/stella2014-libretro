@@ -21,6 +21,7 @@
 #define SERIALIZER_HXX
 
 #include <iostream>
+#include <sstream>
 #include "bspf.hxx"
 
 /**
