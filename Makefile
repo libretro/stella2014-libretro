@@ -610,7 +610,7 @@ LIBRETRO_DIR := .
 
 include Makefile.common
 
-OBJECTS := $(SOURCES_CXX:.cxx=.o)
+OBJECTS := $(SOURCES_CXX:.cxx=.o) $(SOURCES_C:.c=.o)
 
 ifeq ($(DEBUG), 1)
 ifneq (,$(findstring msvc,$(platform)))
