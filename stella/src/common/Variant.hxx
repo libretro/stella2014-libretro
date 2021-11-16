@@ -21,7 +21,6 @@
 #define VARIANT_HXX
 
 #include "Array.hxx"
-#include "Rect.hxx"
 #include "bspf.hxx"
 
 /**
