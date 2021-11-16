@@ -53,24 +53,6 @@ class PropertiesSet
     virtual ~PropertiesSet();
 
   public:
-    /** 
-      Load properties from the specified file, and create an internal
-      searchable list.
-
-      @param filename  Full pathname of input file to use
-    */
-    void load(const string& filename);
-
-    /**
-      Save properties to the specified file.
-
-      @param filename  Full pathname of output file to use
-
-      @return  True on success, false on failure
-               Failure occurs if file couldn't be opened for writing
-    */
-    bool save(const string& filename) const;
-
     /**
       Get the property from the set with the given MD5.
 
@@ -84,21 +66,6 @@ class PropertiesSet
     */
     bool getMD5(const string& md5, Properties& properties,
                 bool useDefaults = false) const;
-
-    /**
-      Get the property from the set with the given MD5, at the same time
-      checking if it exists.  If it doesn't, insert a temporary copy into
-      the set.
-
-      @param file        The node representing the 
-      @param md5         The md5 of the property to get
-      @param properties  The properties with the given MD5, or the default
-                         properties if not found
-      @param defaults    Use the built-in defaults, ignoring any properties
-                         from an external file
-    */
-    //void getMD5WithInsert(const FilesystemNode& rom, const string& md5,
-    //                      Properties& properties);
 
     /**
       Insert the properties into the set.  If a duplicate is inserted

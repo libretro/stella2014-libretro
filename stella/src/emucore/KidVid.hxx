@@ -20,7 +20,6 @@
 #ifndef KIDVID_HXX
 #define KIDVID_HXX
 
-#include <cstdio>
 
 #include "bspf.hxx"
 #include "Control.hxx"

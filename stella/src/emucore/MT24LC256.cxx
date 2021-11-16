@@ -18,25 +18,15 @@
 //============================================================================
 
 #include <cassert>
-#include <cstdio>
 #include <cstring>
 #include <fstream>
 
 #include "System.hxx"
 #include "MT24LC256.hxx"
 
-#define DEBUG_EEPROM 0
-
-#if DEBUG_EEPROM
-  char jpee_msg[256];
-  #define JPEE_LOG0(msg) jpee_logproc(msg)
-  #define JPEE_LOG1(msg,arg1) sprintf(jpee_msg,(msg),(arg1)), jpee_logproc(jpee_msg)
-  #define JPEE_LOG2(msg,arg1,arg2) sprintf(jpee_msg,(msg),(arg1),(arg2)), jpee_logproc(jpee_msg)
-#else
-  #define JPEE_LOG0(msg) { }
-  #define JPEE_LOG1(msg,arg1) { }
-  #define JPEE_LOG2(msg,arg1,arg2) { }
-#endif
+#define JPEE_LOG0(msg) { }
+#define JPEE_LOG1(msg,arg1) { }
+#define JPEE_LOG2(msg,arg1,arg2) { }
 
 /*
   State values for I2C:
@@ -139,10 +129,6 @@ void MT24LC256::update()
   // we only do the write when they have the same 'timestamp'
   if(myCyclesWhenSDASet == myCyclesWhenSCLSet)
   {
-#if DEBUG_EEPROM
-    cerr << endl << "  I2C_PIN_WRITE(SCL = " << mySCL
-         << ", SDA = " << mySDA << ")" << " @ " << mySystem.cycles() << endl;
-#endif
     jpee_clock(mySCL);
     jpee_data(mySDA);
   }

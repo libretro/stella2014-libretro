@@ -17,8 +17,6 @@
 // $Id: PropsSet.cxx 2838 2014-01-17 23:34:03Z stephena $
 //============================================================================
 
-#include <fstream>
-#include <sstream>
 #include <map>
 
 #include "bspf.hxx"
@@ -42,45 +40,6 @@ PropertiesSet::~PropertiesSet()
 {
   myExternalProps.clear();
   myTempProps.clear();
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void PropertiesSet::load(const string& filename)
-{
-  ifstream in(filename.c_str(), ios::in);
-
-  // Loop reading properties
-  for(;;)
-  {
-    // Make sure the stream is still good or we're done 
-    if(!in)
-      break;
-
-    // Get the property list associated with this profile
-    Properties prop;
-    prop.load(in);
-
-    // If the stream is still good then insert the properties
-    if(in)
-      insert(prop);
-  }
-  if(in)
-    in.close();
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool PropertiesSet::save(const string& filename) const
-{
-  ofstream out(filename.c_str(), ios::out);
-  if(!out)
-    return false;
-
-  // Only save those entries in the external list
-  for(PropsList::const_iterator i = myExternalProps.begin();
-      i != myExternalProps.end(); ++i)
-    i->second.save(out);
-
-  return true;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -146,20 +105,6 @@ bool PropertiesSet::getMD5(const string& md5, Properties& properties,
 
   return found;
 }
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//void PropertiesSet::getMD5WithInsert(const FilesystemNode& rom,
-//                                     const string& md5, Properties& properties)
-//{
-//  if(!getMD5(md5, properties))
-//  {
-//    properties.set(Cartridge_MD5, md5);
-//    // Create a name suitable for using in properties
-//    properties.set(Cartridge_Name, rom.getNameWithExt(""));
-//
-//    insert(properties, false);
-//  }
-//}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void PropertiesSet::insert(const Properties& properties, bool save)

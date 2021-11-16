@@ -18,7 +18,6 @@
 //============================================================================
 
 #include <fstream>
-#include <sstream>
 
 #include "Serializer.hxx"
 

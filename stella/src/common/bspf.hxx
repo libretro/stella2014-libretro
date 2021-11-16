@@ -68,7 +68,6 @@
 #include <sstream>
 #include <cstring>
 #include <cctype>
-#include <cstdio>
 using namespace std;
 
 // Defines to help with path handling
