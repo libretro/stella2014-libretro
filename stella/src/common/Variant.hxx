@@ -20,6 +20,7 @@
 #ifndef VARIANT_HXX
 #define VARIANT_HXX
 
+#include <sstream>
 #include "Array.hxx"
 #include "bspf.hxx"
 
