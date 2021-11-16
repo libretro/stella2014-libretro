@@ -23,8 +23,6 @@
 #ifndef ARRAY_HXX
 #define ARRAY_HXX
 
-#include <cassert>
-
 #include "bspf.hxx"
 
 namespace Common {
@@ -80,7 +78,6 @@ class Array
 
     void insert_at(uInt32 idx, const T& element)
     {
-      assert(idx >= 0 && idx <= _size);
       ensureCapacity(_size + 1);
       // The following loop is not efficient if you can just memcpy things around.
       // e.g. if you have a list of ints. But for real objects (String...), memcpy
@@ -96,7 +93,6 @@ class Array
 
     T remove_at(uInt32 idx)
     {
-      assert(idx >= 0 && idx < _size);
       T tmp = _data[idx];
       for(uInt32 i = idx; i < _size - 1; i++)
         _data[i] = _data[i+1];
@@ -106,13 +102,11 @@ class Array
 
     T& operator [](uInt32 idx)
     {
-      assert(idx >= 0 && idx < _size);
       return _data[idx];
     }
 
     const T& operator [](uInt32 idx) const
     {
-      assert(idx >= 0 && idx < _size);
       return _data[idx];
     }
 

@@ -66,7 +66,3 @@ FBInitStatus FrameBuffer::initialize(const string& title, uInt32 width, uInt32 h
 {
     return kSuccess;
 }
-
-void FrameBuffer::refresh() { }
-
-void FrameBuffer::showFrameStats(bool enable) { }

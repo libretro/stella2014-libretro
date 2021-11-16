@@ -17,8 +17,6 @@
 // $Id: Console.cxx 2838 2014-01-17 23:34:03Z stephena $
 //============================================================================
 
-#include <cassert>
-
 #include "AtariVox.hxx"
 #include "Booster.hxx"
 #include "Cart.hxx"
@@ -233,7 +231,7 @@ bool Console::load(Serializer& in)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Console::toggleFormat(int direction)
 {
-  string saveformat, message;
+  string saveformat;
 
   if(direction == 1)
     myCurrentFormat = (myCurrentFormat + 1) % 7;
@@ -245,32 +243,25 @@ void Console::toggleFormat(int direction)
     case 0:  // auto-detect
       myTIA->update();
       myDisplayFormat = myTIA->isPAL() ? "PAL" : "NTSC";
-      message = "Auto-detect mode: " + myDisplayFormat;
       saveformat = "AUTO";
       break;
     case 1:
       saveformat = myDisplayFormat  = "NTSC";
-      message = "NTSC mode";
       break;
     case 2:
       saveformat = myDisplayFormat  = "PAL";
-      message = "PAL mode";
       break;
     case 3:
       saveformat = myDisplayFormat  = "SECAM";
-      message = "SECAM mode";
       break;
     case 4:
       saveformat = myDisplayFormat  = "NTSC50";
-      message = "NTSC50 mode";
       break;
     case 5:
       saveformat = myDisplayFormat  = "PAL60";
-      message = "PAL60 mode";
       break;
     case 6:
       saveformat = myDisplayFormat  = "SECAM60";
-      message = "SECAM60 mode";
       break;
   }
   myProperties.set(Display_Format, saveformat);
@@ -279,8 +270,6 @@ void Console::toggleFormat(int direction)
   setTIAProperties();
   myTIA->frameReset();
   initializeVideo();  // takes care of refreshing the screen
-
-  myOSystem->frameBuffer().showMessage(message);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -289,10 +278,6 @@ void Console::toggleColorLoss()
   bool colorloss = !myOSystem->settings().getBool("colorloss");
   myOSystem->settings().setValue("colorloss", colorloss);
   myTIA->enableColorLoss(colorloss);
-
-  string message = string("PAL color-loss ") +
-                   (colorloss ? "enabled" : "disabled");
-  myOSystem->frameBuffer().showMessage(message);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -304,42 +289,28 @@ void Console::toggleColorLoss(bool state)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Console::togglePalette()
 {
-  string palette, message;
+  string palette;
   palette = myOSystem->settings().getString("palette");
  
   if(palette == "standard")       // switch to z26
   {
     palette = "z26";
-    message = "Z26 palette";
   }
   else if(palette == "z26")       // switch to user or standard
   {
     // If we have a user-defined palette, it will come next in
     // the sequence; otherwise loop back to the standard one
     if(myUserPaletteDefined)
-    {
       palette = "user";
-      message = "User-defined palette";
-    }
     else
-    {
       palette = "standard";
-      message = "Standard Stella palette";
-    }
   }
   else if(palette == "user")  // switch to standard
-  {
     palette = "standard";
-    message = "Standard Stella palette";
-  }
   else  // switch to standard mode if we get this far
-  {
     palette = "standard";
-    message = "Standard Stella palette";
-  }
 
   myOSystem->settings().setValue("palette", palette);
-  myOSystem->frameBuffer().showMessage(message);
 
   setPalette(palette);
 }
@@ -394,13 +365,11 @@ void Console::togglePhosphor()
   {
     myProperties.set(Display_Phosphor, "No");
     enable = false;
-    myOSystem->frameBuffer().showMessage("Phosphor effect disabled");
   }
   else
   {
     myProperties.set(Display_Phosphor, "Yes");
     enable = true;
-    myOSystem->frameBuffer().showMessage("Phosphor effect enabled");
   }
 
   myOSystem->frameBuffer().enablePhosphor(enable, blend);
@@ -425,8 +394,6 @@ FBInitStatus Console::initializeVideo(bool full)
                  myTIA->width() << 1, myTIA->height());
     if(fbstatus != kSuccess)
       return fbstatus;
-
-    myOSystem->frameBuffer().showFrameStats(myOSystem->settings().getBool("stats"));
     setColorLossPalette();
   }
 
@@ -502,19 +469,13 @@ void Console::changeYStart(int direction)
   if(direction == +1)       // increase YStart
   {
     if(ystart >= 64)
-    {
-      myOSystem->frameBuffer().showMessage("YStart at maximum");
       return;
-    }
     ystart++;
   }
   else if(direction == -1)  // decrease YStart
   {
     if(ystart == 0)
-    {
-      myOSystem->frameBuffer().showMessage("YStart at minimum");
       return;
-    }
     ystart--;
   }
   else
@@ -522,11 +483,9 @@ void Console::changeYStart(int direction)
 
   myTIA->setYStart(ystart);
   myTIA->frameReset();
-  myOSystem->frameBuffer().refresh();
 
   ostringstream val;
   val << ystart;
-  myOSystem->frameBuffer().showMessage("YStart " + val.str());
   myProperties.set(Display_YStart, val.str());
 }
 
@@ -538,20 +497,14 @@ void Console::changeHeight(int direction)
   if(direction == +1)       // increase Height
   {
     height++;
-    if(height > 256 || height > myOSystem->desktopHeight())
-    {
-      myOSystem->frameBuffer().showMessage("Height at maximum");
+    if(height > 256 || height > myOSystem->desktopHeight()) /* Height at maximum */
       return;
-    }
   }
   else if(direction == -1)  // decrease Height
   {
     height--;
-    if(height < 210)
-    {
-      myOSystem->frameBuffer().showMessage("Height at minimum");
+    if(height < 210) /* Height at minimum */
       return;
-    }
   }
   else
     return;
@@ -562,7 +515,6 @@ void Console::changeHeight(int direction)
 
   ostringstream val;
   val << height;
-  myOSystem->frameBuffer().showMessage("Height " + val.str());
   myProperties.set(Display_Height, val.str());
 }
 
@@ -873,51 +825,37 @@ void Console::setFramerate(float framerate)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Console::toggleTIABit(TIABit bit, const string& bitname, bool show) const
 {
-  bool result = myTIA->toggleBit(bit);
-  string message = bitname + (result ? " enabled" : " disabled");
-  myOSystem->frameBuffer().showMessage(message);
+  myTIA->toggleBit(bit);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Console::toggleBits() const
 {
-  bool enabled = myTIA->toggleBits();
-  string message = string("TIA bits") + (enabled ? " enabled" : " disabled");
-  myOSystem->frameBuffer().showMessage(message);
+  myTIA->toggleBits();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Console::toggleTIACollision(TIABit bit, const string& bitname, bool show) const
 {
-  bool result = myTIA->toggleCollision(bit);
-  string message = bitname + (result ? " collision enabled" : " collision disabled");
-  myOSystem->frameBuffer().showMessage(message);
+  myTIA->toggleCollision(bit);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Console::toggleCollisions() const
 {
-  bool enabled = myTIA->toggleCollisions();
-  string message = string("TIA collisions") + (enabled ? " enabled" : " disabled");
-  myOSystem->frameBuffer().showMessage(message);
+  myTIA->toggleCollisions();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Console::toggleHMOVE() const
 {
-  if(myTIA->toggleHMOVEBlank())
-    myOSystem->frameBuffer().showMessage("HMOVE blanking enabled");
-  else
-    myOSystem->frameBuffer().showMessage("HMOVE blanking disabled");
+  myTIA->toggleHMOVEBlank();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Console::toggleFixedColors() const
 {
-  if(myTIA->toggleFixedColors())
-    myOSystem->frameBuffer().showMessage("Fixed debug colors enabled");
-  else
-    myOSystem->frameBuffer().showMessage("Fixed debug colors disabled");
+  myTIA->toggleFixedColors();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1374,13 +1312,10 @@ Console::Console(const Console& console)
   : myOSystem(console.myOSystem),
     myEvent(console.myEvent)
 {
-  assert(false);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Console& Console::operator = (const Console&)
 {
-  assert(false);
-
   return *this;
 }

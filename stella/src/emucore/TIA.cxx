@@ -17,7 +17,6 @@
 // $Id: TIA.cxx 2838 2014-01-17 23:34:03Z stephena $
 //============================================================================
 
-#include <cassert>
 #include <cstdlib>
 #include <cstring>
 
@@ -2324,12 +2323,10 @@ TIA::TIA(const TIA& c)
     mySound(c.mySound),
     mySettings(c.mySettings)
 {
-  assert(false);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TIA& TIA::operator = (const TIA&)
 {
-  assert(false);
   return *this;
 }

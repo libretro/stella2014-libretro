@@ -17,8 +17,6 @@
 // $Id: Control.cxx 2838 2014-01-17 23:34:03Z stephena $
 //============================================================================
 
-#include <cassert>
-
 #include "System.hxx"
 #include "Control.hxx"
 
@@ -197,12 +195,10 @@ Controller::Controller(const Controller& c)
     mySystem(c.mySystem),
     myType(c.myType)
 {
-  assert(false);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Controller& Controller::operator = (const Controller&)
 {
-  assert(false);
   return *this;
 }

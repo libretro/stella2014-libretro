@@ -25,8 +25,6 @@
 
 class Cartridge;
 class Properties;
-class CartDebugWidget;
-class GuiObject;
 
 #include "bspf.hxx"
 #include "Array.hxx"

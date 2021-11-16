@@ -17,8 +17,6 @@
 // $Id: Paddles.cxx 2838 2014-01-17 23:34:03Z stephena $
 //============================================================================
 
-#include <cassert>
-
 #include "Event.hxx"
 #include "Paddles.hxx"
 
@@ -225,10 +223,6 @@ Paddles::Paddles(Jack jack, const Event& event, const System& system,
 
   myCharge[0] = myCharge[1] = TRIGRANGE / 2;
   myLastCharge[0] = myLastCharge[1] = 0;
-
-  // Paranoid mode: defaults for the global variables should be set
-  // before the first instance of this class is instantiated
-  assert(_DIGITAL_SENSITIVITY != -1 && _MOUSE_SENSITIVITY != -1);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

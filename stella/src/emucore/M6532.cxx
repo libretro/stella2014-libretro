@@ -17,7 +17,6 @@
 // $Id: M6532.cxx 2838 2014-01-17 23:34:03Z stephena $
 //============================================================================
 
-#include <cassert>
 #include <iostream>
 
 #include "Console.hxx"
@@ -119,9 +118,6 @@ void M6532::install(System& system, Device& device)
   uInt16 shift = mySystem->pageShift();
   uInt16 mask = mySystem->pageMask();
 
-  // Make sure the system we're being installed in has a page size that'll work
-  assert((0x1080 & mask) == 0);
-  
   // All accesses are to the given device
   System::PageAccess access(0, 0, 0, &device, System::PA_READWRITE);
 
@@ -444,12 +440,10 @@ M6532::M6532(const M6532& c)
   : myConsole(c.myConsole),
     mySettings(c.mySettings)
 {
-  assert(false);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 M6532& M6532::operator = (const M6532&)
 {
-  assert(false);
   return *this;
 }

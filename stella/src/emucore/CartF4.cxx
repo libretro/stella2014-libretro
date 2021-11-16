@@ -17,7 +17,6 @@
 // $Id: CartF4.cxx 2838 2014-01-17 23:34:03Z stephena $
 //============================================================================
 
-#include <cassert>
 #include <cstring>
 
 #include "Random.hxx"
@@ -52,9 +51,6 @@ void CartridgeF4::reset()
 void CartridgeF4::install(System& system)
 {
   mySystem = &system;
-
-  // Make sure the system we're being installed in has a page size that'll work
-  assert((0x1000 & mySystem->pageMask()) == 0);
 
   // Install pages for the startup bank
   bank(myStartBank);

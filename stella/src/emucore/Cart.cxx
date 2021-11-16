@@ -17,7 +17,6 @@
 // $Id: Cart.cxx 2839 2014-01-19 19:41:27Z stephena $
 //============================================================================
 
-#include <cassert>
 #include <cstring>
 
 #include "bspf.hxx"
@@ -914,13 +913,11 @@ bool Cartridge::isProbablyX07(const uInt8* image, uInt32 size)
 Cartridge::Cartridge(const Cartridge& cart)
   : mySettings(cart.mySettings)
 {
-  assert(false);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Cartridge& Cartridge::operator = (const Cartridge&)
 {
-  assert(false);
   return *this;
 }
 

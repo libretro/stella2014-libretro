@@ -17,7 +17,6 @@
 // $Id: Cart4A50.cxx 2838 2014-01-17 23:34:03Z stephena $
 //============================================================================
 
-#include <cassert>
 #include <cstring>
 
 #include "System.hxx"
@@ -79,9 +78,6 @@ void Cartridge4A50::install(System& system)
   mySystem = &system;
   uInt16 shift = mySystem->pageShift();
   uInt16 mask = mySystem->pageMask();
-
-  // Make sure the system we're being installed in has a page size that'll work
-  assert((0x1000 & mask) == 0);
 
   // Map all of the accesses to call peek and poke (We don't yet indicate RAM areas)
   System::PageAccess access(0, 0, 0, this, System::PA_READ);

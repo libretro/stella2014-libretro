@@ -17,7 +17,6 @@
 // $Id: CartCTY.cxx 2838 2014-01-17 23:34:03Z stephena $
 //============================================================================
 
-#include <cassert>
 #include <cstring>
 
 #include "OSystem.hxx"
@@ -90,9 +89,6 @@ void CartridgeCTY::install(System& system)
   mySystem = &system;
   uInt16 mask = mySystem->pageMask();
   uInt16 shift = mySystem->pageShift();
-
-  // Make sure the system we're being installed in has a page size that'll work
-  assert(((0x1000 & mask) == 0) && ((0x1080 & mask) == 0));
 
   // Map all RAM accesses to call peek and poke
   System::PageAccess access(0, 0, 0, this, System::PA_READ);

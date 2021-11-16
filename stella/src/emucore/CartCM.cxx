@@ -17,7 +17,6 @@
 // $Id: CartCM.cxx 2838 2014-01-17 23:34:03Z stephena $
 //============================================================================
 
-#include <cassert>
 #include <cstring>
 
 #include "System.hxx"
@@ -66,9 +65,6 @@ void CartridgeCM::install(System& system)
 {
   mySystem = &system;
   uInt16 mask = mySystem->pageMask();
-
-  // Make sure the system we're being installed in has a page size that'll work
-  assert((0x1000 & mask) == 0);
 
   // Mirror all access in RIOT; by doing so we're taking responsibility
   // for that address space in peek and poke below.

@@ -17,8 +17,6 @@
 // $Id: TIATables.cxx 2838 2014-01-17 23:34:03Z stephena $
 //============================================================================
 
-#include <cassert>
-
 #include "bspf.hxx"
 #include "TIATables.hxx"
 
@@ -551,7 +549,6 @@ void TIATables::buildPxPosResetWhenTable()
         if(PxPosResetWhen[nusiz][oldx][newx] == 1)
           ++s2;
       }
-      assert((s1 % 4 == 0) && (s2 % 8 == 0));
     }
   }
 }

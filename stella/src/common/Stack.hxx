@@ -23,8 +23,6 @@
 #ifndef STACK_HXX
 #define STACK_HXX
 
-#include <cassert>
-
 /**
  * Simple fixed size stack class.
  */
@@ -41,7 +39,6 @@ class FixedStack
     void clear() { _size = 0; }
     void push(const T& x)
     {
-      assert(_size < MAX_SIZE);
       _stack[_size++] = x;
     }
     T top() const
@@ -54,14 +51,12 @@ class FixedStack
     T pop()
     {
       T tmp;
-      assert(_size > 0);
       tmp = _stack[--_size];
       return tmp;
     }
     int size() const { return _size; }
     T operator [](int i) const
     {
-      assert(0 <= i && i < MAX_SIZE);
       return _stack[i];
     }
 

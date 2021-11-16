@@ -17,7 +17,6 @@
 // $Id: Settings.cxx 2838 2014-01-17 23:34:03Z stephena $
 //============================================================================
 
-#include <cassert>
 #include <algorithm>
 
 #include "bspf.hxx"
@@ -287,7 +286,5 @@ Settings::Settings(const Settings&)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Settings& Settings::operator = (const Settings&)
 {
-  assert(false);
-
   return *this;
 }

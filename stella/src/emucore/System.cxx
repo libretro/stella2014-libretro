@@ -17,7 +17,6 @@
 // $Id: System.cxx 2838 2014-01-17 23:34:03Z stephena $
 //============================================================================
 
-#include <cassert>
 #include <iostream>
 
 #include "Device.hxx"
@@ -40,9 +39,6 @@ System::System(uInt16 n, uInt16 m)
     myDataBusLocked(false),
     mySystemInAutodetect(false)
 {
-  // Make sure the arguments are reasonable
-  assert((1 <= m) && (m <= n) && (n <= 16));
-
   // Create a new random number generator
   myRandom = new Random();
 
@@ -109,8 +105,6 @@ void System::reset(bool autodetect)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void System::attach(Device* device)
 {
-  assert(myNumberOfDevices < 100);
-
   // Add device to my collection of devices
   myDevices[myNumberOfDevices++] = device;
 
@@ -161,21 +155,12 @@ void System::resetCycles()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void System::setPageAccess(uInt16 page, const PageAccess& access)
 {
-  // Make sure the page is within range
-  assert(page < myNumberOfPages);
-
-  // Make sure the access methods make sense
-  assert(access.device != 0);
-
   myPageAccessTable[page] = access;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const System::PageAccess& System::getPageAccess(uInt16 page) const
 {
-  // Make sure the page is within range
-  assert(page < myNumberOfPages);
-
   return myPageAccessTable[page];
 }
 
@@ -214,16 +199,16 @@ void System::clearDirtyPages()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 uInt8 System::peek(uInt16 addr, uInt8 flags)
 {
+  uInt8 result;
   PageAccess& access = myPageAccessTable[(addr & myAddressMask) >> myPageShift];
 
   // See if this page uses direct accessing or not 
-  uInt8 result;
   if(access.directPeekBase)
     result = *(access.directPeekBase + (addr & myPageMask));
   else
     result = access.device->peek(addr);
 
-    myDataBusState = result;
+  myDataBusState = result;
 
   return result;
 }
@@ -276,54 +261,40 @@ void System::unlockDataBus()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool System::save(Serializer& out) const
 {
-  try
-  {
-    out.putString(name());
-    out.putInt(myCycles);
-    out.putByte(myDataBusState);
+   out.putString(name());
+   out.putInt(myCycles);
+   out.putByte(myDataBusState);
 
-    if(!myM6502->save(out))
+   if(!myM6502->save(out))
       return false;
 
-    // Now save the state of each device
-    for(uInt32 i = 0; i < myNumberOfDevices; ++i)
+   // Now save the state of each device
+   for(uInt32 i = 0; i < myNumberOfDevices; ++i)
       if(!myDevices[i]->save(out))
-        return false;
-  }
-  catch(...)
-  {
-    return false;
-  }
+         return false;
 
-  return true;
+   return true;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool System::load(Serializer& in)
 {
-  try
-  {
-    if(in.getString() != name())
+   if(in.getString() != name())
       return false;
 
-    myCycles = in.getInt();
-    myDataBusState = in.getByte();
+   myCycles = in.getInt();
+   myDataBusState = in.getByte();
 
-    // Next, load state for the CPU
-    if(!myM6502->load(in))
+   // Next, load state for the CPU
+   if(!myM6502->load(in))
       return false;
 
-    // Now load the state of each device
-    for(uInt32 i = 0; i < myNumberOfDevices; ++i)
+   // Now load the state of each device
+   for(uInt32 i = 0; i < myNumberOfDevices; ++i)
       if(!myDevices[i]->load(in))
-        return false;
-  }
-  catch(...)
-  {
-    return false;
-  }
+         return false;
 
-  return true;
+   return true;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -333,12 +304,10 @@ System::System(const System& s)
     myPageMask(s.myPageMask),
     myNumberOfPages(s.myNumberOfPages)
 {
-  assert(false);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 System& System::operator = (const System&)
 {
-  assert(false);
   return *this;
 }

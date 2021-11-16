@@ -18,7 +18,6 @@
 //============================================================================
 
 #include <sstream>
-#include <cassert>
 #include <cmath>
 
 #include "TIASnd.hxx"
@@ -45,12 +44,8 @@ Sound::Sound(OSystem* osystem)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Sound::~Sound()
 {
-  // Close the SDL audio system if it's initialized
   if(myIsInitializedFlag)
-  {
-    //SDL_CloseAudio();
     myIsEnabled = myIsInitializedFlag = false;
-  }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -78,7 +73,6 @@ void Sound::open()
   myVolume = myOSystem->settings().getInt("volume");
   setVolume(myVolume);
 
-  // And start the SDL sound subsystem ...
   myIsEnabled = true;
   mute(false);
 }
@@ -89,7 +83,6 @@ void Sound::close()
   if(myIsInitializedFlag)
   {
     myIsEnabled = false;
-    //SDL_PauseAudio(1);
     myLastRegisterSetCycle = 0;
     myTIASound.reset();
     myRegWriteQueue.clear();
@@ -100,10 +93,7 @@ void Sound::close()
 void Sound::mute(bool state)
 {
   if(myIsInitializedFlag)
-  {
     myIsMuted = state;
-    //SDL_PauseAudio(myIsMuted ? 1 : 0);
-  }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -132,9 +122,6 @@ void Sound::setVolume(Int32 percent)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Sound::adjustVolume(Int8 direction)
 {
-  ostringstream strval;
-  string message;
-
   Int32 percent = myVolume;
 
   if(direction == -1)
@@ -146,13 +133,6 @@ void Sound::adjustVolume(Int8 direction)
     return;
 
   setVolume(percent);
-
-  // Now show an onscreen message
-  strval << percent;
-  message = "Volume set to ";
-  message += strval.str();
-
-  myOSystem->frameBuffer().showMessage(message);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -462,7 +442,6 @@ void Sound::RegWriteQueue::enqueue(const RegWrite& info)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Sound::RegWrite& Sound::RegWriteQueue::front()
 {
-  assert(mySize != 0);
   return myBuffer[myHead];
 }
 

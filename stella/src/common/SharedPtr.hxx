@@ -23,8 +23,6 @@
 #ifndef SHARED_PTR_HXX
 #define SHARED_PTR_HXX
 
-#include <cassert>
-
 namespace Common {
 
 class SharedPtrDeletionInternal
@@ -153,8 +151,8 @@ class SharedPtr
       return *this;
     }
 
-    ValueType &operator *() const { assert(_pointer); return *_pointer; }
-    Pointer operator ->() const { assert(_pointer); return _pointer; }
+    ValueType &operator *() const { return *_pointer; }
+    Pointer operator ->() const { return _pointer; }
 
     /**
      * Returns the plain pointer value. Be sure you know what you

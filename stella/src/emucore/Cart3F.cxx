@@ -17,7 +17,6 @@
 // $Id: Cart3F.cxx 2838 2014-01-17 23:34:03Z stephena $
 //============================================================================
 
-#include <cassert>
 #include <cstring>
 
 #include "System.hxx"
@@ -60,9 +59,6 @@ void Cartridge3F::install(System& system)
   mySystem = &system;
   uInt16 shift = mySystem->pageShift();
   uInt16 mask = mySystem->pageMask();
-
-  // Make sure the system we're being installed in has a page size that'll work
-  assert((0x1800 & mask) == 0);
 
   System::PageAccess access(0, 0, 0, this, System::PA_READWRITE);
 

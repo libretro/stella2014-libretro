@@ -17,7 +17,6 @@
 // $Id: MT24LC256.cxx 2838 2014-01-17 23:34:03Z stephena $
 //============================================================================
 
-#include <cassert>
 #include <cstring>
 #include <fstream>
 
@@ -368,12 +367,10 @@ MT24LC256::MT24LC256(const MT24LC256& c)
   : mySystem(c.mySystem),
     myDataFile(c.myDataFile)
 {
-  assert(false);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 MT24LC256& MT24LC256::operator = (const MT24LC256&)
 {
-  assert(false);
   return *this;
 }

@@ -69,11 +69,6 @@ class FrameBuffer
     void toggleFrameStats();
 
     /**
-      Shows a message containing frame statistics for the current frame.
-    */
-    void showFrameStats(bool enable);
-
-    /**
       Enable/disable any pending messages.  Disabled messages aren't removed
       from the message queue; they're just not redrawn into the framebuffer.
     */
@@ -91,64 +86,6 @@ class FrameBuffer
       @return  A unique ID used to identify this surface
     */
     int allocateSurface(int w, int h, bool useBase = false);
-
-    /**
-      Refresh display according to the current state, taking single vs.
-      double-buffered modes into account, and redrawing accordingly.
-    */
-    void refresh();
-
-    /**
-      Toggles between fullscreen and window mode.
-      Grabmouse activated when in fullscreen mode.
-    */
-    void toggleFullscreen();
-
-    /**
-      Enables/disables fullscreen mode.
-      Grabmouse activated when in fullscreen mode.  
-
-      @param enable  Set the fullscreen mode to this value
-    */
-    void setFullscreen(bool enable);
-
-    /**
-      This method is called when the user wants to switch to the next available
-      video mode (functionality depends on fullscreen or windowed mode).
-      direction = -1 means go to the next lower video mode
-      direction =  0 means to reload the current video mode
-      direction = +1 means go to the next higher video mode
-
-      @param direction  Described above
-    */
-    bool changeVidMode(int direction);
-
-    /**
-      Sets the state of the cursor (hidden or grabbed) based on the
-      current mode.
-    */
-    void setCursorState();
-
-    /**
-      Toggles the use of grabmouse (only has effect in emulation mode).
-      The method changes the 'grabmouse' setting and saves it.
-    */
-    void toggleGrabMouse();
-
-    /**
-      Shows or hides the cursor based on the given boolean value.
-    */
-    void showCursor(bool show);
-
-    /**
-      Answers if the display is currently in fullscreen mode.
-    */
-    bool fullScreen() const;
-
-    /**
-      Set the title for the main SDL window.
-    */
-    void setWindowTitle(const string& title);
 
     /**
       Get the TIA pixel associated with the given TIA buffer index,
@@ -169,19 +106,6 @@ class FrameBuffer
       @param palette  The array of colors
     */
     void setUIPalette(const uInt32* palette);
-
-    /**
-      Shows a message onscreen.
-
-      @param message  The message to be shown
-      @param position Onscreen position for the message
-      @param force    Force showing this message, even if messages are disabled
-      @param color    Color of text in the message
-    */
-    void showMessage(const string& message,
-                     int position = 0,
-                     bool force = false,
-                     uInt32 color = 0) { };
 
   //////////////////////////////////////////////////////////////////////
   // The following methods are system-specific and must be implemented
