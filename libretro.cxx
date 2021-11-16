@@ -1,10 +1,11 @@
 #ifndef _MSC_VER
-#include <stdbool.h>
 #include <sched.h>
 #endif
 #include <stddef.h>
 #include <stdlib.h>
 #include <math.h>
+
+#include <boolean.h>
 
 #ifdef _MSC_VER
 #define snprintf _snprintf
