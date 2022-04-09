@@ -409,7 +409,6 @@ int Thumbulator::execute ( void )
     {
       ra=read_register(rn);
       rc=ra+rb;
-      //fprintf(stderr,"0x%08X = 0x%08X + 0x%08X\n",rc,ra,rb);
       write_register(rd,rc);
       do_nflag(rc);
       do_zflag(rc);
@@ -468,7 +467,6 @@ int Thumbulator::execute ( void )
     ra=read_register(rd);
     rb=read_register(rm);
     rc=ra+rb;
-    //fprintf(stderr,"0x%08X = 0x%08X + 0x%08X\n",rc,ra,rb);
     write_register(rd,rc);
     return(0);
   }
@@ -791,7 +789,6 @@ int Thumbulator::execute ( void )
     }
     else if((inst&0x1800)==0x0800) //H=b01
     {
-      //fprintf(stderr,"cannot branch to arm 0x%08X 0x%04X\n",pc,inst);
       // fxq: this should exit the code without having to detect it
       return(1);
     }
@@ -802,7 +799,6 @@ int Thumbulator::execute ( void )
   {
     rm=(inst>>3)&0xF;
     rc=read_register(rm);
-    //fprintf(stderr,"blx r%u 0x%X 0x%X\n",rm,rc,pc);
     rc+=2;
     if(rc&1)
     {
@@ -812,7 +808,6 @@ int Thumbulator::execute ( void )
     }
     else
     {
-      //fprintf(stderr,"cannot branch to arm 0x%08X 0x%04X\n",pc,inst);
       // fxq: this could serve as exit code
       return(1);
     }
@@ -824,7 +819,6 @@ int Thumbulator::execute ( void )
     rm=(inst>>3)&0xF;
     rc=read_register(rm);
     rc+=2;
-    //fprintf(stderr,"bx r%u 0x%X 0x%X\n",rm,rc,pc);
     if(rc&1)
     {
       write_register(15,rc);
@@ -832,7 +826,6 @@ int Thumbulator::execute ( void )
     }
     else
     {
-      //fprintf(stderr,"cannot branch to arm 0x%08X 0x%04X\n",pc,inst);
       // fxq: or maybe this one??
       return(1);
     }
@@ -860,7 +853,6 @@ int Thumbulator::execute ( void )
     rn=(inst>>8)&0x07;
     ra=read_register(rn);
     rc=ra-rb;
-    //fprintf(stderr,"0x%08X 0x%08X\n",ra,rb);
     do_nflag(rc);
     do_zflag(rc);
     do_cflag(ra,~rb,1);
@@ -876,7 +868,6 @@ int Thumbulator::execute ( void )
     ra=read_register(rn);
     rb=read_register(rm);
     rc=ra-rb;
-    //fprintf(stderr,"0x%08X 0x%08X\n",ra,rb);
     do_nflag(rc);
     do_zflag(rc);
     do_cflag(ra,~rb,1);
@@ -1245,7 +1236,6 @@ int Thumbulator::execute ( void )
     rd=(inst>>0)&7;
     rn=(inst>>3)&7;
     rc=read_register(rn);
-    //fprintf(stderr,"0x%08X\n",rc);
     write_register(rd,rc);
     do_nflag(rc);
     do_zflag(rc);
@@ -1351,7 +1341,6 @@ int Thumbulator::execute ( void )
   {
 
     sp=read_register(13);
-    //fprintf(stderr,"sp 0x%08X\n",sp);
     for(ra=0,rb=0x01,rc=0;rb;rb=(rb<<1)&0xFF,ra++)
     {
       if(inst&rb)
@@ -1527,7 +1516,6 @@ int Thumbulator::execute ( void )
     rd=(inst>>8)&0x07;
     rb<<=2;
     rb=read_register(13)+rb;
-    //fprintf(stderr,"0x%08X\n",rb);
     rc=read_register(rd);
     write32(rb,rc);
     return(0);
