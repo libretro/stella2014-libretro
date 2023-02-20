@@ -196,7 +196,7 @@ else ifneq (,$(filter $(platform), ps3 psl1ght))
     FLAGS += -DMSB_FIRST -D__PS3__ 
 	OLD_GCC = 1
     ifeq ($(platform), psl1ght)
-        FLAGS += -D__PSL1GHT__
+        FLAGS += -D__PSL1GHT__ -I$(PS3DEV)/ppu/include
     endif
 
 # PS2
