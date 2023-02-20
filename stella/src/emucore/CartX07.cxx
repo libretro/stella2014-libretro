@@ -51,9 +51,8 @@ void CartridgeX07::reset()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void CartridgeX07::install(System& system)
 {
-  mySystem = &system;
+  mySystem     = &system;
   uInt16 shift = mySystem->pageShift();
-  uInt16 mask = mySystem->pageMask();
 
   // Set the page accessing methods for the hot spots
   // The hotspots use almost all addresses below 0x1000, so we simply grab them

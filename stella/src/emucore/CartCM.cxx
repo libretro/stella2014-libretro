@@ -64,7 +64,6 @@ void CartridgeCM::reset()
 void CartridgeCM::install(System& system)
 {
   mySystem = &system;
-  uInt16 mask = mySystem->pageMask();
 
   // Mirror all access in RIOT; by doing so we're taking responsibility
   // for that address space in peek and poke below.

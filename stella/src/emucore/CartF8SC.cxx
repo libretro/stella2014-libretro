@@ -59,9 +59,8 @@ void CartridgeF8SC::reset()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void CartridgeF8SC::install(System& system)
 {
-  mySystem = &system;
+  mySystem     = &system;
   uInt16 shift = mySystem->pageShift();
-  uInt16 mask = mySystem->pageMask();
 
   System::PageAccess access(0, 0, 0, this, System::PA_READ);
 

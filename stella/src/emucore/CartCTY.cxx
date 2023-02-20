@@ -86,8 +86,7 @@ void CartridgeCTY::systemCyclesReset()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void CartridgeCTY::install(System& system)
 {
-  mySystem = &system;
-  uInt16 mask = mySystem->pageMask();
+  mySystem     = &system;
   uInt16 shift = mySystem->pageShift();
 
   // Map all RAM accesses to call peek and poke

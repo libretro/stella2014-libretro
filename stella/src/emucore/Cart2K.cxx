@@ -68,9 +68,8 @@ void Cartridge2K::reset()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Cartridge2K::install(System& system)
 {
-  mySystem = &system;
+  mySystem     = &system;
   uInt16 shift = mySystem->pageShift();
-  uInt16 mask = mySystem->pageMask();
 
   // Map ROM image into the system
   System::PageAccess access(0, 0, 0, this, System::PA_READ);

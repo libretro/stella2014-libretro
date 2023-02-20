@@ -94,11 +94,10 @@ void CartridgeAR::systemCyclesReset()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void CartridgeAR::install(System& system)
 {
-  mySystem = &system;
+  mySystem     = &system;
   uInt16 shift = mySystem->pageShift();
-  uInt16 mask = mySystem->pageMask();
 
-  my6502 = &(mySystem->m6502());
+  my6502       = &(mySystem->m6502());
 
   // Map all of the accesses to call peek and poke (we don't yet indicate RAM areas)
   System::PageAccess access(0, 0, 0, this, System::PA_READ);

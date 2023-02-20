@@ -113,10 +113,8 @@ void M6532::install(System& system)
 void M6532::install(System& system, Device& device)
 {
   // Remember which system I'm installed in
-  mySystem = &system;
-
+  mySystem     = &system;
   uInt16 shift = mySystem->pageShift();
-  uInt16 mask = mySystem->pageMask();
 
   // All accesses are to the given device
   System::PageAccess access(0, 0, 0, &device, System::PA_READWRITE);

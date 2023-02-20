@@ -68,9 +68,8 @@ void Cartridge3E::reset()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Cartridge3E::install(System& system)
 {
-  mySystem = &system;
+  mySystem     = &system;
   uInt16 shift = mySystem->pageShift();
-  uInt16 mask = mySystem->pageMask();
 
   System::PageAccess access(0, 0, 0, this, System::PA_READWRITE);
 

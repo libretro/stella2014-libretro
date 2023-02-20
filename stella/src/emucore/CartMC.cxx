@@ -63,9 +63,8 @@ void CartridgeMC::reset()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void CartridgeMC::install(System& system)
 {
-  mySystem = &system;
+  mySystem     = &system;
   uInt16 shift = mySystem->pageShift();
-  uInt16 mask = mySystem->pageMask();
 
   // Set the page accessing methods for the hot spots in the TIA.  For 
   // correct emulation I would need to chain any accesses below 0x40 to 
