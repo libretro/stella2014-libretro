@@ -61,12 +61,6 @@ static const string EmptyString("");
 #define MIN(a, b) ((a < b) ? a : b)
 #define MAX(a, b) ((a > b) ? a : b)
 
-// Test whether two characters are equal (case insensitive)
-static bool BSPF_equalsIgnoreCaseChar(char ch1, char ch2)
-{
-  return toupper((unsigned char)ch1) == toupper((unsigned char)ch2);
-}
-
 // Compare two strings, ignoring case
 inline int BSPF_compareIgnoreCase(const string& s1, const string& s2)
 {

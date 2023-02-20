@@ -219,7 +219,6 @@ static retro_input_state_t input_state_cb;
 static retro_environment_t environ_cb;
 static retro_audio_sample_t audio_cb;
 static retro_audio_sample_batch_t audio_batch_cb;
-static struct retro_system_av_info g_av_info;
 
 static bool libretro_supports_bitmasks = false;
 
