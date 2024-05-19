@@ -82,14 +82,6 @@ class Settings
     // Assignment operator isn't supported by this class so make it private
     Settings& operator = (const Settings&);
 
-    // Trim leading and following whitespace from a string
-    static string trim(string& str)
-    {
-      string::size_type first = str.find_first_not_of(' ');
-      return (first == string::npos) ? EmptyString :
-              str.substr(first, str.find_last_not_of(' ')-first+1);
-    }
-
   protected:
     // The parent OSystem object
     OSystem* myOSystem;
@@ -102,11 +94,6 @@ class Settings
       Variant initialValue;
     };
     typedef Common::Array<Setting> SettingsArray;
-
-    const SettingsArray& getInternalSettings() const
-      { return myInternalSettings; }
-    const SettingsArray& getExternalSettings() const
-      { return myExternalSettings; }
 
     /** Get position in specified array of 'key' */
     int getInternalPos(const string& key) const;

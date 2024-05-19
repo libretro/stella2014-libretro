@@ -25,17 +25,7 @@ OSystem::~OSystem()
 
 bool OSystem::create() { return 1; }
 
-void OSystem::mainLoop() { }
-
-void OSystem::pollEvent() { }
-
-bool OSystem::queryVideoHardware() { return 1; }
-
 void OSystem::stateChanged(EventHandler::State state) { }
-
-void OSystem::setDefaultJoymap(Event::Type event, EventMode mode) { }
-
-void OSystem::setFramerate(float framerate) { }
 
 uInt64 OSystem::getTicks() const
 {

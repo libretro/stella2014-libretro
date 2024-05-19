@@ -306,8 +306,4 @@ typedef enum {
 	KBDK_LAST
 } StellaKey;
 
-// Just pass SDLMod directly as int (placeholder for now)
-// The underlying code doesn't need to know how it's implemented
-typedef int StellaMod;
-
 #endif /* StellaKeys */

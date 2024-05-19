@@ -151,11 +151,6 @@ class EventHandler
     void reset(State state);
 
     /**
-      This method indicates that the system should terminate.
-    */
-    void quit() { handleEvent(Event::Quit, 1); }
-
-    /**
       Sets the mouse axes and buttons to act as the controller specified in
       the ROM properties, otherwise disable mouse control completely
 
@@ -199,116 +194,6 @@ class EventHandler
     void leaveDebugMode();
 
     /**
-      Send an event directly to the event handler.
-      These events cannot be remapped.
-
-      @param type  The event
-      @param value The value for the event
-    */
-    void handleEvent(Event::Type type, Int32 value);
-
-//    bool frying() const { return myFryingFlag; }
-
-    void getActionList(EventMode mode, StringList& list) const;
-    void getComboList(EventMode mode, VariantList& map) const;
-
-    /** Used to access the list of events assigned to a specific combo event. */
-    void getComboListForEvent(Event::Type event, StringList& list) const;
-    void setComboListForEvent(Event::Type event, const StringList& events);
-
-//    Event::Type eventForKey(StellaKey key, EventMode mode) const
-//      { return myKeyTable[key][mode]; }
-//    Event::Type eventForJoyAxis(int stick, int axis, int value, EventMode mode) const
-//      { return myJoysticks[stick].axisTable[axis][(value > 0)][mode]; }
-//    Event::Type eventForJoyButton(int stick, int button, EventMode mode) const
-//      { return myJoysticks[stick].btnTable[button][mode]; }
-//    Event::Type eventForJoyHat(int stick, int hat, int value, EventMode mode) const
-//      { return myJoysticks[stick].hatTable[hat][value][mode]; }
-
-    Event::Type eventAtIndex(int idx, EventMode mode) const;
-    string actionAtIndex(int idx, EventMode mode) const;
-    string keyAtIndex(int idx, EventMode mode) const;
-
-    /**
-      Bind a key to an event/action and regenerate the mapping array(s)
-
-      @param event  The event we are remapping
-      @param mode   The mode where this event is active
-      @param key    The key to bind to this event
-    */
-    bool addKeyMapping(Event::Type event, EventMode mode, StellaKey key);
-
-    /**
-      Bind a joystick axis direction to an event/action and regenerate
-      the mapping array(s)
-
-      @param event  The event we are remapping
-      @param mode   The mode where this event is active
-      @param stick  The joystick number
-      @param axis   The joystick axis
-      @param value  The value on the given axis
-      @param updateMenus  Whether to update the action mappings (normally
-                          we want to do this, unless there are a batch of
-                          'adds', in which case it's delayed until the end
-    */
-    bool addJoyAxisMapping(Event::Type event, EventMode mode,
-                           int stick, int axis, int value,
-                           bool updateMenus = true);
-
-    /**
-      Bind a joystick button to an event/action and regenerate the
-      mapping array(s)
-
-      @param event  The event we are remapping
-      @param mode   The mode where this event is active
-      @param stick  The joystick number
-      @param button The joystick button
-      @param updateMenus  Whether to update the action mappings (normally
-                          we want to do this, unless there are a batch of
-                          'adds', in which case it's delayed until the end
-    */
-    bool addJoyButtonMapping(Event::Type event, EventMode mode, int stick, int button,
-                             bool updateMenus = true);
-
-    /**
-      Bind a joystick hat direction to an event/action and regenerate
-      the mapping array(s)
-
-      @param event  The event we are remapping
-      @param mode   The mode where this event is active
-      @param stick  The joystick number
-      @param axis   The joystick hat
-      @param value  The value on the given hat
-      @param updateMenus  Whether to update the action mappings (normally
-                          we want to do this, unless there are a batch of
-                          'adds', in which case it's delayed until the end
-    */
-    bool addJoyHatMapping(Event::Type event, EventMode mode,
-                          int stick, int hat, int value,
-                          bool updateMenus = true);
-
-    /**
-      Erase the specified mapping
-
-      @param event  The event for which we erase all mappings
-      @param mode   The mode where this event is active
-    */
-    void eraseMapping(Event::Type event, EventMode mode);
-
-    /**
-      Resets the event mappings to default values
-
-      @param event  The event which to (re)set (Event::NoType resets all)
-      @param mode   The mode for which the defaults are set
-    */
-    void setDefaultMapping(Event::Type event, EventMode mode);
-
-    /**
-      Sets the combo event mappings to those in the 'combomap' setting
-    */
-    void setComboMap();
-
-    /**
       Joystick emulates 'impossible' directions (ie, left & right
       at the same time)
 
@@ -325,22 +210,8 @@ class EventHandler
 //    };
 
     /**
-      Detects and changes the eventhandler state
-
-      @param type  The event
-      @return      True if the state changed, else false
-    */
-    bool eventStateChange(Event::Type type);
-
-    /**
       The following methods take care of assigning action mappings.
     */
-    void setActionMappings(EventMode mode);
-    void setSDLMappings();
-    void setKeymap();
-    void setJoymap();
-    void setDefaultKeymap(Event::Type, EventMode mode);
-    void setDefaultJoymap(Event::Type, EventMode mode);
     void saveKeyMapping();
     void saveJoyMapping();
     void saveComboMapping();

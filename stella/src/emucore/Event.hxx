@@ -116,11 +116,6 @@ class Event
     */
     const bool* getKeys() const { return myKeyTable; }
 
-    /**
-      Set the value associated with the event of the specified type
-    */
-    void setKey(StellaKey key, bool state) { myKeyTable[key] = state; }
-
   private:
     // Array of values associated with each event type
     Int32 myValues[LastType];

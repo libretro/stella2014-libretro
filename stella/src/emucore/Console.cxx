@@ -402,17 +402,6 @@ FBInitStatus Console::initializeVideo(bool full)
   myOSystem->frameBuffer().enablePhosphor(enable, blend);
   setPalette(myOSystem->settings().getString("palette"));
 
-  // Set the correct framerate based on the format of the ROM
-  // This can be overridden by changing the framerate on the
-  // commandline, but it can't be saved
-  // (ie, framerate is now determined based on number of scanlines).
-  //float framerate = myOSystem->settings().getFloat("framerate");
-  //if(framerate > 0) myFramerate = float(framerate);
-  myOSystem->setFramerate(myFramerate);
-
-  // Make sure auto-frame calculation is only enabled when necessary
-  //myTIA->enableAutoFrame(framerate <= 0);
-
   return fbstatus;
 }
 
@@ -532,14 +521,12 @@ void Console::setTIAProperties()
      myDisplayFormat == "SECAM60")
   {
     // Assume we've got ~262 scanlines (NTSC-like format)
-    //myFramerate = 60.0;
     myFramerate = 59.92;
     myConsoleInfo.InitialFrameRate = "60";
   }
   else
   {
     // Assume we've got ~312 scanlines (PAL-like format)
-    //myFramerate = 50.0;
     myFramerate = 49.92;
     myConsoleInfo.InitialFrameRate = "50";
 
@@ -818,7 +805,6 @@ void Console::setColorLossPalette()
 void Console::setFramerate(float framerate)
 {
   myFramerate = framerate;
-  myOSystem->setFramerate(framerate);
   myOSystem->sound().setFrameRate(framerate);
 }
 

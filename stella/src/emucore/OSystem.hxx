@@ -133,19 +133,6 @@ class OSystem
 #endif
 
     /**
-      Set the framerate for the video system.  It's placed in this class since
-      the mainLoop() method is defined here.
-
-      @param framerate  The video framerate to use
-    */
-    virtual void setFramerate(float framerate);
-
-    /**
-      Set all config file paths for the OSystem.
-    */
-    void setConfigPaths();
-
-    /**
       Set the user-interface palette which is specified in current settings.
     */
     void setUIPalette();
@@ -188,52 +175,6 @@ class OSystem
     */
     void deleteConsole();
 
-    /**
-      Creates a new ROM launcher, to select a new ROM to emulate.
-
-      @param startdir  The directory to use when opening the launcher;
-                       if blank, use 'romdir' setting.
-
-      @return  True on successful creation, otherwise false
-    */
-    bool createLauncher(const string& startdir = "");
-
-    /**
-      Gets all possible info about the ROM by creating a temporary
-      Console object and querying it.
-
-      @param romfile  The full pathname of the ROM to use
-      @return  Some information about this ROM
-    */
-    string getROMInfo(const string& romfile);
-
-    /**
-      Calculate the MD5sum of the given file.
-
-      @param filename  Filename of potential ROM file
-    */
-    string MD5FromFile(const string& filename);
-
-    /**
-      Append a message to the internal log.
-
-      @param message  The message to be appended
-      @param level    If 0, always output the message, only append when
-                      level is less than or equal to that in 'loglevel'
-    */
-	#ifdef NDEBUG
-    void logMessage(const string& message, uInt8 level) { }
-	#else
-    void logMessage(const string& message, uInt8 level);
-	#endif
-
-    /**
-      Get the system messages logged up to this point.
-
-      @return The list of log messages
-    */
-    //const string& logMessages() const { return myLogMessages; }
-
   public:
     //////////////////////////////////////////////////////////////////////
     // The following methods are system-specific and can be overrided in
@@ -252,68 +193,12 @@ class OSystem
     virtual uInt64 getTicks() const;
 
     /**
-      This method runs the main loop.  Since different platforms
-      may use different timing methods and/or algorithms, this method can
-      be overrided.  However, the port then takes all responsibility for
-      running the emulation and taking care of timing.
-    */
-    virtual void mainLoop();
-
-    /**
-      This method determines the default mapping of joystick actions to
-      Stella events for a specific system/platform.
-
-      @param event  The event which to (re)set (Event::NoType resets all)
-      @param mode   The mode for which the defaults are set
-    */
-    virtual void setDefaultJoymap(Event::Type event, EventMode mode);
-
-    /**
-      This method creates events from platform-specific hardware.
-    */
-    virtual void pollEvent();
-
-    /**
       Informs the OSystem of a change in EventHandler state.
     */
     virtual void stateChanged(EventHandler::State state);
 
-    /**
-      Returns the default path for the snapshot directory.
-      Since this varies greatly among different systems and is the one
-      directory that most end-users care about (vs. config file stuff
-      that usually isn't user-modifiable), we create a special method
-      for it.
-    */
-    virtual string defaultSnapDir() { return "~"; }
-
-    /**
-      Set the position of the application window, generally using
-      platform-specific code.  Note that this method is only ever
-      called for windowed mode, so no provisions need be made
-      for fullscreen mode.
-    */
-    virtual void setAppWindowPos(int x, int y, int w, int h) { };
-
     // Pointer to the (currently defined) Console object
     Console* myConsole;
-
-  protected:
-    /**
-      Query the OSystem video hardware for resolution information.
-    */
-    virtual bool queryVideoHardware();
-
-    /**
-      Set the base directory for all Stella files (these files may be
-      located in other places through settings).
-    */
-    void setBaseDir(const string& basedir);
-
-    /**
-      Set the locations of config file
-    */
-    void setConfigFile(const string& file);
 
   protected:
     // Pointer to the EventHandler object
@@ -339,78 +224,6 @@ class OSystem
     string myPaletteFile;
 
   private:
-    /**
-      Creates the various framebuffers/renderers available in this system
-      (for now, that means either 'software' or 'opengl').  Note that
-      it will only create one type per run of Stella.
-
-      @return  Success or failure of the framebuffer creation
-               Note that if OpenGL mode fails because OpenGL is not
-               available, rendering will attempt to fall back to
-               software mode
-    */
-    FBInitStatus createFrameBuffer();
-
-    /**
-      Creates the various sound devices available in this system
-      (for now, that means either 'SDL' or 'Null').
-    */
-    void createSound();
-
-    /**
-      Creates an actual Console object based on the given info.
-
-      @param romfile  The full pathname of the ROM to use
-      @param md5      The MD5sum of the ROM
-      @param type     The bankswitch type of the ROM
-      @param id       The additional id (if any) used by the ROM
-
-      @return  The actual Console object, otherwise NULL
-               (calling method is responsible for deleting it)
-    */
-    Console* openConsole(const string& romfile, string& md5, string& type, string& id);
-
-    /**
-      Open the given ROM and return an array containing its contents.
-      Also, the properties database is updated with a valid ROM name
-      for this ROM (if necessary).
-
-      @param rom    The absolute pathname of the ROM file
-      @param md5    The md5 calculated from the ROM file
-                    (will be recalculated if necessary)
-      @param size   The amount of data read into the image array
-
-      @return  Pointer to the array, with size >=0 indicating valid data
-               (calling method is responsible for deleting it)
-    */
-    uInt8* openROM(string rom, string& md5, uInt32& size);
-
-    /**
-      Gets all possible info about the given console.
-
-      @param console  The console to use
-      @return  Some information about this console
-    */
-    string getROMInfo(const Console* console);
-
-    /**
-      Initializes the timing so that the mainloop is reset to its
-      initial values.
-    */
-    void resetLoopTiming();
-
-    /**
-      Validate the directory name, and create it if necessary.
-      Also, update the settings with the new name.  For now, validation
-      means that the path must always end with the appropriate separator.
-
-      @param path     The actual path being accessed and created
-      @param setting  The setting corresponding to the path being considered
-      @param defaultpath  The default path to use if the settings don't exist
-    */
-    void validatePath(string& path, const string& setting,
-    		              const string& defaultpath);
-
     // Copy constructor isn't supported by this class so make it private
     OSystem(const OSystem&);
 

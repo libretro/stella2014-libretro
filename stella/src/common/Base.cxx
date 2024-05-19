@@ -23,21 +23,6 @@
 namespace Common {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Base::setHexUppercase(bool enable)
-{
-  if(enable)
-  {
-    myHexflags |= std::ios_base::uppercase;
-    myFmt = Base::myUpperFmt;
-  }
-  else
-  {
-    myHexflags &= ~std::ios_base::uppercase;
-    myFmt = Base::myLowerFmt;
-  }
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 string Base::toString(int value, Common::Base::Format outputBase)
 {
   static char vToS_buf[32];
