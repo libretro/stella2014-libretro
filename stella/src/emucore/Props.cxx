@@ -44,10 +44,10 @@ Properties::~Properties()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const string& Properties::get(PropertyType key) const
 {
+  static const string EmptyString("");
   if(key >= 0 && key < LastPropType)
     return myProperties[key];
-  else
-    return EmptyString;
+  return EmptyString;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

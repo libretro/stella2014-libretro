@@ -411,7 +411,6 @@ void Console::initializeAudio()
 
   myOSystem->sound().close();
   myOSystem->sound().setChannels(sound == "STEREO" ? 2 : 1);
-  myOSystem->sound().setFrameRate(myFramerate);
   myOSystem->sound().open();
 
   // Make sure auto-frame calculation is only enabled when necessary
@@ -799,7 +798,6 @@ void Console::setColorLossPalette()
 void Console::setFramerate(float framerate)
 {
   myFramerate = framerate;
-  myOSystem->sound().setFrameRate(framerate);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

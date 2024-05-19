@@ -70,14 +70,6 @@ class Sound : public Serializable
     void setChannels(uInt32 channels);
 
     /**
-      Sets the display framerate.  Sound generation for NTSC and PAL games
-      depends on the framerate, so we need to set it here.
-
-      @param framerate The base framerate depending on NTSC or PAL ROM
-    */
-    void setFrameRate(float framerate);
-
-    /**
       Start the sound system, initializing it if necessary.  This must be
       called before any calls are made to derived methods.
     */

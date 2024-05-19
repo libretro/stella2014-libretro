@@ -53,8 +53,6 @@ typedef uint64_t uInt64;
 #include <cctype>
 using namespace std;
 
-static const string EmptyString("");
-
 //////////////////////////////////////////////////////////////////////
 // Some convenience functions
 

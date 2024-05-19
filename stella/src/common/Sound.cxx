@@ -66,8 +66,7 @@ void Sound::open()
 
   // Now initialize the TIASound object which will actually generate sound
   myTIASound.outputFrequency(31400);
-  const string& chanResult =
-      myTIASound.channels(2, myNumChannels == 2);
+  myTIASound.channels(2, myNumChannels == 2);
 
   // Adjust volume to that defined in settings
   myVolume = myOSystem->settings().getInt("volume");
@@ -146,11 +145,6 @@ void Sound::setChannels(uInt32 channels)
 {
   if(channels == 1 || channels == 2)
     myNumChannels = channels;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Sound::setFrameRate(float framerate)
-{
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

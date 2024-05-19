@@ -68,20 +68,12 @@ void TIASound::outputFrequency(Int32 freq)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-string TIASound::channels(uInt32 hardware, bool stereo)
+void TIASound::channels(uInt32 hardware, bool stereo)
 {
   if(hardware == 1)
     myChannelMode = Hardware1;
   else
     myChannelMode = stereo ? Hardware2Stereo : Hardware2Mono;
-
-  switch(myChannelMode)
-  {
-    case Hardware1:       return "Hardware1";
-    case Hardware2Mono:   return "Hardware2Mono";
-    case Hardware2Stereo: return "Hardware2Stereo";
-    default:              return EmptyString;
-  }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

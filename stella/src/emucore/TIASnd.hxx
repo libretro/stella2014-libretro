@@ -63,10 +63,8 @@ class TIASound
       @param hardware  The number of channels supported by the sound system
       @param stereo    Whether to output the internal sound signals into 1
                        or 2 channels
-
-      @return  Status of the channel configuration used
     */
-    string channels(uInt32 hardware, bool stereo);
+    void channels(uInt32 hardware, bool stereo);
 
   public:
     /**
