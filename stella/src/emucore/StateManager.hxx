@@ -90,12 +90,6 @@ class StateManager
 
     // The parent OSystem object
     OSystem* myOSystem;
-
-    // The current slot for load/save states
-    int myCurrentSlot;
-
-    // MD5 of the currently active ROM (either in movie or rewind mode)
-    string myMD5;
 };
 
 #endif
