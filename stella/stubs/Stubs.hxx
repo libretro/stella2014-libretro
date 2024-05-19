@@ -51,8 +51,3 @@ FrameBuffer::~FrameBuffer()
 {
 
 }
-
-FBInitStatus FrameBuffer::initialize(const string& title, uInt32 width, uInt32 height)
-{
-    return kSuccess;
-}

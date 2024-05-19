@@ -132,11 +132,6 @@ class OSystem
     CheatManager& cheat() const { return *myCheatManager; }
 #endif
 
-    /**
-      Set the user-interface palette which is specified in current settings.
-    */
-    void setUIPalette();
-
     uInt32 desktopHeight() const { return 512; }
 
     /**
