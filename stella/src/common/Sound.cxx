@@ -303,19 +303,6 @@ void Sound::processFragment(Int16* stream, uInt32 length)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Sound::callback(void* udata, uInt8* stream, int len)
-{
-  Sound* sound = (Sound*)udata;
-  if(sound->myIsEnabled)
-  {
-    // The callback is requesting 8-bit (unsigned) data, but the TIA sound
-    // emulator deals in 16-bit (signed) data
-    // So, we need to convert the pointer and half the length
-    sound->processFragment((Int16*)stream, (uInt32)len >> 1);
-  }
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool Sound::save(Serializer& out) const
 {
    out.putString(name());

@@ -104,26 +104,6 @@ class CheatManager
     const CheatList& perFrame() { return myPerFrameList; }
 
     /**
-      Load all cheats (for all ROMs) from disk to internal database.
-    */
-    void loadCheatDatabase();
-
-    /**
-      Save all cheats (for all ROMs) in internal database to disk.
-    */
-    void saveCheatDatabase();
-
-    /**
-      Load cheats for ROM with given MD5sum to cheatlist(s).
-    */
-    void loadCheats(const string& md5sum);
-
-    /**
-      Saves cheats for ROM with given MD5sum to cheat map.
-    */
-    void saveCheats(const string& md5sum);
-
-    /**
       Checks if a code is valid.
     */
     bool isValidCode(const string& code);
@@ -158,7 +138,6 @@ class CheatManager
     CheatList myPerFrameList;
 
     CheatCodeMap myCheatMap;
-    string myCheatFile;
 
     // This is set each time a new cheat/ROM is loaded, for later
     // comparison to see if the cheatcode list has actually been modified

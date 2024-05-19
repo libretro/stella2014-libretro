@@ -119,9 +119,6 @@ class Sound : public Serializable
     */
     void adjustVolume(Int8 direction);
 
-    // Callback function invoked by the SDL Audio library when it needs data
-    static void callback(void* udata, uInt8* stream, int len);
-
     /**
       Invoked by the sound callback to process the next sound fragment.
       The stream is 16-bits (even though the callback is 8-bits), since
