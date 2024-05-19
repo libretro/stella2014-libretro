@@ -371,8 +371,6 @@ void Console::togglePhosphor()
     myProperties.set(Display_Phosphor, "Yes");
     enable = true;
   }
-
-  myOSystem->frameBuffer().enablePhosphor(enable, blend);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -384,19 +382,12 @@ void Console::setProperties(const Properties& props)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 FBInitStatus Console::initializeVideo(bool full)
 {
-  FBInitStatus fbstatus = kSuccess;
-
   if(full)
-  {
     setColorLossPalette();
-  }
 
-  bool enable = myProperties.get(Display_Phosphor) == "YES";
-  int blend = atoi(myProperties.get(Display_PPBlend).c_str());
-  myOSystem->frameBuffer().enablePhosphor(enable, blend);
   setPalette(myOSystem->settings().getString("palette"));
 
-  return fbstatus;
+  return kSuccess;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -412,9 +403,6 @@ void Console::initializeAudio()
   myOSystem->sound().close();
   myOSystem->sound().setChannels(sound == "STEREO" ? 2 : 1);
   myOSystem->sound().open();
-
-  // Make sure auto-frame calculation is only enabled when necessary
-  //myTIA->enableAutoFrame(framerate <= 0);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -834,11 +822,6 @@ void Console::toggleHMOVE() const
 void Console::toggleFixedColors() const
 {
   myTIA->toggleFixedColors();
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Console::addDebugger()
-{
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

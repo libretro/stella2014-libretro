@@ -38,7 +38,7 @@ class FrameBuffer
     /**
       Creates a new Frame Buffer
     */
-    FrameBuffer(/*OSystem* osystem*/);
+    FrameBuffer();
 
     /**
       Destructor
@@ -46,27 +46,11 @@ class FrameBuffer
     ~FrameBuffer();
 
     /**
-      Updates the display, which depending on the current mode could mean
-      drawing the TIA, any pending menus, etc.
-    */
-    void update();
-
-    /**
       Set up the TIA/emulation palette for a screen of any depth > 8.
 
       @param palette  The array of colors
     */
     void setTIAPalette(const uInt32* palette);
-
-  //////////////////////////////////////////////////////////////////////
-  // The following methods are system-specific and must be implemented
-  // in derived classes.
-  //////////////////////////////////////////////////////////////////////
-  public:
-    /**
-      Enable/disable phosphor effect.
-    */
-    void enablePhosphor(bool enable, int blend) { }
 };
 
 #endif

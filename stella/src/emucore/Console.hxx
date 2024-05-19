@@ -178,11 +178,6 @@ class Console : public Serializable
     const ConsoleInfo& about() const { return myConsoleInfo; }
 
     /**
-      Set up the console to use the debugger.
-    */
-    void addDebugger();
-
-    /**
       Informs the Console of a change in EventHandler state.
     */
     void stateChanged(EventHandler::State state);
