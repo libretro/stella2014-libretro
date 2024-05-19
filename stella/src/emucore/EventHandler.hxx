@@ -90,11 +90,7 @@ class EventHandler
     enum State {
       S_NONE,
       S_EMULATE,
-      S_PAUSE,
-      S_LAUNCHER,
-      S_MENU,
-      S_CMDMENU,
-      S_DEBUGGER
+      S_PAUSE
     };
 
     /**
@@ -110,88 +106,11 @@ class EventHandler
     void initialize();
 
     /**
-      Set up any joysticks on the system.  This must be called *after* the
-      framebuffer has been created, since SDL requires the video to be
-      intialized before joysticks can be probed.
-    */
-    void setupJoysticks();
-
-    /**
-      Maps the given Stelladaptor/2600-daptor(s) to specified ports on a real 2600.
-
-      @param saport  How to map the ports ('lr' or 'rl')
-    */
-    void mapStelladaptors(const string& saport);
-
-    /**
-      Swaps the ordering of Stelladaptor/2600-daptor(s) devices.
-    */
-    void toggleSAPortOrder();
-
-    /**
-      Collects and dispatches any pending events.  This method should be
-      called regularly (at X times per second, where X is the game framerate).
-
-      @param time  The current time in microseconds.
-    */
-    void poll(uInt64 time);
-
-    /**
-      Returns the current state of the EventHandler
-
-      @return The State type
-    */
-//    State state() const { return myState; }
-
-    /**
       Resets the state machine of the EventHandler to the defaults
 
       @param state  The current state to set
     */
     void reset(State state);
-
-    /**
-      Sets the mouse axes and buttons to act as the controller specified in
-      the ROM properties, otherwise disable mouse control completely
-
-      @param enable  Whether to use the mouse to emulate controllers
-                     Currently, this will be one of the following values:
-                       'always', 'analog', 'never'
-    */
-    void setMouseControllerMode(const string& enable);
-
-    /**
-      Set the number of seconds between taking a snapshot in
-      continuous snapshot mode.  Setting an interval of 0 disables
-      continuous snapshots.
-
-      @param interval  Interval in seconds between snapshots
-    */
-    void setContinuousSnapshots(uInt32 interval);
-
-//    inline bool kbdAlt(int mod) const
-//    {
-//  #ifndef MAC_OSX
-//      return (mod & KMOD_ALT);
-//  #else
-//      return (mod & KMOD_META);
-//  #endif
-//    }
-//
-//    inline bool kbdControl(int mod) const
-//    {
-//      return (mod & KMOD_CTRL) > 0;
-//    }
-//
-//    inline bool kbdShift(int mod) const
-//    {
-//      return (mod & KMOD_SHIFT);
-//    }
-
-    void enterMenuMode(State state);
-    void leaveMenuMode();
-    bool enterDebugMode();
-    void leaveDebugMode();
 
     /**
       Joystick emulates 'impossible' directions (ie, left & right
@@ -202,145 +121,16 @@ class EventHandler
     void allowAllDirections(bool allow) { myAllowAllDirectionsFlag = allow; }
 
   private:
-//    enum {
-//      kComboSize          = 16,
-//      kEventsPerCombo     = 8,
-//      kEmulActionListSize = 75 + kComboSize,
-//      kMenuActionListSize = 14
-//    };
-
-    /**
-      The following methods take care of assigning action mappings.
-    */
-    void saveKeyMapping();
-    void saveJoyMapping();
-    void saveComboMapping();
-    void setMouseAsPaddle(int paddle, const string& message);
-
-    /**
-      Tests if a given event should use continuous/analog values.
-
-      @param event  The event to test for analog processing
-      @return       True if analog, else false
-    */
-    bool eventIsAnalog(Event::Type event) const;
-
-    void setEventState(State state);
-
-    // Callback function invoked by the event-reset SDL Timer
-    static uInt32 resetEventsCallback(uInt32 interval, void* param);
-
-  private:
-    // Structure used for action menu items
-//    struct ActionList {
-//      Event::Type event;
-//      const char* action;
-//      char* key;
-//      bool allow_combo;
-//    };
-//
-//    struct JoyMouse {   // Used for joystick to mouse emulation
-//      bool active;
-//      int x, y, x_amt, y_amt, amt, val, old_val;
-//    };
-
-    // Global OSystem object
-//    OSystem* myOSystem;
-
     // Global Event object
     Event myEvent;
-
-    // Indicates current overlay object
-//    DialogContainer* myOverlay;
-//
-//    // MouseControl object, which takes care of switching the mouse between
-//    // all possible controller modes
-//    MouseControl* myMouseControl;
-//
-//    // Array of key events, indexed by StellaKey
-//    Event::Type myKeyTable[KBDK_LAST][kNumModes];
-//
-//    // The event(s) assigned to each combination event
-//    Event::Type myComboTable[kComboSize][kEventsPerCombo];
-//
-//    // Array of strings which correspond to the given StellaKey
-//    string ourKBDKMapping[KBDK_LAST];
-//
-//    // Indicates the current state of the system (ie, which mode is current)
-//    State myState;
 
     // Indicates whether the joystick emulates 'impossible' directions
     bool myAllowAllDirectionsFlag;;
 
-    // Indicates whether or not we're in frying mode
-/*     bool myFryingFlag;
-
-    // Indicates whether the key-combos tied to the Control key are
-    // being used or not (since Ctrl by default is the fire button,
-    // pressing it with a movement key could inadvertantly activate
-    // a Ctrl combo when it isn't wanted)
-    bool myUseCtrlKeyFlag;
-
-    // A bug in the SDL video handler creates an extraneous mouse motion
-    // event after a video state change
-    // We detect when this happens and discard the event
-    bool mySkipMouseMotion;
-
-    // Used for continuous snapshot mode
-    uInt32 myContSnapshotInterval;
-    uInt32 myContSnapshotCounter;
-
-    // Holds static strings for the remap menu (emulation and menu events)
-    static ActionList ourEmulActionList[kEmulActionListSize];
-    static ActionList ourMenuActionList[kMenuActionListSize];
-
-    // Static lookup tables for Stelladaptor/2600-daptor axis/button support
-    static const Event::Type SA_Axis[2][2];
-    static const Event::Type SA_Button[2][4];
-    static const Event::Type SA_Key[2][12];
-
-    // Thin wrapper holding all information about an SDL joystick in Stella.
-    // A StellaJoystick holds its own event mapping information, space for
-    // which is dynamically allocated based on the actual number of buttons,
-    // axes, etc that the device contains.
-    class StellaJoystick
-    {
-      public:
-        StellaJoystick();
-        virtual ~StellaJoystick();
-
-        string setStick(int i);
-        string getMap() const;
-        bool setMap(const string& map);
-        void eraseMap(EventMode mode);
-        void eraseEvent(Event::Type event, EventMode mode);
-        string about() const;
-
-      public:
-        enum JoyType {
-          JT_NONE               = 0,
-          JT_REGULAR            = 1,
-          JT_STELLADAPTOR_LEFT  = 2,
-          JT_STELLADAPTOR_RIGHT = 3,
-          JT_2600DAPTOR_LEFT    = 4,
-          JT_2600DAPTOR_RIGHT   = 5
-        };
-
-        JoyType type;
-        string name;
-        SDL_Joystick* stick;
-        int numAxes, numButtons, numHats;
-        Event::Type (*axisTable)[2][kNumModes];
-        Event::Type (*btnTable)[kNumModes];
-        Event::Type (*hatTable)[4][kNumModes];
-        int* axisLastValue;
-
-      private:
-        void getValues(const string& list, IntArray& map);
-    };
-    StellaJoystick* myJoysticks;
-    uInt32 myNumJoysticks;
-    map<string,string> myJoystickMap;*/
+    /**
+      The following methods take care of assigning action mappings.
+    */
+    void setMouseAsPaddle(int paddle, const string& message);
 };
 
 #endif
