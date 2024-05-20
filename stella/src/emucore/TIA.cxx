@@ -163,7 +163,6 @@ void TIA::frameReset()
   // framebuffer that is exposed outside the class actually starts at 'ystart'
   myFramePointerOffset = 160 * myFrameYStart;
 
-  //myAutoFrameEnabled = (mySettings.getFloat("framerate") <= 0);
   myAutoFrameEnabled = false;
   myFramerate = myConsole.getFramerate();
 

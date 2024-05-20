@@ -43,7 +43,6 @@
 #include "System.hxx"
 #include "TIA.hxx"
 #include "TrackBall.hxx"
-#include "FrameBuffer.hxx"
 #include "OSystem.hxx"
 #include "Serializable.hxx"
 #include "Version.hxx"
@@ -360,14 +359,10 @@ void Console::setProperties(const Properties& props)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-FBInitStatus Console::initializeVideo(bool full)
+void Console::initializeVideo()
 {
-  if(full)
-    setColorLossPalette();
-
+  setColorLossPalette();
   setPalette(myOSystem->settings().getString("palette"));
-
-  return kSuccess;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

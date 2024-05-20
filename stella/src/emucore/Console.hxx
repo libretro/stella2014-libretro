@@ -32,8 +32,8 @@ class CompuMate;
 #include "bspf.hxx"
 #include "Control.hxx"
 #include "Props.hxx"
+#include "OSystem.hxx"
 #include "TIATables.hxx"
-#include "FrameBuffer.hxx"
 #include "Serializable.hxx"
 
 /**
@@ -220,13 +220,8 @@ class Console : public Serializable
     /**
       Initialize the video subsystem wrt this class.
       This is required for changing window size, title, etc.
-
-      @param full  Whether we want a full initialization,
-                   or only reset certain attributes.
-
-      @return  The results from FrameBuffer::initialize()
     */
-    FBInitStatus initializeVideo(bool full = true);
+    void initializeVideo();
 
     /**
       Initialize the audio subsystem wrt this class.

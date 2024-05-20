@@ -21,7 +21,6 @@
 #include <cmath>
 
 #include "TIASnd.hxx"
-#include "FrameBuffer.hxx"
 #include "Settings.hxx"
 #include "System.hxx"
 #include "OSystem.hxx"
