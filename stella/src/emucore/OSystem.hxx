@@ -22,11 +22,7 @@
 
 class Cartridge;
 class CheatManager;
-class CommandMenu;
 class Console;
-class Debugger;
-class Launcher;
-class Menu;
 class Properties;
 class PropertiesSet;
 class SerialPort;

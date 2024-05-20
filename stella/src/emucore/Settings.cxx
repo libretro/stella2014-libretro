@@ -33,48 +33,15 @@ Settings::Settings(OSystem* osystem)
   // Add this settings object to the OSystem
   myOSystem->attach(this);
 
-  // Add options that are common to all versions of Stella
-  setInternal("video", "soft");
-
-  // OpenGL specific options
-  setInternal("gl_inter", "false");
-  setInternal("gl_aspectn", "90");
-  setInternal("gl_aspectp", "100");
-  setInternal("gl_fsscale", "false");
-  setInternal("gl_lib", "libGL.so");
-  setInternal("gl_vsync", "true");
-  setInternal("gl_vbo", "true");
-
   // Framebuffer-related options
-  setInternal("tia_filter", "zoom2x");
-  setInternal("fullscreen", "0");
-  setInternal("fullres", "auto");
   setInternal("center", "false");
   setInternal("grabmouse", "true");
   setInternal("palette", "standard");
   setInternal("colorloss", "true");
   setInternal("timing", "sleep");
-  setInternal("uimessages", "true");
-
-  // TV filtering options
-  setInternal("tv_filter", "0");
-  setInternal("tv_scanlines", "25");
-  setInternal("tv_scaninter", "true");
-  // TV options when using 'custom' mode
-  setInternal("tv_contrast", "0.0");
-  setInternal("tv_brightness", "0.0");
-  setInternal("tv_hue", "0.0");
-  setInternal("tv_saturation", "0.0");
-  setInternal("tv_gamma", "0.0");
-  setInternal("tv_sharpness", "0.0");
-  setInternal("tv_resolution", "0.0");
-  setInternal("tv_artifacts", "0.0");
-  setInternal("tv_fringing", "0.0");
-  setInternal("tv_bleed", "0.0");
 
   // Sound options
   setInternal("sound", "true");
-  setInternal("fragsize", "512");
   setInternal("freq", "31400");
   setInternal("volume", "100");
 
@@ -88,57 +55,13 @@ Settings::Settings(OSystem* osystem)
   setInternal("dsense", "5");
   setInternal("msense", "7");
   setInternal("saport", "lr");
-  setInternal("ctrlcombo", "true");
-
-  // Snapshot options
-  setInternal("snapsavedir", "");
-  setInternal("snaploaddir", "");
-  setInternal("snapname", "int");
-  setInternal("sssingle", "false");
-  setInternal("ss1x", "false");
-  setInternal("ssinterval", "2");
-
-  // Config files and paths
-  setInternal("romdir", "");
-  setInternal("statedir", "");
-  setInternal("cheatfile", "");
-  setInternal("palettefile", "");
-  setInternal("propsfile", "");
-  setInternal("nvramdir", "");
-  setInternal("cfgdir", "");
-
-  // ROM browser options
-  setInternal("exitlauncher", "false");
-  setInternal("launcherfont", "medium");
-  setInternal("launcherexts", "allroms");
-  setInternal("romviewer", "0");
-  setInternal("lastrom", "");
-
-  // UI-related options
-  setInternal("uipalette", "0");
-  setInternal("listdelay", "300");
-  setInternal("mwheel", "4");
 
   // Misc options
-  setInternal("autoslot", "false");
-  setInternal("loglevel", "1");
-  setInternal("logtoconsole", "0");
   setInternal("tiadriven", "false");
   setInternal("cpurandom", "true");
   setInternal("ramrandom", "true");
   setInternal("avoxport", "");
-  setInternal("stats", "false");
   setInternal("fastscbios", "false");
-  setExternal("romloadcount", "0");
-  setExternal("maxres", "");
-
-  // Debugger/disassembly options
-  setInternal("dbg.fontstyle", "0");
-  setInternal("dbg.uhex", "true");
-  setInternal("dis.resolve", "true");
-  setInternal("dis.gfxformat", "2");
-  setInternal("dis.showaddr", "true");
-  setInternal("dis.relocate", "false");
 
   // Thumb ARM emulation options
   setInternal("thumb.trapfatal", "true");
