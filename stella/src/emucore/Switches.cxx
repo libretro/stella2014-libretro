@@ -111,27 +111,13 @@ void Switches::update()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 bool Switches::save(Serializer& out) const
 {
-  try
-  {
-    out.putByte(mySwitches);
-  }
-  catch(...)
-  {
-    return false;
-  }
+  out.putByte(mySwitches);
   return true;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 bool Switches::load(Serializer& in)
 {
-  try
-  {
-    mySwitches = in.getByte();
-  }
-  catch(...)
-  {
-    return false;
-  }
+  mySwitches = in.getByte();
   return true;
 }

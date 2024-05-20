@@ -440,14 +440,7 @@ void CartridgeCTY::loadScore(uInt8 index)
   if(serializer.isValid())
   {
     uInt8 scoreRAM[256];
-    try
-    {
-      serializer.getByteArray(scoreRAM, 256);
-    }
-    catch(...)
-    {
-      memset(scoreRAM, 0, 256);
-    }
+    serializer.getByteArray(scoreRAM, 256);
     // Grab 60B slice @ given index (first 4 bytes are ignored)
     memcpy(myRAM+4, scoreRAM + (index << 6) + 4, 60);
   }
@@ -461,28 +454,14 @@ void CartridgeCTY::saveScore(uInt8 index)
   {
     // Load score RAM
     uInt8 scoreRAM[256];
-    try
-    {
-      serializer.getByteArray(scoreRAM, 256);
-    }
-    catch(...)
-    {
-      memset(scoreRAM, 0, 256);
-    }
+    serializer.getByteArray(scoreRAM, 256);
 
     // Add 60B RAM to score table @ given index (first 4 bytes are ignored)
     memcpy(scoreRAM + (index << 6) + 4, myRAM+4, 60);
 
     // Save score RAM
     serializer.reset();
-    try
-    {
-      serializer.putByteArray(scoreRAM, 256);
-    }
-    catch(...)
-    {
-      // Maybe add logging here that save failed?
-    }
+    serializer.putByteArray(scoreRAM, 256);
   }
 }
 
@@ -495,14 +474,7 @@ void CartridgeCTY::wipeAllScores()
     // Erase score RAM
     uInt8 scoreRAM[256];
     memset(scoreRAM, 0, 256);
-    try
-    {
-      serializer.putByteArray(scoreRAM, 256);
-    }
-    catch(...)
-    {
-      // Maybe add logging here that save failed?
-    }
+    serializer.putByteArray(scoreRAM, 256);
   }
 }
 

@@ -117,28 +117,6 @@ class TIA : public Device
     bool load(Serializer& in);
 
     /**
-      The following are very similar to save() and load(), except they
-      do a 'deeper' save of the display data itself.
-
-      Normally, the internal framebuffer doesn't need to be saved to
-      a state file, since the file already contains all the information
-      needed to re-create it, starting from scanline 0.  In effect, when a
-      state is loaded, the framebuffer is empty, and the next call to
-      update() generates valid framebuffer data.
-
-      However, state files saved from the debugger need more information,
-      such as the exact state of the internal framebuffer itself *before*
-      we call update(), including if the display was in partial frame mode.
-
-      Essentially, a normal state save has 'frame resolution', whereas
-      the debugger state save has 'cycle resolution', and hence needs
-      more information.  The methods below save/load this extra info,
-      and eliminate having to save approx. 50K to normal state files.
-    */
-    bool saveDisplay(Serializer& out) const;
-    bool loadDisplay(Serializer& in);
-
-    /**
       Get a descriptor for the device name (used in error checking).
 
       @return The name of the object

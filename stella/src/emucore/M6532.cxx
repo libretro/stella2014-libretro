@@ -17,8 +17,6 @@
 // $Id: M6532.cxx 2838 2014-01-17 23:34:03Z stephena $
 //============================================================================
 
-#include <iostream>
-
 #include "Console.hxx"
 #include "Settings.hxx"
 #include "Switches.hxx"
@@ -330,7 +328,6 @@ void M6532::setPinState(bool swcha)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool M6532::save(Serializer& out) const
 {
-  try
   {
     out.putString(name());
 
@@ -350,10 +347,6 @@ bool M6532::save(Serializer& out) const
     out.putBool(myEdgeDetectPositive);
     out.putByteArray(myOutTimer, 4);
   }
-  catch(...)
-  {
-    return false;
-  }
 
   return true;
 }
@@ -361,7 +354,6 @@ bool M6532::save(Serializer& out) const
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool M6532::load(Serializer& in)
 {
-  try
   {
     if(in.getString() != name())
       return false;
@@ -381,10 +373,6 @@ bool M6532::load(Serializer& in)
     myTimerFlagValid = in.getBool();
     myEdgeDetectPositive = in.getBool();
     in.getByteArray(myOutTimer, 4);
-  }
-  catch(...)
-  {
-    return false;
   }
 
   return true;

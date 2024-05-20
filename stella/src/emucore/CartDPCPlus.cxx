@@ -197,17 +197,13 @@ inline void CartridgeDPCPlus::callFunction(uInt8 value)
         myDisplayImage[myCounters[myParameter[2]]+i] = myParameter[0];
       myParameterPointer = 0;
       break;
-  #ifdef THUMB_SUPPORT
+#ifdef THUMB_SUPPORT
     case 254:
     case 255:
       // Call user written ARM code (most likely be C compiled for ARM)
-      try {
-        myThumbEmulator->run();
-      }
-      catch(const string& error) {
-      }
+      myThumbEmulator->run();
       break;
-  #endif
+#endif
     // reserved
   }
 }

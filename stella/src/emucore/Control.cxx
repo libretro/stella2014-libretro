@@ -127,46 +127,32 @@ void Controller::set(AnalogPin pin, Int32 value)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool Controller::save(Serializer& out) const
 {
-  try
-  {
-    // Output the digital pins
-    out.putBool(myDigitalPinState[One]);
-    out.putBool(myDigitalPinState[Two]);
-    out.putBool(myDigitalPinState[Three]);
-    out.putBool(myDigitalPinState[Four]);
-    out.putBool(myDigitalPinState[Six]);
+  // Output the digital pins
+  out.putBool(myDigitalPinState[One]);
+  out.putBool(myDigitalPinState[Two]);
+  out.putBool(myDigitalPinState[Three]);
+  out.putBool(myDigitalPinState[Four]);
+  out.putBool(myDigitalPinState[Six]);
 
-    // Output the analog pins
-    out.putInt(myAnalogPinValue[Five]);
-    out.putInt(myAnalogPinValue[Nine]);
-  }
-  catch(...)
-  {
-    return false;
-  }
+  // Output the analog pins
+  out.putInt(myAnalogPinValue[Five]);
+  out.putInt(myAnalogPinValue[Nine]);
   return true;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool Controller::load(Serializer& in)
 {
-  try
-  {
-    // Input the digital pins
-    myDigitalPinState[One]   = in.getBool();
-    myDigitalPinState[Two]   = in.getBool();
-    myDigitalPinState[Three] = in.getBool();
-    myDigitalPinState[Four]  = in.getBool();
-    myDigitalPinState[Six]   = in.getBool();
+  // Input the digital pins
+  myDigitalPinState[One]   = in.getBool();
+  myDigitalPinState[Two]   = in.getBool();
+  myDigitalPinState[Three] = in.getBool();
+  myDigitalPinState[Four]  = in.getBool();
+  myDigitalPinState[Six]   = in.getBool();
 
-    // Input the analog pins
-    myAnalogPinValue[Five] = (Int32) in.getInt();
-    myAnalogPinValue[Nine] = (Int32) in.getInt();
-  }
-  catch(...)
-  {
-    return false;
-  }
+  // Input the analog pins
+  myAnalogPinValue[Five] = (Int32) in.getInt();
+  myAnalogPinValue[Nine] = (Int32) in.getInt();
   return true;
 }
 

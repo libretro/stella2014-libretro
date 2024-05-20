@@ -306,16 +306,9 @@ const uInt8* CartridgeFA2::getImage(int& size) const
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeFA2::save(Serializer& out) const
 {
-  try
-  {
-    out.putString(name());
-    out.putShort(myCurrentBank);
-    out.putByteArray(myRAM, 256);
-  }
-  catch(...)
-  {
-    return false;
-  }
+  out.putString(name());
+  out.putShort(myCurrentBank);
+  out.putByteArray(myRAM, 256);
 
   return true;
 }
@@ -323,18 +316,11 @@ bool CartridgeFA2::save(Serializer& out) const
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeFA2::load(Serializer& in)
 {
-  try
-  {
-    if(in.getString() != name())
-      return false;
-
-    myCurrentBank = in.getShort();
-    in.getByteArray(myRAM, 256);
-  }
-  catch(...)
-  {
+  if(in.getString() != name())
     return false;
-  }
+
+  myCurrentBank = in.getShort();
+  in.getByteArray(myRAM, 256);
 
   // Remember what bank we were in
   bank(myCurrentBank);
@@ -382,26 +368,12 @@ uInt8 CartridgeFA2::ramReadWrite()
     {
       if(myRAM[255] == 1)       // read
       {
-        try
-        {
-          serializer.getByteArray(myRAM, 256);
-        }
-        catch(...)
-        {
-          memset(myRAM, 0, 256);
-        }
+        serializer.getByteArray(myRAM, 256);
         myRamAccessTimeout += 500;  // Add 0.5 ms delay for read
       }
       else if(myRAM[255] == 2)  // write
       {
-        try
-        {
-          serializer.putByteArray(myRAM, 256);
-        }
-        catch(...)
-        {
-          // Maybe add logging here that save failed?
-        }
+        serializer.putByteArray(myRAM, 256);
         myRamAccessTimeout += 101000;  // Add 101 ms delay for write
       }
     }
@@ -433,37 +405,13 @@ void CartridgeFA2::flash(uInt8 operation)
   {
     if(operation == 0)       // erase
     {
-      try
-      {
-        uInt8 buf[256];
-        memset(buf, 0, 256);
-        serializer.putByteArray(buf, 256);
-      }
-      catch(...)
-      {
-      }
+      uInt8 buf[256];
+      memset(buf, 0, 256);
+      serializer.putByteArray(buf, 256);
     }
     else if(operation == 1)  // read
-    {
-      try
-      {
-        serializer.getByteArray(myRAM, 256);
-      }
-      catch(...)
-      {
-        memset(myRAM, 0, 256);
-      }
-    }
+      serializer.getByteArray(myRAM, 256);
     else if(operation == 2)  // write
-    {
-      try
-      {
-        serializer.putByteArray(myRAM, 256);
-      }
-      catch(...)
-      {
-        // Maybe add logging here that save failed?
-      }
-    }
+      serializer.putByteArray(myRAM, 256);
   }
 }

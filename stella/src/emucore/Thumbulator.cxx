@@ -33,45 +33,21 @@ using namespace Common;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Thumbulator::Thumbulator(const uInt16* rom_ptr, uInt16* ram_ptr, bool traponfatal)
-  : rom(rom_ptr),
-    ram(ram_ptr)
-{
-  trapFatalErrors(traponfatal);
-}
+  : rom(rom_ptr), ram(ram_ptr) { }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Thumbulator::~Thumbulator()
-{
-}
+Thumbulator::~Thumbulator() { }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-string Thumbulator::run( void )
+void Thumbulator::run( void )
 {
   reset();
   for(;;)
   {
     if (execute()) break;
     if (instructions > 500000) // way more than would otherwise be possible
-      throw "instructions > 500000";
+      break;
   }
-  return statusMsg.str();
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-inline int Thumbulator::fatalError(const char* opcode, uInt32 v1, const char* msg)
-{
-  if(trapOnFatal)
-    throw statusMsg.str();
-  return 0;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-inline int Thumbulator::fatalError(const char* opcode, uInt32 v1, uInt32 v2,
-                                    const char* msg)
-{
-  if(trapOnFatal)
-    throw statusMsg.str();
-  return 0;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -85,27 +61,27 @@ uInt32 Thumbulator::fetch16 ( uInt32 addr )
     case 0x00000000: //ROM
       addr &= ROMADDMASK;
       if(addr<0x50)
-        fatalError("fetch16", addr, "abort");
+	return 0;
 
       addr>>=1;
-    #ifdef __BIG_ENDIAN__
+#ifdef MSB_FIRST
       data=((rom[addr]>>8)|(rom[addr]<<8))&0xffff;
-    #else
+#else
       data=rom[addr];
-    #endif
+#endif
       return(data);
 
     case 0x40000000: //RAM
       addr &= RAMADDMASK;
       addr>>=1;
-    #ifdef __BIG_ENDIAN__
+#ifdef MSB_FIRST
       data=((ram[addr]>>8)|(ram[addr]<<8))&0xffff;
-    #else
+#else
       data=ram[addr];
-    #endif
+#endif
       return(data);
   }
-  return fatalError("fetch16", addr, "abort");
+  return 0;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -120,7 +96,7 @@ uInt32 Thumbulator::fetch32 ( uInt32 addr )
         data=read32(addr);
         if(addr==0x00000000) return(data);
         if(addr==0x00000004) return(data);
-        fatalError("fetch32", addr, "abort");
+	return 0;
       }
 
     case 0x40000000: //RAM
@@ -129,18 +105,18 @@ uInt32 Thumbulator::fetch32 ( uInt32 addr )
       data|=fetch16(addr+0);
       return(data);
   }
-  return fatalError("fetch32", addr, "abort");
+  return 0;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Thumbulator::write16 ( uInt32 addr, uInt32 data )
 {
   if((addr>0x40001fff)&&(addr<0x50000000))
-    fatalError("write16", addr, "abort - out of range");
+    return;
   else if((addr>0x40000028)&&(addr<0x40000c00))
-    fatalError("write16", addr, "to bankswitch code area");
+    return;
   if(addr&1)
-    fatalError("write16", addr, "abort - misaligned");
+    return;
 
   writes++;
 
@@ -149,11 +125,11 @@ void Thumbulator::write16 ( uInt32 addr, uInt32 data )
     case 0x40000000: //RAM
       addr&=RAMADDMASK;
       addr>>=1;
-    #ifdef __BIG_ENDIAN__
+#ifdef MSB_FIRST
       ram[addr]=(((data&0xFFFF)>>8)|((data&0xffff)<<8))&0xffff;
-    #else
+#else
       ram[addr]=data&0xFFFF;
-    #endif
+#endif
       return;
 
     case 0xE0000000: //MAMCR
@@ -163,14 +139,13 @@ void Thumbulator::write16 ( uInt32 addr, uInt32 data )
         return;
       }
   }
-  fatalError("write16", addr, data, "abort");
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Thumbulator::write32 ( uInt32 addr, uInt32 data )
 {
   if(addr&3)
-    fatalError("write32", addr, "abort - misaligned");
+    return;
 
   switch(addr&0xF0000000)
   {
@@ -186,8 +161,6 @@ void Thumbulator::write32 ( uInt32 addr, uInt32 data )
       return;
 
     case 0xD0000000: //debug
-      statusMsg << "[" << Base::HEX8 << read_register(14) << "]["
-                << addr << "] " << data << endl;
       return;
 
     case 0x40000000: //RAM
@@ -195,7 +168,6 @@ void Thumbulator::write32 ( uInt32 addr, uInt32 data )
       write16(addr+2,(data>>16)&0xFFFF);
       return;
   }
-  fatalError("write32", addr, data, "abort");
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -204,11 +176,11 @@ uInt32 Thumbulator::read16 ( uInt32 addr )
   uInt32 data;
 
   if((addr>0x40001fff)&&(addr<0x50000000))
-    fatalError("read16", addr, "abort - out of range");
+    return 0;
   else if((addr>0x7fff)&&(addr<0x10000000))
-    fatalError("read16", addr, "abort - out of range");
+    return 0;
   if(addr&1)
-    fatalError("read16", addr, "abort - misaligned");
+    return 0;
 
   reads++;
 
@@ -217,35 +189,35 @@ uInt32 Thumbulator::read16 ( uInt32 addr )
     case 0x00000000: //ROM
       addr&=ROMADDMASK;
       addr>>=1;
-    #ifdef __BIG_ENDIAN__
+#ifdef MSB_FIRST
       data=((rom[addr]>>8)|(rom[addr]<<8))&0xffff;
-    #else
+#else
       data=rom[addr];
-    #endif
+#endif
       return(data);
 
     case 0x40000000: //RAM
       addr&=RAMADDMASK;
       addr>>=1;
-    #ifdef __BIG_ENDIAN__
+#ifdef MSB_FIRST
       data=((ram[addr]>>8)|(ram[addr]<<8))&0xffff;
-    #else
+#else
       data=ram[addr];
-    #endif
+#endif
       return(data);
 
     case 0xE0000000: //MAMCR
       if(addr == 0xE01FC000)
         return mamcr;
   }
-  return fatalError("read16", addr, "abort");
+  return 0;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 uInt32 Thumbulator::read32 ( uInt32 addr )
 {
   if(addr&3)
-    fatalError("read32", addr, "abort - misaligned");
+    return 0;
 
   uInt32 data;
   switch(addr&0xF0000000)
@@ -257,7 +229,7 @@ uInt32 Thumbulator::read32 ( uInt32 addr )
       data|=read16(addr+0);
       return(data);
   }
-  return fatalError("read32", addr, "abort");
+  return 0;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -276,7 +248,7 @@ uInt32 Thumbulator::read_register ( uInt32 reg )
       }
       return(data);
   }
-  return fatalError("read_register", cpsr, "invalid cpsr mode");
+  return 0;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -294,7 +266,7 @@ uInt32 Thumbulator::write_register ( uInt32 reg, uInt32 data )
       }
       return(data);
   }
-  return fatalError("write_register", cpsr, "invalid cpsr mode");
+  return 0;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -761,7 +733,6 @@ int Thumbulator::execute ( void )
   if((inst&0xFF00)==0xBE00)
   {
     rb=(inst>>0)&0xFF;
-    statusMsg << "bkpt 0x" << Base::HEX2 << rb << endl;
     return(1);
   }
 
@@ -896,22 +867,12 @@ int Thumbulator::execute ( void )
     do_zflag(rc);
     do_cflag(ra,~rb,1);
     do_sub_vflag(ra,rb,rc);
-
-#if 0
-    if(cpsr&CPSR_N) statusMsg << "N"; else statusMsg << "n";
-    if(cpsr&CPSR_Z) statusMsg << "Z"; else statusMsg << "z";
-    if(cpsr&CPSR_C) statusMsg << "C"; else statusMsg << "c";
-    if(cpsr&CPSR_V) statusMsg << "V"; else statusMsg << "v";
-    statusMsg << " -- 0x" << Base::HEX8 << ra << " 0x" << Base::HEX8 << rb << endl;
-#endif
     return(0);
   }
 
   //CPS
   if((inst&0xFFE8)==0xB660)
-  {
     return(1);
-  }
 
   //CPY copy high register
   if((inst&0xFFC0)==0x4600)
@@ -1461,10 +1422,7 @@ int Thumbulator::execute ( void )
 
   //SETEND
   if((inst&0xFFF7)==0xB650)
-  {
-    statusMsg << "setend not implemented" << endl;
     return(1);
-  }
 
   //STMIA
   if((inst&0xF800)==0xC000)
@@ -1655,7 +1613,6 @@ int Thumbulator::execute ( void )
   if((inst&0xFF00)==0xDF00)
   {
     rb=inst&0xFF;
-    statusMsg << endl << endl << "swi 0x" << Base::HEX2 << rb << endl;
     return(1);
   }
 
@@ -1718,7 +1675,6 @@ int Thumbulator::execute ( void )
     return(0);
   }
 
-  statusMsg << "invalid instruction " << Base::HEX8 << pc << " " << Base::HEX4 << inst << endl;
   return(1);
 }
 
@@ -1740,12 +1696,7 @@ int Thumbulator::reset ( void )
   reads=0;
   writes=0;
 
-  statusMsg.str("");
-
   return(0);
 }
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Thumbulator::trapOnFatal = true;
 
 #endif

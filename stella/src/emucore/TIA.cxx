@@ -264,8 +264,6 @@ bool TIA::save(Serializer& out) const
 {
   const string& device = name();
 
-  try
-  {
     out.putString(device);
 
     out.putInt(myClockWhenFrameStarted);
@@ -352,11 +350,6 @@ bool TIA::save(Serializer& out) const
 
     // Save the sound sample stuff ...
     mySound.save(out);
-  }
-  catch(...)
-  {
-    return false;
-  }
 
   return true;
 }
@@ -366,8 +359,6 @@ bool TIA::load(Serializer& in)
 {
   const string& device = name();
 
-  try
-  {
     if(in.getString() != device)
       return false;
 
@@ -460,55 +451,6 @@ bool TIA::load(Serializer& in)
     enableBits(true);
     toggleFixedColors(0);
     myAllowHMOVEBlanks = true;
-  }
-  catch(...)
-  {
-    return false;
-  }
-
-  return true;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool TIA::saveDisplay(Serializer& out) const
-{
-  try
-  {
-    out.putBool(myPartialFrameFlag);
-    out.putInt(myFramePointerClocks);
-    out.putByteArray(myCurrentFrameBuffer, 160*320);
-  }
-  catch(...)
-  {
-    return false;
-  }
-
-  return true;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool TIA::loadDisplay(Serializer& in)
-{
-  try
-  {
-    myPartialFrameFlag = in.getBool();
-    myFramePointerClocks = in.getInt();
-
-    // Reset frame buffer pointer and data
-    clearBuffers();
-    myFramePointer = myCurrentFrameBuffer;
-    in.getByteArray(myCurrentFrameBuffer, 160*320);
-    memcpy(myPreviousFrameBuffer, myCurrentFrameBuffer, 160*320);
-
-    // If we're in partial frame mode, make sure to re-create the screen
-    // as it existed when the state was saved
-    if(myPartialFrameFlag)
-      myFramePointer += myFramePointerClocks;
-  }
-  catch(...)
-  {
-    return false;
-  }
 
   return true;
 }

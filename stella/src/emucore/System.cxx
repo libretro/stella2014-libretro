@@ -17,8 +17,6 @@
 // $Id: System.cxx 2838 2014-01-17 23:34:03Z stephena $
 //============================================================================
 
-#include <iostream>
-
 #include "Device.hxx"
 #include "M6502.hxx"
 #include "M6532.hxx"

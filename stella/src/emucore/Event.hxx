@@ -72,10 +72,7 @@ class Event
       MouseAxisXValue, MouseAxisYValue,
       MouseButtonLeftValue, MouseButtonRightValue,
 
-      Fry, VolumeDecrease, VolumeIncrease,
-
-      UIUp, UIDown, UILeft, UIRight, UIHome, UIEnd, UIPgUp, UIPgDown,
-      UISelect, UINavPrev, UINavNext, UIOK, UICancel, UIPrevDir,
+      Fry,
 
       LastType
     };

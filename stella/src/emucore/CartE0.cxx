@@ -227,33 +227,17 @@ const uInt8* CartridgeE0::getImage(int& size) const
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeE0::save(Serializer& out) const
 {
-  try
-  {
-    out.putString(name());
-    out.putShortArray(myCurrentSlice, 4);
-  }
-  catch(...)
-  {
-    return false;
-  }
-
+  out.putString(name());
+  out.putShortArray(myCurrentSlice, 4);
   return true;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeE0::load(Serializer& in)
 {
-  try
-  {
-    if(in.getString() != name())
-      return false;
-
-    in.getShortArray(myCurrentSlice, 4);
-  }
-  catch(...)
-  {
+  if(in.getString() != name())
     return false;
-  }
 
+  in.getShortArray(myCurrentSlice, 4);
   return true;
 }

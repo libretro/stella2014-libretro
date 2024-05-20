@@ -71,8 +71,6 @@ bool StateManager::loadState(Serializer& in)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool StateManager::saveState(Serializer& out)
 {
-  try
-  {
     if(&myOSystem->console())
     {
       // Make sure the file can be opened for writing
@@ -90,10 +88,6 @@ bool StateManager::saveState(Serializer& out)
           return true;
       }
     }
-  }
-  catch(...)
-  {
-  }
   return false;
 }
 

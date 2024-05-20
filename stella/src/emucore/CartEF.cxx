@@ -139,33 +139,18 @@ const uInt8* CartridgeEF::getImage(int& size) const
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeEF::save(Serializer& out) const
 {
-  try
-  {
-    out.putString(name());
-    out.putShort(myCurrentBank);
-  }
-  catch(...)
-  {
-    return false;
-  }
-
+  out.putString(name());
+  out.putShort(myCurrentBank);
   return true;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeEF::load(Serializer& in)
 {
-  try
-  {
-    if(in.getString() != name())
-      return false;
-
-    myCurrentBank = in.getShort();
-  }
-  catch(...)
-  {
+  if(in.getString() != name())
     return false;
-  }
+
+  myCurrentBank = in.getShort();
 
   // Remember what bank we were in
   bank(myCurrentBank);
