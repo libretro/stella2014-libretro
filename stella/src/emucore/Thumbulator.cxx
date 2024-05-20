@@ -150,7 +150,11 @@ void Thumbulator::write32 ( uInt32 addr, uInt32 data )
   switch(addr&0xF0000000)
   {
     case 0xF0000000: //halt
+#if 1
+      return;
+#else
       throw "HALT";// exit(0);
+#endif
 
     case 0xE0000000: //periph
       switch(addr)
