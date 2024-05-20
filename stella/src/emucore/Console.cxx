@@ -356,24 +356,6 @@ const uInt32* Console::getPalette(int direction) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Console::togglePhosphor()
-{
-  const string& phosphor = myProperties.get(Display_Phosphor);
-  int blend = atoi(myProperties.get(Display_PPBlend).c_str());
-  bool enable;
-  if(phosphor == "YES")
-  {
-    myProperties.set(Display_Phosphor, "No");
-    enable = false;
-  }
-  else
-  {
-    myProperties.set(Display_Phosphor, "Yes");
-    enable = true;
-  }
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Console::setProperties(const Properties& props)
 {
   myProperties = props;

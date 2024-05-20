@@ -212,11 +212,6 @@ class Console : public Serializable
     void setPalette(const string& palette);
 
     /**
-      Toggles phosphor effect.
-    */
-    void togglePhosphor();
-
-    /**
       Toggles the PAL color-loss effect.
     */
     void toggleColorLoss();
