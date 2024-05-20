@@ -107,36 +107,6 @@ bool PropertiesSet::getMD5(const string& md5, Properties& properties,
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void PropertiesSet::insert(const Properties& properties, bool save)
-{
-  // Note that the following code is optimized for insertion when an item
-  // doesn't already exist, and when the external properties file is
-  // relatively small (which is the case with current versions of Stella,
-  // as the properties are built-in)
-  // If an item does exist, it will be removed and insertion done again
-  // This shouldn't be a speed issue, as insertions will only fail with
-  // duplicates when you're changing the current ROM properties, which
-  // most people tend not to do
-
-  // Since the PropSet is keyed by md5, we can't insert without a valid one
-  const string& md5 = properties.get(Cartridge_MD5);
-  if(md5 == "")
-    return;
-
-  // The status of 'save' determines which list to save to
-  PropsList& list = save ? myExternalProps : myTempProps;
-
-  pair<PropsList::iterator,bool> ret;
-  ret = list.insert(make_pair(md5, properties));
-  if(ret.second == false)
-  {
-    // Remove old item and insert again
-    list.erase(ret.first);
-    list.insert(make_pair(md5, properties));
-  }
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void PropertiesSet::removeMD5(const string& md5)
 {
   // We only remove from the external list

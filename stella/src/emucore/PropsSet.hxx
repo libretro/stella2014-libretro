@@ -23,7 +23,6 @@
 #include <map>
 
 #include "bspf.hxx"
-//#include "FSNode.hxx"
 #include "Props.hxx"
 
 class OSystem;
@@ -66,16 +65,6 @@ class PropertiesSet
     */
     bool getMD5(const string& md5, Properties& properties,
                 bool useDefaults = false) const;
-
-    /**
-      Insert the properties into the set.  If a duplicate is inserted
-      the old properties are overwritten with the new ones.
-
-      @param properties  The collection of properties
-      @param save        Indicates whether the properties should be saved
-                         when the program exits
-    */
-    void insert(const Properties& properties, bool save = true);
 
     /**
       Marks the property with the given MD5 as being removed.
