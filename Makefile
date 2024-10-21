@@ -107,6 +107,8 @@ else
    MINVERSION = -miphoneos-version-min=5.0
 endif
    SHARED += $(MINVERSION)
+   CFLAGS += $(MINVERSION)
+   CXXFLAGS += $(MINVERSION)
 
 # tvOS
 else ifeq ($(platform), tvos-arm64)
@@ -120,6 +122,10 @@ else ifeq ($(platform), tvos-arm64)
 
         CC = clang -arch arm64 -isysroot $(IOSSDK)
         CXX = clang++ -arch arm64 -isysroot $(IOSSDK)
+        MINVERSION = -mappletvos-version-min=11.0
+        SHARED += $(MINVERSION)
+        CFLAGS += $(MINVERSION)
+        CXXFLAGS += $(MINVERSION)
 
 else ifeq ($(platform), theos_ios)
 DEPLOYMENT_IOSVERSION = 5.0
