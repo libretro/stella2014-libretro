@@ -1409,11 +1409,18 @@ void retro_reset(void)
 void retro_run(void)
 {
    static int16_t sampleBuffer[2048];
-   //Get the number of samples in a frame: sampleRate/fps as exact integers,
-   //31400 * den / num (e.g. NTSC 31400*25/1498 = 524, PAL 31400*25/1248 = 629)
-   static uint32_t tiaSamplesPerFrame =
+   //Number of samples in this frame: sampleRate/fps as exact integers,
+   //31400 * den / num (e.g. NTSC 31400*25/1498 = 524, PAL 31400*25/1248 = 629).
+   //Recomputed every frame: the TIA auto-framerate can retune num/den at
+   //any frame boundary, and the previous once-only 'static' froze the
+   //value computed on the very first retro_run() forever.
+   uint32_t tiaSamplesPerFrame =
          (31400u * console->getFramerateDen()) /
          (console->getFramerateNum() ? console->getFramerateNum() : 1498u);
+   //sampleBuffer holds 2048 int16 = 1024 stereo samples; worst case is
+   //31400*342/15600 = 688 samples (auto-framerate at 342 scanlines)
+   if (tiaSamplesPerFrame > 1024)
+      tiaSamplesPerFrame = 1024;
 
    //CORE OPTIONS
    bool updated = false;
