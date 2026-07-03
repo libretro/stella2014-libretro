@@ -1135,11 +1135,18 @@ inline uInt8 TIA::dumpedInputPort(int resistance)
   {
     // Constant is derived from '1.6 * 0.01e-6 * 228 / 3' = 1.216e-6,
     // expressed exactly as the rational 76 / 62500000; the framerate is
-    // the exact rational num/den, so this is pure integer arithmetic
-    uInt32 needed = (uInt32)
-      (((uInt64)resistance * myScanlineCountForLastFrame *
-        myConsole.getFramerateNum() * 76) /
-       ((uInt64)myConsole.getFramerateDen() * 62500000));
+    // the exact rational num/den, so this is pure integer arithmetic.
+    //
+    // The computation is deliberately broken into separate 64-bit steps
+    // with named intermediates rather than one chained expression. The
+    // single-expression form triggers an internal compiler error (C1001)
+    // in the MSVC 2005 optimizer (this is a supported build target); the
+    // stepwise form is arithmetically identical and compiles cleanly.
+    uInt64 numer = (uInt64)resistance * myScanlineCountForLastFrame;
+    numer *= myConsole.getFramerateNum();
+    numer *= 76;
+    uInt64 denom = (uInt64)myConsole.getFramerateDen() * 62500000;
+    uInt32 needed = (uInt32)(numer / denom);
     if((mySystem->cycles() - myDumpDisabledCycle) > needed)
       return 0x80;
     else
