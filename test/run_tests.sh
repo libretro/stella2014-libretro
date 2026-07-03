@@ -11,12 +11,18 @@ CORE="${1:-./stella2014_libretro.so}"
 cc -O2 -o test/determinism_harness test/determinism_harness.c \
    -I libretro-common/include -ldl
 
+cc -O1 -g -o test/malformed_state test/malformed_state.c \
+   -I libretro-common/include -ldl
+
 ./test/determinism_harness "$CORE"
+./test/malformed_state "$CORE"   # malformed-savestate robustness
 
 if command -v valgrind >/dev/null 2>&1; then
     echo "running under valgrind..."
     valgrind -q --leak-check=full --error-exitcode=42 \
         ./test/determinism_harness "$CORE" >/dev/null
+    valgrind -q --leak-check=full --error-exitcode=42 \
+        ./test/malformed_state "$CORE" >/dev/null
     echo "valgrind: clean"
 else
     echo "valgrind not found: skipping leak check"
