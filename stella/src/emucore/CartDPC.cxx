@@ -28,7 +28,7 @@ CartridgeDPC::CartridgeDPC(const uInt8* image, uInt32 size,
   : Cartridge(settings),
     mySize(size),
     mySystemCycles(0),
-    myFractionalClocks(0.0)
+    myFractionalClocks(0)
 {
   // Make a copy of the entire image
   memcpy(myImage, image, MIN(size, 8192u + 2048u + 256u));
@@ -122,9 +122,17 @@ inline void CartridgeDPC::updateMusicModeDataFetchers()
   mySystemCycles = mySystem->cycles();
 
   // Calculate the number of DPC OSC clocks since the last update
-  double clocks = ((20000.0 * cycles) / 1193191.66666667) + myFractionalClocks;
-  Int32 wholeClocks = (Int32)clocks;
-  myFractionalClocks = clocks - (double)wholeClocks;
+  // The DPC music oscillator is an on-chip RC circuit (560K ohm resistor,
+  // 5% tolerance, plus an on-die capacitor), so its frequency varies from
+  // cartridge to cartridge; ~20 KHz is the accepted nominal model (Stella
+  // uses 20 KHz, UnoCart uses 21 KHz on real hardware). Against the NTSC
+  // CPU clock of 3579545/3 Hz this is exactly 20000/(3579545/3) =
+  // 12000/715909 OSC clocks per CPU cycle. The fraction is carried as an
+  // integer remainder (units of 1/715909 clock) so the arithmetic is
+  // exact and bit-for-bit deterministic on every platform.
+  uInt64 acc = (uInt64)(uInt32)cycles * 12000 + myFractionalClocks;
+  Int32 wholeClocks = (Int32)(acc / 715909);
+  myFractionalClocks = (uInt32)(acc % 715909);
 
   if(wholeClocks <= 0)
   {
@@ -495,7 +503,7 @@ bool CartridgeDPC::save(Serializer& out) const
    out.putByte(myRandomNumber);
 
    out.putInt(mySystemCycles);
-   out.putInt((uInt32)(myFractionalClocks * 100000000.0));
+   out.putInt(myFractionalClocks);
 
    return true;
 }
@@ -530,7 +538,7 @@ bool CartridgeDPC::load(Serializer& in)
 
    // Get system cycles and fractional clocks
    mySystemCycles = (Int32)in.getInt();
-   myFractionalClocks = (double)in.getInt() / 100000000.0;
+   myFractionalClocks = in.getInt();
 
    // Now, go to the current bank
    bank(myCurrentBank);

@@ -200,8 +200,9 @@ class CartridgeDPC : public Cartridge
     // System cycle count when the last update to music data fetchers occurred
     Int32 mySystemCycles;
 
-    // Fractional DPC music OSC clocks unused during the last update
-    double myFractionalClocks;
+    // Fractional DPC music OSC clocks unused during the last update,
+    // as an integer remainder in units of 1/715909 of an OSC clock
+    uInt32 myFractionalClocks;
 };
 
 #endif
