@@ -1158,6 +1158,12 @@ bool retro_load_game(const struct retro_game_info *info)
    if (!info || info->size >= 96*1024)
       return false;
 
+   /* Release any state from a previous load (repeat retro_load_game
+    * calls without an intervening retro_unload_game, or a retry after
+    * a failed load); prevents leaking the previous Settings/Console
+    * and keeps the ownership invariants below simple. */
+   retro_unload_game();
+
    // Set color depth
    check_variables(true);
 
@@ -1201,6 +1207,8 @@ bool retro_load_game(const struct retro_game_info *info)
    {
       if (log_cb)
          log_cb(RETRO_LOG_ERROR, "Stella: Failed to load cartridge.\n");
+      delete settings;
+      settings = 0;
       return false;
    }
 
@@ -1241,11 +1249,17 @@ void retro_unload_game(void)
 {
    if (console)
    {
+      /* Console owns System, and System owns every attached Device
+       * including the cartridge, so deleting the console also frees
+       * the cartridge. Null the global so it can never dangle. */
       delete console;
-      console = 0;
+      console   = 0;
+      cartridge = 0;
    }
    else if (cartridge)
    {
+      /* Load failed after the cartridge was created but before the
+       * console took ownership of it */
       delete cartridge;
       cartridge = 0;
    }
