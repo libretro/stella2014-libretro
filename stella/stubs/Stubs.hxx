@@ -26,6 +26,14 @@ void OSystem::stateChanged(EventHandler::State state) { }
 
 uInt64 OSystem::getTicks() const
 {
+    // DETERMINISM INVARIANT: this must return *emulated* time, never
+    // wall-clock time. Random::initSeed() seeds the RNG from getTicks(),
+    // and that RNG initializes cartridge RAM contents (CartXX ctors) and
+    // undriven TIA pins. Upstream Stella's getTicks() is wall-clock;
+    // if a future sync ever restores that, RAM-init randomness stops
+    // being reproducible and netplay/run-ahead/replay determinism
+    // silently breaks. TIA::getMilliSeconds() is derived purely from
+    // emulated frame counters, which is what keeps this deterministic.
     return myConsole->tia().getMilliSeconds();
 }
 
