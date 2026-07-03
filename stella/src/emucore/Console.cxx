@@ -677,13 +677,13 @@ void Console::loadUserPalette()
   for(int i = 0; i < 128; i++)  // NTSC palette
   {
     in.read((char*)pixbuf, 3);
-    uInt32 pixel = ((int)pixbuf[0] << R_SHIFT) + ((int)pixbuf[1] << G_SHIFT) + (int)pixbuf[2] << B_SHIFT;
+    uInt32 pixel = ((int)pixbuf[0] << R_SHIFT) + ((int)pixbuf[1] << G_SHIFT) + ((int)pixbuf[2] << B_SHIFT);
     ourUserNTSCPalette[(i<<1)] = pixel;
   }
   for(int i = 0; i < 128; i++)  // PAL palette
   {
     in.read((char*)pixbuf, 3);
-    uInt32 pixel = ((int)pixbuf[0] << R_SHIFT) + ((int)pixbuf[1] << G_SHIFT) + (int)pixbuf[2] << B_SHIFT;
+    uInt32 pixel = ((int)pixbuf[0] << R_SHIFT) + ((int)pixbuf[1] << G_SHIFT) + ((int)pixbuf[2] << B_SHIFT);
     ourUserPALPalette[(i<<1)] = pixel;
   }
 
@@ -691,7 +691,7 @@ void Console::loadUserPalette()
   for(int i = 0; i < 8; i++)    // SECAM palette
   {
     in.read((char*)pixbuf, 3);
-    uInt32 pixel = ((int)pixbuf[0] << R_SHIFT) + ((int)pixbuf[1] << G_SHIFT) + (int)pixbuf[2] << B_SHIFT;
+    uInt32 pixel = ((int)pixbuf[0] << R_SHIFT) + ((int)pixbuf[1] << G_SHIFT) + ((int)pixbuf[2] << B_SHIFT);
     secam[(i<<1)]   = pixel;
     secam[(i<<1)+1] = 0;
   }
