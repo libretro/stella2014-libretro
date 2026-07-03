@@ -134,6 +134,19 @@ Console::Console(OSystem* osystem, Cartridge* cart, const Properties& props)
   }
   myConsoleInfo.DisplayFormat = myDisplayFormat + autodetected;
 
+  // Tell DPC-family cartridges which TV format they're running under, so
+  // their music oscillator uses the correct clock rate (backported from
+  // Stella 7). Exact integer ratios of OSC clocks per CPU cycle:
+  //   NTSC  20000 / (3579545/3) = 12000/715909
+  //   PAL   20000 / 1182298     = 10000/591149
+  //   SECAM 20000 / 1187500     = 8/475
+  if(myDisplayFormat == "PAL" || myDisplayFormat == "PAL60")
+    myCart->setDpcClockRate(10000, 591149);
+  else if(myDisplayFormat == "SECAM" || myDisplayFormat == "SECAM60")
+    myCart->setDpcClockRate(8, 475);
+  else
+    myCart->setDpcClockRate(12000, 715909);  // NTSC / NTSC50 / default
+
   // Set up the correct properties used when toggling format
   // Note that this can be overridden if a format is forced
   //   For example, if a PAL ROM is forced to be NTSC, it will use NTSC-like

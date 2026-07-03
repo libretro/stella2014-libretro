@@ -192,6 +192,19 @@ class Cartridge : public Device
     virtual string name() const = 0;
 
     /**
+      Set the DPC music-oscillator clock rate as an exact integer ratio
+      (OSC clocks per CPU cycle = num/den), selected from the console's
+      TV format. Only the DPC-family cartridges (DPC, DPC+, CTY) use a
+      music oscillator; the base implementation is a no-op so every other
+      cartridge type ignores it. Backported from Stella 7's per-format
+      DPC clock rates (NTSC/PAL/SECAM), which the 2014 core lacked --
+      previously every DPC cartridge used the NTSC rate regardless of
+      the console's TV format, giving PAL/SECAM DPC games a slightly
+      wrong music pitch.
+    */
+    virtual void setDpcClockRate(uInt32 num, uInt32 den) { (void)num; (void)den; }
+
+    /**
       Informs the cartridge about the name of the ROM file used when
       creating this cart.
 

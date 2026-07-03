@@ -35,7 +35,9 @@ CartridgeCTY::CartridgeCTY(const uInt8* image, uInt32 size, const OSystem& osyst
     myRandomNumber(0x2B435044),
     myRamAccessTimeout(0),
     mySystemCycles(0),
-    myFractionalClocks(0)
+    myFractionalClocks(0),
+    myDpcClockNum(12000),   // default to NTSC until the console sets the format
+    myDpcClockDen(715909)
 {
   // Copy the ROM image into my buffer
   memcpy(myImage, image, MIN(32768u, size));
@@ -70,7 +72,7 @@ void CartridgeCTY::reset()
 
   // Update cycles to the current system cycles
   mySystemCycles = mySystem->cycles();
-  myFractionalClocks = 0.0;
+  myFractionalClocks = 0;
 
   // Upon reset we switch to the startup bank
   bank(myStartBank);
@@ -491,12 +493,14 @@ inline void CartridgeCTY::updateMusicModeDataFetchers()
   // cartridge to cartridge; ~20 KHz is the accepted nominal model (Stella
   // uses 20 KHz, UnoCart uses 21 KHz on real hardware). Against the NTSC
   // CPU clock of 3579545/3 Hz this is exactly 20000/(3579545/3) =
-  // 12000/715909 OSC clocks per CPU cycle. The fraction is carried as an
-  // integer remainder (units of 1/715909 clock) so the arithmetic is
+  // OSC clocks per CPU cycle as the exact rational myDpcClockNum/Den,
+  // selected from the console's TV format (NTSC 12000/715909, PAL
+  // 10000/591149, SECAM 8/475). The fraction is carried as an integer
+  // remainder (units of 1/den clock) so the arithmetic is
   // exact and bit-for-bit deterministic on every platform.
-  uInt64 acc = (uInt64)(uInt32)cycles * 12000 + myFractionalClocks;
-  Int32 wholeClocks = (Int32)(acc / 715909);
-  myFractionalClocks = (uInt32)(acc % 715909);
+  uInt64 acc = (uInt64)(uInt32)cycles * myDpcClockNum + myFractionalClocks;
+  Int32 wholeClocks = (Int32)(acc / myDpcClockDen);
+  myFractionalClocks = (uInt32)(acc % myDpcClockDen);
 
   if(wholeClocks <= 0)
     return;
@@ -505,5 +509,15 @@ inline void CartridgeCTY::updateMusicModeDataFetchers()
   for(int x = 0; x <= 2; ++x)
   {
 //    myMusicCounters[x] += myMusicFrequencies[x];
+  }
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void CartridgeCTY::setDpcClockRate(uInt32 num, uInt32 den)
+{
+  if(den != 0)
+  {
+    myDpcClockNum = num;
+    myDpcClockDen = den;
   }
 }

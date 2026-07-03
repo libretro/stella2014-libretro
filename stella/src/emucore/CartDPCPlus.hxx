@@ -249,8 +249,18 @@ class CartridgeDPCPlus : public Cartridge
     Int32 mySystemCycles;
 
     // Fractional DPC music OSC clocks unused during the last update,
-    // as an integer remainder in units of 1/715909 of an OSC clock
+    // as an integer remainder in units of 1/myDpcClockDen of an OSC clock
     uInt32 myFractionalClocks;
+
+    // DPC music-oscillator clock rate as an exact integer ratio
+    // (OSC clocks per CPU cycle = num/den), chosen from the TV format
+    uInt32 myDpcClockNum;
+    uInt32 myDpcClockDen;
+
+  public:
+    void setDpcClockRate(uInt32 num, uInt32 den);
+
+  private:
 };
 
 #endif
