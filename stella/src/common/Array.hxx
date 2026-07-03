@@ -40,8 +40,8 @@ class Array
     typedef const T *const_iterator;
 
   public:
-    Array<T>() : _capacity(0), _size(0), _data(0) {}
-    Array<T>(const Array<T>& array) : _capacity(0), _size(0), _data(0)
+    Array() : _capacity(0), _size(0), _data(0) {}
+    Array(const Array<T>& array) : _capacity(0), _size(0), _data(0)
     {
       _size = array._size;
       _capacity = _size + 128;
@@ -50,7 +50,7 @@ class Array
         _data[i] = array._data[i];
     }
 
-    ~Array<T>()
+    ~Array()
     {
       if (_data)
         delete [] _data;
