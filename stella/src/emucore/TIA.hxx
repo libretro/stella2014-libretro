@@ -191,19 +191,19 @@ class TIA : public Device
 
       @param mode  Whether to enable or disable PAL color-loss mode
     */
-    void enableColorLoss(bool mode)
-      { myColorLossEnabled = myFramerate <= 55 ? mode : false; }
+    void enableColorLoss(bool mode);
 
     /**
       Answers whether this TIA runs at NTSC or PAL scanrates,
       based on how many frames of out the total count are PAL frames.
     */
     bool isPAL()
-      { return float(myPALFrameCounter) / myFrameCounter >= (25.0/60.0); }
+      { return (uInt64)myPALFrameCounter * 12 >= (uInt64)myFrameCounter * 5; }
 
     uInt64 getMilliSeconds() const {
+        // NTSC frames at 60 fps last 1000/60 = 50/3 ms; PAL at 50 fps, 20 ms
         uInt64 ntscFrames = myFrameCounter - myPALFrameCounter;
-        return ntscFrames * (1000.0f/60.0f) + myPALFrameCounter * (1000.0f/50.f);
+        return (ntscFrames * 50) / 3 + (uInt64)myPALFrameCounter * 20;
     }
 
     /**
@@ -583,7 +583,7 @@ class TIA : public Device
     uInt32 myPALFrameCounter;
 
     // The framerate currently in use by the Console
-    float myFramerate;
+
 
     // Whether TIA bits/collisions are currently enabled/disabled
     bool myBitsEnabled, myCollisionsEnabled;

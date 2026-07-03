@@ -252,13 +252,14 @@ class Console : public Serializable
       Sets the framerate of the console, which in turn communicates
       this to all applicable subsystems.
     */
-    void setFramerate(float framerate);
+    void setFramerate(uInt32 num, uInt32 den);
 
     /**
       Returns the framerate based on a number of factors
       (whether 'framerate' is set, what display format is in use, etc)
     */
-    float getFramerate() const { return myFramerate; }
+    uInt32 getFramerateNum() const { return myFramerateNum; }
+    uInt32 getFramerateDen() const { return myFramerateDen; }
 
     /**
       Toggles the TIA bit specified in the method name.
@@ -358,7 +359,10 @@ class Console : public Serializable
     string myDisplayFormat;
 
     // The currently defined display framerate
-    float myFramerate;
+    // Framerate as an exact rational (frames per second = num/den),
+    // e.g. NTSC 59.92 fps = 1498/25, PAL 49.92 fps = 1248/25
+    uInt32 myFramerateNum;
+    uInt32 myFramerateDen;
 
     // Display format currently in use
     uInt32 myCurrentFormat;

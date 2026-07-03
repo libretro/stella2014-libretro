@@ -74,7 +74,8 @@ Console::Console(OSystem* osystem, Cartridge* cart, const Properties& props)
     myCart(cart),
     myCMHandler(0),
     myDisplayFormat(""),  // Unknown TV format @ start
-    myFramerate(0.0),     // Unknown framerate @ start
+    myFramerateNum(0),    // Unknown framerate @ start
+    myFramerateDen(1),
     myCurrentFormat(0),   // Unknown format @ start
     myUserPaletteDefined(false)
 {
@@ -357,8 +358,7 @@ void Console::initializeAudio()
   // Initialize the sound interface.
   // The # of channels can be overridden in the AudioDialog box or on
   // the commandline, but it can't be saved.
-  //float framerate = myOSystem->settings().getFloat("framerate");
-  //if(framerate > 0) myFramerate = float(framerate);
+
   const string& sound = myProperties.get(Cartridge_Sound);
 
   myOSystem->sound().close();
@@ -463,13 +463,15 @@ void Console::setTIAProperties()
      myDisplayFormat == "SECAM60")
   {
     // Assume we've got ~262 scanlines (NTSC-like format)
-    myFramerate = 59.92;
+    myFramerateNum = 1498;  // 59.92 fps
+    myFramerateDen = 25;
     myConsoleInfo.InitialFrameRate = "60";
   }
   else
   {
     // Assume we've got ~312 scanlines (PAL-like format)
-    myFramerate = 49.92;
+    myFramerateNum = 1248;  // 49.92 fps
+    myFramerateDen = 25;
     myConsoleInfo.InitialFrameRate = "50";
 
     // PAL ROMs normally need at least 250 lines
@@ -735,18 +737,19 @@ void Console::setColorLossPalette()
       uInt8 r = (pixel >> R_SHIFT) & 0xff;
       uInt8 g = (pixel >> G_SHIFT)  & 0xff;
       uInt8 b = (pixel >> B_SHIFT)  & 0xff;
-      uInt8 sum = (uInt8) (((float)r * 0.2989) +
-                           ((float)g * 0.5870) +
-                           ((float)b * 0.1140));
+      // Integer luma weights: 77/256, 150/256, 29/256 (sum = 256),
+      // matching the 0.2989/0.5870/0.1140 float weights to within 1 LSB
+      uInt8 sum = (uInt8)((r * 77 + g * 150 + b * 29) >> 8);
       palette[i][(j<<1)+1] = (sum << 16) + (sum << 8) + sum;
     }
   }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Console::setFramerate(float framerate)
+void Console::setFramerate(uInt32 num, uInt32 den)
 {
-  myFramerate = framerate;
+  myFramerateNum = num;
+  myFramerateDen = (den == 0) ? 1 : den;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

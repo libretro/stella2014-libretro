@@ -164,9 +164,9 @@ void TIA::frameReset()
   myFramePointerOffset = 160 * myFrameYStart;
 
   myAutoFrameEnabled = false;
-  myFramerate = myConsole.getFramerate();
 
-  if(myFramerate > 55.0)  // NTSC
+  // NTSC iff framerate > 55 fps, i.e. num/den > 55, i.e. num > 55*den
+  if(myConsole.getFramerateNum() > 55u * myConsole.getFramerateDen())  // NTSC
   {
     myFixedColor[P0Color]     = 0x30;
     myFixedColor[P1Color]     = 0x16;
@@ -210,6 +210,15 @@ void TIA::frameReset()
   myClockAtLastUpdate = myClockWhenFrameStarted;
   myClocksToEndOfScanLine = 228;
   myVSYNCFinishClock = 0x7FFFFFFF;
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void TIA::enableColorLoss(bool mode)
+{
+  // PAL only: framerate num/den <= 55
+  myColorLossEnabled =
+      (myConsole.getFramerateNum() <= 55u * myConsole.getFramerateDen())
+      ? mode : false;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -592,9 +601,11 @@ inline void TIA::endFrame()
   // Recalculate framerate. attempting to auto-correct for scanline 'jumps'
   if(myAutoFrameEnabled)
   {
-    myFramerate = (myScanlineCountForLastFrame > 285 ? 15600.0 : 15720.0) /
-                   myScanlineCountForLastFrame;
-    myConsole.setFramerate(myFramerate);
+    // fps = lineRate / scanlines, kept as the exact rational
+    // (15600 or 15720) / scanlineCount
+    myConsole.setFramerate(
+        myScanlineCountForLastFrame > 285 ? 15600 : 15720,
+        myScanlineCountForLastFrame);
 
     // Adjust end-of-frame pointer
     // We always accommodate the highest # of scanlines, up to the maximum
@@ -1122,9 +1133,13 @@ inline uInt8 TIA::dumpedInputPort(int resistance)
   }
   else
   {
-    // Constant here is derived from '1.6 * 0.01e-6 * 228 / 3'
+    // Constant is derived from '1.6 * 0.01e-6 * 228 / 3' = 1.216e-6,
+    // expressed exactly as the rational 76 / 62500000; the framerate is
+    // the exact rational num/den, so this is pure integer arithmetic
     uInt32 needed = (uInt32)
-      (1.216e-6 * resistance * myScanlineCountForLastFrame * myFramerate);
+      (((uInt64)resistance * myScanlineCountForLastFrame *
+        myConsole.getFramerateNum() * 76) /
+       ((uInt64)myConsole.getFramerateDen() * 62500000));
     if((mySystem->cycles() - myDumpDisabledCycle) > needed)
       return 0x80;
     else
