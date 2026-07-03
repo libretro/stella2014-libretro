@@ -71,7 +71,6 @@ class Settings
       @return The specific type value of the setting
     */
     int getInt(const string& key) const     { return value(key).toInt();   }
-    float getFloat(const string& key) const { return value(key).toFloat(); }
     bool getBool(const string& key) const   { return value(key).toBool();  }
     const string& getString(const string& key) const { return value(key).toString(); }
 
