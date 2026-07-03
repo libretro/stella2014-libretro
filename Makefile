@@ -241,7 +241,7 @@ else ifeq ($(platform), ctr)
    AR = $(DEVKITARM)/bin/arm-none-eabi-ar$(EXE_EXT)
    FLAGS += -march=armv6k -mtune=mpcore -mfloat-abi=hard
    FLAGS += -Wall -mword-relocations
-   FLAGS += -fomit-frame-pointer -ffast-math
+   FLAGS += -fomit-frame-pointer
    FLAGS += -DARM11 -D_3DS
    STATIC_LINKING = 1
 
@@ -251,7 +251,7 @@ else ifeq ($(platform), rpi1)
 	fpic := -fPIC
 	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
 	FLAGS += -marm -march=armv6j -mfpu=vfp -mfloat-abi=hard
-	FLAGS += -fomit-frame-pointer -ffast-math
+	FLAGS += -fomit-frame-pointer
 
 # Raspberry Pi 2
 else ifeq ($(platform), rpi2)
@@ -259,7 +259,7 @@ else ifeq ($(platform), rpi2)
 	fpic := -fPIC
 	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
 	FLAGS += -marm -mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard
-	FLAGS += -fomit-frame-pointer -ffast-math
+	FLAGS += -fomit-frame-pointer
 
 # Raspberry Pi 3
 else ifeq ($(platform), rpi3)
@@ -267,7 +267,7 @@ else ifeq ($(platform), rpi3)
 	fpic := -fPIC
 	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
 	FLAGS += -marm -mcpu=cortex-a53 -mfpu=neon-fp-armv8 -mfloat-abi=hard
-	FLAGS += -fomit-frame-pointer -ffast-math
+	FLAGS += -fomit-frame-pointer
 
 	# Raspberry Pi 4
 	else ifeq ($(platform), rpi4)
@@ -275,13 +275,13 @@ else ifeq ($(platform), rpi3)
 		fpic := -fPIC
 		SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
 		FLAGS += -marm -mcpu=cortex-a72 -mfpu=neon-fp-armv8 -mfloat-abi=hard
-		FLAGS += -fomit-frame-pointer -ffast-math
+		FLAGS += -fomit-frame-pointer
 
 # ARM
 else ifneq (,$(findstring armv,$(platform)))
 	TARGET := $(TARGET_NAME)_libretro.so
 	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
-	FLAGS += -fomit-frame-pointer -ffast-math
+	FLAGS += -fomit-frame-pointer
 	fpic := -fPIC
 	CC = gcc
 	ifneq (,$(findstring cortexa8,$(platform)))
@@ -344,7 +344,7 @@ else ifeq ($(platform), rs90)
 	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
 	LDFLAGS += $(PTHREAD_FLAGS) -lrt
 	FLAGS += $(PTHREAD_FLAGS) -DHAVE_MKDIR
-	FLAGS += -fomit-frame-pointer -ffast-math -march=mips32 -mtune=mips32
+	FLAGS += -fomit-frame-pointer -march=mips32 -mtune=mips32
 	fpic := -fPIC
 
 # GCW0
@@ -356,7 +356,7 @@ else ifeq ($(platform), gcw0)
 	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
 	LDFLAGS += $(PTHREAD_FLAGS) -lrt
 	FLAGS += $(PTHREAD_FLAGS) -DHAVE_MKDIR
-	FLAGS += -fomit-frame-pointer -ffast-math -march=mips32 -mtune=mips32r2 -mhard-float
+	FLAGS += -fomit-frame-pointer -march=mips32 -mtune=mips32r2 -mhard-float
 	fpic := -fPIC
 
 # GCW0
@@ -368,7 +368,7 @@ else ifeq ($(platform), retrofw)
 	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
 	LDFLAGS += $(PTHREAD_FLAGS) -lrt
 	FLAGS += $(PTHREAD_FLAGS) -DHAVE_MKDIR
-	FLAGS += -fomit-frame-pointer -ffast-math -march=mips32 -mtune=mips32 -mhard-float
+	FLAGS += -fomit-frame-pointer -march=mips32 -mtune=mips32 -mhard-float
 	fpic := -fPIC
 
 # MIYOO
@@ -380,7 +380,7 @@ else ifeq ($(platform), miyoo)
 	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
 	LDFLAGS += $(PTHREAD_FLAGS) -lrt
 	FLAGS += $(PTHREAD_FLAGS) -DHAVE_MKDIR
-	FLAGS += -fomit-frame-pointer -ffast-math -march=armv5te -mtune=arm926ej-s
+	FLAGS += -fomit-frame-pointer -march=armv5te -mtune=arm926ej-s
 	fpic := -fPIC
 
 # Windows MSVC 2003 Xbox 1
@@ -642,7 +642,7 @@ endif
 endif
 
 ifeq (,$(findstring msvc,$(platform)))
-FLAGS += -ffast-math
+FLAGS +=
 else
 FLAGS += -D_CRT_SECURE_NO_DEPRECATE
 endif
