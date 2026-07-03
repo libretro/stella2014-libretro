@@ -156,12 +156,16 @@ class Sound : public Serializable
     // The OSystem for this sound object
     OSystem* myOSystem;
 
-    // Struct to hold information regarding a TIA sound register write
+    // Struct to hold information regarding a TIA sound register write.
+    // Timing is kept in integer CPU cycles for exactness/determinism:
+    // the TIA produces exactly one audio sample every 38 CPU cycles
+    // (2 samples per 76-cycle scanline, as on real hardware and in the
+    // MiSTer FPGA implementation).
     struct RegWrite
     {
       uInt16 addr;
       uInt8 value;
-      double delta;
+      uInt32 deltaCycles;
     };
 
     /**
@@ -194,9 +198,10 @@ class Sound : public Serializable
         void dequeue();
 
         /**
-          Return the duration of all the items in the queue.
+          Return the total duration of all the items in the queue,
+          in integer CPU cycles.
         */
-        double duration();
+        uInt64 durationCycles();
 
         /**
           Enqueue the specified object.

@@ -149,19 +149,19 @@ void Sound::setChannels(uInt32 channels)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Sound::set(uInt16 addr, uInt8 value, Int32 cycle)
 {
-  // First, calculate how many seconds would have past since the last
-  // register write on a real 2600
-  double delta = (((double)(cycle - myLastRegisterSetCycle)) / 
-      (1193191.66666667));
+  // Record how many CPU cycles have passed since the last register write.
+  // All queue timing is integer CPU cycles: the TIA emits exactly one
+  // audio sample every 38 CPU cycles (2 samples per 76-cycle scanline,
+  // per real hardware / MiSTer RTL), so no seconds conversion is needed
+  // and the arithmetic is exact and deterministic.
+  Int32 delta = cycle - myLastRegisterSetCycle;
+  if(delta < 0)
+    delta = 0;
 
-  // Now, adjust the time based on the frame rate the user has selected. For
-  // the sound to "scale" correctly, we have to know the games real frame 
-  // rate (e.g., 50 or 60) and the currently emulated frame rate. We use these
-  // values to "scale" the time before the register change occurs.
   RegWrite info;
   info.addr = addr;
   info.value = value;
-  info.delta = delta;
+  info.deltaCycles = (uInt32)delta;
   myRegWriteQueue.enqueue(info);
 
   // Update last cycle counter to the current cycle
@@ -171,32 +171,41 @@ void Sound::set(uInt16 addr, uInt8 value, Int32 cycle)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Sound::processFragment(Int16* stream, uInt32 length)
 {
-    const uInt32 channels = 2;
-    double streamLengthInSecs = (double)length/(double)31400;
-    double excessStreamSecs = myRegWriteQueue.duration() - streamLengthInSecs;
-    if(excessStreamSecs > 0.0)
-    {
-        double removed = 0.0;
-        while(removed < excessStreamSecs)
-        {
-            RegWrite& info = myRegWriteQueue.front();
-            removed += info.delta;
-            myTIASound.set(info.addr, info.value);
-            myRegWriteQueue.dequeue();
-        }
-    }
+  // All timing below is in integer CPU cycles. The TIA produces exactly
+  // one audio sample every 38 CPU cycles (2 samples per 76-cycle scanline,
+  // as on real hardware and in the MiSTer FPGA implementation), so a
+  // fragment of 'length' samples spans exactly length*38 cycles. This
+  // arithmetic is exact and bit-for-bit deterministic on every platform.
+  const uInt32 channels = 2;
+  const uInt32 CYCLES_PER_SAMPLE = 38;
 
-  double position = 0.0;
-  double remaining = length;
-
-  while(remaining > 0.0)
+  uInt64 streamLengthCycles = (uInt64)length * CYCLES_PER_SAMPLE;
+  uInt64 queuedCycles = myRegWriteQueue.durationCycles();
+  if(queuedCycles > streamLengthCycles)
   {
+    uInt64 excessCycles = queuedCycles - streamLengthCycles;
+    uInt64 removedCycles = 0;
+    while(removedCycles < excessCycles)
+    {
+      RegWrite& info = myRegWriteQueue.front();
+      removedCycles += info.deltaCycles;
+      myTIASound.set(info.addr, info.value);
+      myRegWriteQueue.dequeue();
+    }
+  }
+
+  uInt64 positionCycles = 0;   // elapsed time within this fragment
+
+  while(positionCycles < streamLengthCycles)
+  {
+    uInt32 positionSamples = (uInt32)(positionCycles / CYCLES_PER_SAMPLE);
+
     if(myRegWriteQueue.size() == 0)
     {
       // There are no more pending TIA sound register updates so we'll
       // use the current settings to finish filling the sound fragment
-      myTIASound.process(stream + ((uInt32)position * channels),
-          length - (uInt32)position);
+      myTIASound.process(stream + (positionSamples * channels),
+          length - positionSamples);
 
       // Since we had to fill the fragment we'll reset the cycle counter
       // to zero.  NOTE: This isn't 100% correct, however, it'll do for
@@ -211,25 +220,25 @@ void Sound::processFragment(Int16* stream, uInt32 length)
       // update the sound buffer to the point of the next register update
       RegWrite& info = myRegWriteQueue.front();
 
-      // How long will the remaining samples in the fragment take to play
-      double duration = remaining / (double)31400;
+      // Cycles remaining until the end of this fragment
+      uInt64 remainingCycles = streamLengthCycles - positionCycles;
 
       // Does the register update occur before the end of the fragment?
-      if(info.delta <= duration)
+      if((uInt64)info.deltaCycles <= remainingCycles)
       {
         // If the register update time hasn't already passed then
         // process samples upto the point where it should occur
-        if(info.delta > 0.0)
+        if(info.deltaCycles > 0)
         {
-          // Process the fragment upto the next TIA register write.  We
-          // round the count passed to process up if needed.
-          double samples = (31400 * info.delta);
-          myTIASound.process(stream + ((uInt32)position * channels),
-              (uInt32)samples + (uInt32)(position + samples) - 
-              ((uInt32)position + (uInt32)samples));
+          // Process the fragment up to the next TIA register write.
+          // The sample count is the number of whole sample boundaries
+          // crossed: floor((pos+delta)/38) - floor(pos/38).
+          uInt32 nextSamples = (uInt32)
+              ((positionCycles + info.deltaCycles) / CYCLES_PER_SAMPLE);
+          myTIASound.process(stream + (positionSamples * channels),
+              nextSamples - positionSamples);
 
-          position += samples;
-          remaining -= samples;
+          positionCycles += info.deltaCycles;
         }
         myTIASound.set(info.addr, info.value);
         myRegWriteQueue.dequeue();
@@ -239,66 +248,13 @@ void Sound::processFragment(Int16* stream, uInt32 length)
         // The next register update occurs in the next fragment so finish
         // this fragment with the current TIA settings and reduce the register
         // update delay by the corresponding amount of time
-        myTIASound.process(stream + ((uInt32)position * channels),
-            length - (uInt32)position);
-        info.delta -= duration;
+        myTIASound.process(stream + (positionSamples * channels),
+            length - positionSamples);
+        info.deltaCycles -= (uInt32)remainingCycles;
         break;
       }
     }
   }
-    
-//    double position = 0.0;
-//    double remaining = length;
-//    
-//    while(remaining > 0.0)
-//    {
-//        if(myRegWriteQueue.size() == 0)
-//        {
-//            // There are no more pending TIA sound register updates so we'll use the current settings to finish filling the sound fragment
-//            myTIASound.process(stream + ((uInt32)position * 2), length - (uInt32)position);
-//            myLastRegisterSetCycle = 0;
-//            break;
-//        }
-//        else
-//        {
-//            // There are pending TIA sound register updates so we need to
-//            // update the sound buffer to the point of the next register update
-//            RegWrite& info = myRegWriteQueue.front();
-//            
-//            // How long will the remaining samples in the fragment take to play
-//            //      double duration = remaining / (double)myHardwareSpec.freq;
-//            double duration = remaining / 31400.0;
-//            
-//            // Does the register update occur before the end of the fragment?
-//            if(info.delta <= duration)
-//            {
-//                // If the register update time hasn't already passed then
-//                // process samples upto the point where it should occur
-//                if(info.delta > 0.0)
-//                {
-//                    // Process the fragment upto the next TIA register write.  We
-//                    // round the count passed to process up if needed.
-//                    //          double samples = (myHardwareSpec.freq * info.delta);
-//                    double samples = (31400.0 * info.delta);
-//                    myTIASound.process(stream + ((uInt32)position * 2), (uInt32)samples + (uInt32)(position + samples) - ((uInt32)position + (uInt32)samples));
-//                    
-//                    position += samples;
-//                    remaining -= samples;
-//                }
-//                myTIASound.set(info.addr, info.value);
-//                myRegWriteQueue.dequeue();
-//            }
-//            else
-//            {
-//                // The next register update occurs in the next fragment so finish
-//                // this fragment with the current TIA settings and reduce the register
-//                // update delay by the corresponding amount of time
-//                myTIASound.process(stream + ((uInt32)position * 2), length - (uInt32)position);
-//                info.delta -= duration;
-//                break;
-//            }
-//        }
-//    }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -396,12 +352,12 @@ void Sound::RegWriteQueue::dequeue()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double Sound::RegWriteQueue::duration()
+uInt64 Sound::RegWriteQueue::durationCycles()
 {
-  double duration = 0.0;
+  uInt64 duration = 0;
   for(uInt32 i = 0; i < mySize; ++i)
   {
-    duration += myBuffer[(myHead + i) % myCapacity].delta;
+    duration += myBuffer[(myHead + i) % myCapacity].deltaCycles;
   }
   return duration;
 }
