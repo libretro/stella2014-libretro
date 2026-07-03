@@ -45,7 +45,14 @@ static StateManager stateManager(&osystem);
 
 static int videoWidth, videoHeight;
 
-#define FRAME_BUFFER_SIZE (256 * 160 * 4)
+/* Sized to the TIA's internal frame buffer (160 x 320 lines), not the
+ * nominal 160 x 256 display maximum: the display height (<=256), the
+ * y-start offset (<=64) and this buffer previously had to satisfy
+ * three independent invariants exactly, with zero bytes of margin.
+ * Matching the TIA buffer makes the output buffer safe for anything
+ * the TIA can hand us. */
+#define FRAME_BUFFER_MAX_LINES 320
+#define FRAME_BUFFER_SIZE (FRAME_BUFFER_MAX_LINES * 160 * 4)
 static uint8_t *frameBuffer = NULL;
 static uint8_t *frameBufferPrev = NULL;
 static uint8_t framePixelBytes = 2;
@@ -1438,6 +1445,11 @@ void retro_run(void)
    //Get the frame info from stella
    videoWidth = tia.width();
    videoHeight = tia.height();
+
+   //Defensive: never let the blend loops run past either the TIA's
+   //internal buffer or our output buffer, whatever the TIA reports
+   if (videoHeight > FRAME_BUFFER_MAX_LINES)
+      videoHeight = FRAME_BUFFER_MAX_LINES;
 
    //Copy the frame from stella to libretro
    if (framePixelBytes == 2)
