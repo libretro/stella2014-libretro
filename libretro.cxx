@@ -179,9 +179,9 @@ static Controller::Type left_controller_type = Controller::Joystick;
 static int paddle_digital_sensitivity = 50;
 
 #define PADDLE_ANALOG_RANGE 0x8000
-static float paddle_analog_sensitivity = 50.0f;
+static int paddle_analog_sensitivity = 50;
 static bool paddle_analog_is_quadratic = false;
-static int paddle_analog_deadzone = (int)(0.15f * (float)PADDLE_ANALOG_RANGE);
+static int paddle_analog_deadzone = (15 * PADDLE_ANALOG_RANGE) / 100;
 
 static Event::Type MouseAxisValue0   = Event::MouseAxisXValue;
 static Event::Type MouseButtonValue0 = Event::MouseButtonLeftValue;
@@ -193,18 +193,29 @@ static Event::Type MouseButtonValue1 = Event::MouseButtonRightValue;
  *   to regular gamepads, thus independent sensitivity
  *   and offset options are required */
 #define STELLADAPTOR_ANALOG_SENSE_DEFAULT  20
-#define STELLADAPTOR_ANALOG_SENSE_FACTOR   0.148643628f
-#define STELLADAPTOR_ANALOG_SENSE_BASE     1.1f
 #define STELLADAPTOR_ANALOG_SENSE_MIN      0
 #define STELLADAPTOR_ANALOG_SENSE_MAX      30
 
 #define STELLADAPTOR_ANALOG_CENTER_DEFAULT 0
-#define STELLADAPTOR_ANALOG_CENTER_FACTOR  860.0f
+#define STELLADAPTOR_ANALOG_CENTER_FACTOR  860
 #define STELLADAPTOR_ANALOG_CENTER_MIN     -10
 #define STELLADAPTOR_ANALOG_CENTER_MAX     30
 
-static float stelladaptor_analog_sensitivity = 1.0f;
-static float stelladaptor_analog_center      = 0.0f;
+/* 16.16 fixed-point table of 1.1^(sense - 20) for sense = 0..30,
+ * replacing 0.148643628 * pow(1.1, sense); entry 20 is exactly 1.0.
+ * Precomputed so no floating point or libm pow() is needed. */
+static const int32_t stelladaptor_analog_sense_table
+      [STELLADAPTOR_ANALOG_SENSE_MAX + 1] = {
+     9742,  10716,  11787,  12966,  14263,  15689,  17258,  18983,
+    20882,  22970,  25267,  27794,  30573,  33630,  36993,  40693,
+    44762,  49238,  54162,  59578,  65536,  72090,  79299,  87228,
+    95951, 105546, 116101, 127711, 140482, 154530, 169984
+};
+
+/* Sensitivity is 16.16 fixed point (0x10000 = 1.0); center is a plain
+ * integer offset (the old float factor of 860.0 was already integral) */
+static int32_t stelladaptor_analog_sensitivity = 0x10000;
+static int32_t stelladaptor_analog_center      = 0;
 
 /* Low pass audio filter */
 static bool low_pass_enabled       = false;
@@ -598,23 +609,19 @@ static void (*apply_low_pass_filter)(int16_t *buf, int length) = apply_low_pass_
  * Auxiliary functions
  ************************************/
 
-static float get_stelladaptor_analog_sensitivity(int sensitivity)
+static int32_t get_stelladaptor_analog_sensitivity(int sensitivity)
 {
-   /* STELLADAPTOR_ANALOG_SENSE_FACTOR *
-    *       (STELLADAPTOR_ANALOG_SENSE_BASE ^
-    *             STELLADAPTOR_ANALOG_SENSE_DEFAULT) = 1.0 */
-
+   /* Returns 16.16 fixed point; table entry at the default (20) is 1.0 */
    int sense = (sensitivity > STELLADAPTOR_ANALOG_SENSE_MAX) ?
          STELLADAPTOR_ANALOG_SENSE_MAX : sensitivity;
 
    sense = (sense < STELLADAPTOR_ANALOG_SENSE_MIN) ?
          STELLADAPTOR_ANALOG_SENSE_MIN : sense;
 
-   return STELLADAPTOR_ANALOG_SENSE_FACTOR * (float)pow(
-         (double)STELLADAPTOR_ANALOG_SENSE_BASE, (double)sense);
+   return stelladaptor_analog_sense_table[sense];
 }
 
-static float get_stelladaptor_analog_center(int center)
+static int32_t get_stelladaptor_analog_center(int center)
 {
    /* Convert into ~5 pixel steps */
 
@@ -624,7 +631,7 @@ static float get_stelladaptor_analog_center(int center)
    offset = (offset < STELLADAPTOR_ANALOG_CENTER_MIN) ?
          STELLADAPTOR_ANALOG_CENTER_MIN : offset;
 
-   return STELLADAPTOR_ANALOG_CENTER_FACTOR * (float)offset;
+   return STELLADAPTOR_ANALOG_CENTER_FACTOR * offset;
 }
 
 static void init_paddles(void)
@@ -701,13 +708,15 @@ static void update_input()
                RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_Y);
 
          /* Apply sensitivity/offset factors */
-         paddle_a = (int)(((float)paddle_a * stelladaptor_analog_sensitivity) +
-               stelladaptor_analog_center);
+         paddle_a = (int)(((int64_t)paddle_a *
+               stelladaptor_analog_sensitivity) >> 16) +
+               stelladaptor_analog_center;
          paddle_a = (paddle_a >  0x7FFF) ?  0x7FFF : paddle_a;
          paddle_a = (paddle_a < -0x7FFF) ? -0x7FFF : paddle_a;
 
-         paddle_b = (int)(((float)paddle_b * stelladaptor_analog_sensitivity) +
-               stelladaptor_analog_center);
+         paddle_b = (int)(((int64_t)paddle_b *
+               stelladaptor_analog_sensitivity) >> 16) +
+               stelladaptor_analog_center;
          paddle_b = (paddle_b >  0x7FFF) ?  0x7FFF : paddle_b;
          paddle_b = (paddle_b < -0x7FFF) ? -0x7FFF : paddle_b;
 
@@ -779,7 +788,7 @@ static void update_input()
          /* Read analog paddle input, if required */
          if (left_controller_type == Controller::Paddles)
          {
-            float paddle_amp = 0.0f;
+            int32_t paddle_amp = 0; /* 16.16 fixed point, [-1.0, 1.0] */
             int paddle       = input_state_cb(i, RETRO_DEVICE_ANALOG,
                   RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X);
 
@@ -788,18 +797,18 @@ static void update_input()
             if ((paddle < -paddle_analog_deadzone) ||
                 (paddle > paddle_analog_deadzone))
             {
-               paddle_amp = (float)((paddle > paddle_analog_deadzone) ?
+               int32_t p = (paddle > paddle_analog_deadzone) ?
                      (paddle - paddle_analog_deadzone) :
-                           (paddle + paddle_analog_deadzone)) /
-                                 (float)(PADDLE_ANALOG_RANGE - paddle_analog_deadzone);
+                           (paddle + paddle_analog_deadzone);
+               paddle_amp = (int32_t)(((int64_t)p << 16) /
+                     (PADDLE_ANALOG_RANGE - paddle_analog_deadzone));
 
                /* Check whether paddle response is quadratic */
                if (paddle_analog_is_quadratic)
                {
-                  if (paddle_amp < 0.0)
-                     paddle_amp = -(paddle_amp * paddle_amp);
-                  else
-                     paddle_amp = paddle_amp * paddle_amp;
+                  int32_t sq = (int32_t)
+                        (((int64_t)paddle_amp * paddle_amp) >> 16);
+                  paddle_amp = (paddle_amp < 0) ? -sq : sq;
                }
             }
 
@@ -807,7 +816,8 @@ static void update_input()
              * scaling by current analog sensitivity value
              * > Note: Stella internally divides paddle value
              *   by 2 - counter this by premultiplying */
-            paddle = (int)(paddle_amp * paddle_analog_sensitivity) << 1;
+            paddle = (int)(((int64_t)paddle_amp *
+                  paddle_analog_sensitivity) >> 16) << 1;
 
             if (i == 0)
             {
@@ -927,7 +937,7 @@ static void check_variables(bool first_run)
             150 : analog_sensitivity;
       analog_sensitivity = (analog_sensitivity <  10) ?
             10  : analog_sensitivity;
-      paddle_analog_sensitivity = (float)analog_sensitivity;
+      paddle_analog_sensitivity = analog_sensitivity;
    }
 
    /* Read paddle analog response option */
@@ -944,10 +954,10 @@ static void check_variables(bool first_run)
    var.key   = "stella2014_paddle_analog_deadzone";
    var.value = NULL;
 
-   paddle_analog_deadzone = (int)(0.15f * (float)PADDLE_ANALOG_RANGE);
+   paddle_analog_deadzone = (15 * PADDLE_ANALOG_RANGE) / 100;
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-      paddle_analog_deadzone = (int)((float)atoi(var.value) * 0.01f * (float)PADDLE_ANALOG_RANGE);
+      paddle_analog_deadzone = (atoi(var.value) * PADDLE_ANALOG_RANGE) / 100;
 
    /* Read Stelladaptor analog sensitivity option */
    var.key   = "stella2014_stelladaptor_analog_sensitivity";
@@ -1014,7 +1024,11 @@ void retro_get_system_info(struct retro_system_info *info)
 void retro_get_system_av_info(struct retro_system_av_info *info)
 {
    memset(info, 0, sizeof(*info));
-   info->timing.fps            = console->getFramerate();
+   /* retro_system_timing.fps is typed 'double' by the libretro API; the
+    * value is frontend pacing metadata only and never feeds back into
+    * emulation, which is pure integer. Computed from the exact rational. */
+   info->timing.fps            = (double)console->getFramerateNum() /
+                                 (double)console->getFramerateDen();
    info->timing.sample_rate    = 31400;
    info->geometry.base_width   = 160 * 2;
    info->geometry.base_height  = videoHeight;
@@ -1244,7 +1258,6 @@ void retro_unload_game(void)
 
 unsigned retro_get_region(void)
 {
-   //console->getFramerate();
    return RETRO_REGION_NTSC;
 }
 
@@ -1335,8 +1348,11 @@ void retro_reset(void)
 void retro_run(void)
 {
    static int16_t sampleBuffer[2048];
-   //Get the number of samples in a frame
-   static uint32_t tiaSamplesPerFrame = (uint32_t)(31400.0f/console->getFramerate());
+   //Get the number of samples in a frame: sampleRate/fps as exact integers,
+   //31400 * den / num (e.g. NTSC 31400*25/1498 = 524, PAL 31400*25/1248 = 629)
+   static uint32_t tiaSamplesPerFrame =
+         (31400u * console->getFramerateDen()) /
+         (console->getFramerateNum() ? console->getFramerateNum() : 1498u);
 
    //CORE OPTIONS
    bool updated = false;
