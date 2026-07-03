@@ -18,6 +18,7 @@
 //============================================================================
 
 #include <fstream>
+#include <stdexcept>
 
 #include "Serializer.hxx"
 
@@ -159,6 +160,21 @@ void Serializer::getIntArray(uInt32* array, uInt32 size)
 string Serializer::getString(void)
 {
   int len = getInt();
+
+  // A malformed or truncated stream can yield a bogus length here (a
+  // negative value, or one far larger than the data that remains).
+  // Passing that straight to string::resize()/read() means a giant
+  // allocation or a long read that only fails at the very end. Instead,
+  // reject any length that cannot possibly be satisfied by the bytes
+  // left in the stream, so a bad state is refused immediately.
+  stringstream* s = (stringstream*)myStream;
+  streampos cur = s->tellg();
+  s->seekg(0, ios::end);
+  streampos end = s->tellg();
+  s->seekg(cur, ios::beg);
+  if(len < 0 || (streamoff)len > (end - cur))
+    throw runtime_error("Serializer: invalid string length");
+
   string str;
   str.resize(len);
   myStream->read(&str[0], len);
