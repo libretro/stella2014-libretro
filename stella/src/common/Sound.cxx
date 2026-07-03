@@ -262,27 +262,27 @@ bool Sound::save(Serializer& out) const
 {
    out.putString(name());
 
-   uInt8 reg1 = 0, reg2 = 0, reg3 = 0, reg4 = 0, reg5 = 0, reg6 = 0;
-
-   // Only get the TIA sound registers if sound is enabled
-   if(myIsInitializedFlag)
-   {
-      reg1 = myTIASound.get(0x15);
-      reg2 = myTIASound.get(0x16);
-      reg3 = myTIASound.get(0x17);
-      reg4 = myTIASound.get(0x18);
-      reg5 = myTIASound.get(0x19);
-      reg6 = myTIASound.get(0x1a);
-   }
-
-   out.putByte(reg1);
-   out.putByte(reg2);
-   out.putByte(reg3);
-   out.putByte(reg4);
-   out.putByte(reg5);
-   out.putByte(reg6);
+   // Full generator state (poly positions, divider phases, output
+   // counter), not just the six registers: restoring registers alone
+   // loses the waveform phase and every sample after a state load
+   // diverges from the timeline that was saved.
+   if(!myTIASound.save(out))
+      return false;
 
    out.putInt(myLastRegisterSetCycle);
+
+   // Pending register writes that have been queued but not yet
+   // consumed by processFragment(); dropping them on load loses
+   // register updates entirely.
+   uInt32 n = myRegWriteQueue.size();
+   out.putInt(n);
+   for(uInt32 i = 0; i < n; ++i)
+   {
+      const RegWrite& r = myRegWriteQueue.peek(i);
+      out.putInt(r.addr);
+      out.putByte(r.value);
+      out.putInt(r.deltaCycles);
+   }
 
    return true;
 }
@@ -293,26 +293,20 @@ bool Sound::load(Serializer& in)
    if(in.getString() != name())
       return false;
 
-   uInt8 reg1 = in.getByte(),
-         reg2 = in.getByte(),
-         reg3 = in.getByte(),
-         reg4 = in.getByte(),
-         reg5 = in.getByte(),
-         reg6 = in.getByte();
+   if(!myTIASound.load(in))
+      return false;
 
    myLastRegisterSetCycle = (Int32) in.getInt();
 
-   // Only update the TIA sound registers if sound is enabled
-   // Make sure to empty the queue of previous sound fragments
-   if(myIsInitializedFlag)
+   myRegWriteQueue.clear();
+   uInt32 n = (uInt32) in.getInt();
+   for(uInt32 i = 0; i < n; ++i)
    {
-      myRegWriteQueue.clear();
-      myTIASound.set(0x15, reg1);
-      myTIASound.set(0x16, reg2);
-      myTIASound.set(0x17, reg3);
-      myTIASound.set(0x18, reg4);
-      myTIASound.set(0x19, reg5);
-      myTIASound.set(0x1a, reg6);
+      RegWrite r;
+      r.addr        = (uInt16) in.getInt();
+      r.value       = in.getByte();
+      r.deltaCycles = (uInt32) in.getInt();
+      myRegWriteQueue.enqueue(r);
    }
 
    return true;

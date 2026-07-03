@@ -209,6 +209,13 @@ class Sound : public Serializable
         void enqueue(const RegWrite& info);
 
         /**
+          Return the i-th queued item counted from the front,
+          for state serialization.
+        */
+        const RegWrite& peek(uInt32 i) const
+          { return myBuffer[(myHead + i) % myCapacity]; }
+
+        /**
           Return the item at the front on the queue.
 
           @return  The item at the front of the queue.

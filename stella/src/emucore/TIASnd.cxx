@@ -18,6 +18,7 @@
 //============================================================================
 
 #include "System.hxx"
+#include "Serializer.hxx"
 #include "TIASnd.hxx"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -397,3 +398,43 @@ const uInt8 TIASound::Div31[POLY5_SIZE] = {
   0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+bool TIASound::save(Serializer& out) const
+{
+  for(int i = 0; i < 2; ++i)
+  {
+    out.putByte(myAUDC[i]);
+    out.putByte(myAUDF[i]);
+    out.putInt(myAUDV[i]);
+    out.putInt(myVolume[i]);
+    out.putByte(myP4[i]);
+    out.putByte(myP5[i]);
+    out.putInt(myP9[i]);
+    out.putByte(myDivNCnt[i]);
+    out.putByte(myDivNMax[i]);
+    out.putByte(myDiv3Cnt[i]);
+  }
+  out.putInt(myOutputCounter);
+  return true;
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+bool TIASound::load(Serializer& in)
+{
+  for(int i = 0; i < 2; ++i)
+  {
+    myAUDC[i]    = in.getByte();
+    myAUDF[i]    = in.getByte();
+    myAUDV[i]    = (Int16)in.getInt();
+    myVolume[i]  = (Int16)in.getInt();
+    myP4[i]      = in.getByte();
+    myP5[i]      = in.getByte();
+    myP9[i]      = (uInt16)in.getInt();
+    myDivNCnt[i] = in.getByte();
+    myDivNMax[i] = in.getByte();
+    myDiv3Cnt[i] = in.getByte();
+  }
+  myOutputCounter = (Int32)in.getInt();
+  return true;
+}

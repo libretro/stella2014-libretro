@@ -32,6 +32,8 @@
   @author  Bradford W. Mott, Stephen Anthony, z26 and MESS teams
   @version $Id: TIASnd.hxx 2838 2014-01-17 23:34:03Z stephena $
 */
+class Serializer;
+
 class TIASound
 {
   public:
@@ -99,6 +101,18 @@ class TIASound
 
   private:
     void polyInit(uInt8* poly, int size, int f0, int f1);
+
+  public:
+    /**
+      Save/load the generator's emulated state (registers, polynomial
+      positions, divider phases, output counter). Configuration values
+      (output frequency, volume percentage, channel mode) are NOT
+      saved: they belong to the frontend, not the emulated machine.
+    */
+    bool save(Serializer& out) const;
+    bool load(Serializer& in);
+
+  private:
 
   private:
     // Definitions for AUDCx (15, 16)
