@@ -1113,12 +1113,36 @@ void retro_set_controller_port_device(unsigned port, unsigned device)
    environ_cb(RETRO_ENVIRONMENT_SET_CORE_OPTIONS_DISPLAY, &option_display);
 }
 
+/* The audio low-pass filter carries per-frame state
+ * (low_pass_left_prev / low_pass_right_prev). It must round-trip
+ * through savestates or the first frames after a load diverge,
+ * breaking netplay / run-ahead determinism. It is stored as a small
+ * tagged trailer after the Stella state blob so that states written
+ * before this trailer existed still load (the filter state then
+ * resets to a deterministic zero). */
+#define LPF_TRAILER_MAGIC 0x4C504631u /* 'LPF1' */
+#define LPF_TRAILER_SIZE  12u         /* magic + left + right */
+
+static void write_u32(uint8_t *p, uint32_t v)
+{
+   p[0] = (uint8_t)(v      );
+   p[1] = (uint8_t)(v >>  8);
+   p[2] = (uint8_t)(v >> 16);
+   p[3] = (uint8_t)(v >> 24);
+}
+
+static uint32_t read_u32(const uint8_t *p)
+{
+   return (uint32_t)p[0]        | ((uint32_t)p[1] << 8) |
+         ((uint32_t)p[2] << 16) | ((uint32_t)p[3] << 24);
+}
+
 size_t retro_serialize_size(void) 
 {
    Serializer state;
    if(!stateManager.saveState(state))
       return 0;
-   return state.get().size();
+   return state.get().size() + LPF_TRAILER_SIZE;
 }
 
 bool retro_serialize(void *data, size_t size)
@@ -1127,18 +1151,41 @@ bool retro_serialize(void *data, size_t size)
     if(!stateManager.saveState(state))
         return false;
     std::string s = state.get();
+    if(size < s.size() + LPF_TRAILER_SIZE)
+        return false;
     memcpy(data, s.data(), s.size());
+
+    uint8_t *trailer = (uint8_t*)data + s.size();
+    write_u32(trailer + 0, LPF_TRAILER_MAGIC);
+    write_u32(trailer + 4, (uint32_t)low_pass_left_prev);
+    write_u32(trailer + 8, (uint32_t)low_pass_right_prev);
     return true;
 }
 
 bool retro_unserialize(const void *data, size_t size)
 {
-    std::string s((const char*)data, size);
-    Serializer state;
-    state.set(s);
-   if(stateManager.loadState(state))
-      return true;
-   return false;
+   /* Stella's Serializer reads only the fields it knows about, so the
+    * trailer at the end of the buffer is ignored by loadState() */
+   std::string s((const char*)data, size);
+   Serializer state;
+   state.set(s);
+   if(!stateManager.loadState(state))
+      return false;
+
+   if(size >= LPF_TRAILER_SIZE)
+   {
+      const uint8_t *trailer = (const uint8_t*)data + size - LPF_TRAILER_SIZE;
+      if(read_u32(trailer) == LPF_TRAILER_MAGIC)
+      {
+         low_pass_left_prev  = (int32_t)read_u32(trailer + 4);
+         low_pass_right_prev = (int32_t)read_u32(trailer + 8);
+         return true;
+      }
+   }
+   /* State predates the trailer: reset to a deterministic default */
+   low_pass_left_prev  = 0;
+   low_pass_right_prev = 0;
+   return true;
 }
 
 void retro_cheat_reset(void)
