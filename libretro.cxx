@@ -1171,13 +1171,27 @@ bool retro_serialize(void *data, size_t size)
 
 bool retro_unserialize(const void *data, size_t size)
 {
-   /* Stella's Serializer reads only the fields it knows about, so the
-    * trailer at the end of the buffer is ignored by loadState() */
-   std::string s((const char*)data, size);
-   Serializer state;
-   state.set(s);
-   if(!stateManager.loadState(state))
+   /* Stella's Serializer arms iostream exceptions on any read error, and
+    * the entire Console::load() chain reads attacker-controllable fields
+    * (including string lengths passed to string::resize) with no internal
+    * bounds checks. A corrupt or truncated savestate -- as a frontend may
+    * hand us during netplay, rewind, or from a tampered file -- therefore
+    * throws std::ios_failure (or std::bad_alloc / std::length_error) that
+    * would otherwise escape across the C libretro ABI and abort the whole
+    * process. This function is the firewall: any failure means "reject the
+    * state", reported as a false return, never a crash. */
+   try
+   {
+      std::string s((const char*)data, size);
+      Serializer state;
+      state.set(s);
+      if(!stateManager.loadState(state))
+         return false;
+   }
+   catch(...)
+   {
       return false;
+   }
 
    if(size >= LPF_TRAILER_SIZE)
    {
