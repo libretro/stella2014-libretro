@@ -402,6 +402,14 @@ class Cartridge : public Device
     static bool isProbably0FA0(const uint8_t* image, uint32_t size);
 
     /**
+      Returns true if the image is probably a 03E0 (Parker Bros) cartridge.
+
+      @param image  A pointer to the ROM image
+      @param size   The size of the ROM image
+    */
+    static bool isProbably03E0(const uint8_t* image, uint32_t size);
+
+    /**
       Returns true if the image is probably a UA bankswitching cartridge
     */
     static bool isProbablyUA(const uint8_t* image, uint32_t size);

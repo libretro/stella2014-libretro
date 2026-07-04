@@ -58,6 +58,7 @@
 #include "CartSB.hxx"
 #include "CartTVBoy.hxx"
 #include "Cart0FA0.hxx"
+#include "Cart03E0.hxx"
 #include "CartUA.hxx"
 #include "CartX07.hxx"
 #include "MD5.hxx"
@@ -248,6 +249,8 @@ Cartridge* Cartridge::create(const uint8_t* image, uint32_t size, string& md5,
     cartridge = new CartridgeTVBoy(image, size, settings);
   else if(type == "0FA0")
     cartridge = new Cartridge0FA0(image, size, settings);
+  else if(type == "03E0")
+    cartridge = new Cartridge03E0(image, size, settings);
   else if(type == "X07")
     cartridge = new CartridgeX07(image, size, settings);
   else if(dtype == "WRONG_SIZE")
@@ -412,6 +415,8 @@ string Cartridge::autodetectType(const uint8_t* image, uint32_t size)
       type = "UA";
     else if(isProbably0FA0(image, size))
       type = "0FA0";
+    else if(isProbably03E0(image, size))
+      type = "03E0";
     else if(isProbablyFE(image, size) && !f8)
       type = "FE";
     else if(isProbably0840(image, size))
@@ -983,6 +988,20 @@ bool Cartridge::isProbably0FA0(const uint8_t* image, uint32_t size)
   };
   for(int i = 0; i < 4; ++i)
     if(searchForBytes(image, size, signature[i], 3, 1))
+      return true;
+  return false;
+}
+
+bool Cartridge::isProbably03E0(const uint8_t* image, uint32_t size)
+{
+  // 03E0 (Brazilian Parker Bros) switches segment 0 into bank 0 by
+  // accessing $03E0 with 'LDA $3E0' or 'ORA $3E0'.
+  static const uint8_t signature[2][4] = {
+    { 0x0D, 0xE0, 0x03, 0x0D },  // ORA $3E0, ORA (Popeye)
+    { 0xAD, 0xE0, 0x03, 0xAD }   // LDA $3E0, ORA (Montezuma's Revenge)
+  };
+  for(int i = 0; i < 2; ++i)
+    if(searchForBytes(image, size, signature[i], 4, 1))
       return true;
   return false;
 }
