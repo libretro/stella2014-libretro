@@ -30,6 +30,7 @@
 #include "KidVid.hxx"
 #include "Genesis.hxx"
 #include "MindLink.hxx"
+#include "QuadTari.hxx"
 #include "CompuMate.hxx"
 #include "M6502.hxx"
 #include "M6532.hxx"
@@ -587,6 +588,10 @@ void Console::setControllers(const string& rommd5)
   {
     myControllers[leftPort] = new MindLink(Controller::Left, myEvent, *mySystem);
   }
+  else if(left == "QUADTARI")
+  {
+    myControllers[leftPort] = new QuadTari(Controller::Left, myEvent, *mySystem);
+  }
   else
   {
     myControllers[leftPort] = new Joystick(Controller::Left, myEvent, *mySystem);
@@ -657,6 +662,10 @@ void Console::setControllers(const string& rommd5)
   else if(right == "MINDLINK")
   {
     myControllers[rightPort] = new MindLink(Controller::Right, myEvent, *mySystem);
+  }
+  else if(right == "QUADTARI")
+  {
+    myControllers[rightPort] = new QuadTari(Controller::Right, myEvent, *mySystem);
   }
   else
   {

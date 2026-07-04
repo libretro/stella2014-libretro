@@ -131,6 +131,7 @@ class System : public Serializable
       @return The attached TIA device
     */
     TIA& tia() { return *myTIA; }
+    const TIA& tia() const { return *myTIA; }
 
     /**
       Answer the random generator attached to the system.

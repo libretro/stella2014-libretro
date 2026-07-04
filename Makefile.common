@@ -70,6 +70,7 @@ SOURCES_CXX := $(CORE_DIR)/src/common/Base.cxx \
 	       $(CORE_DIR)/src/emucore/MT24LC256.cxx \
 	       $(CORE_DIR)/src/emucore/NullDev.cxx \
 	       $(CORE_DIR)/src/emucore/Paddles.cxx \
+	       $(CORE_DIR)/src/emucore/QuadTari.cxx \
 	       $(CORE_DIR)/src/emucore/Props.cxx \
 	       $(CORE_DIR)/src/emucore/PropsSet.cxx \
 	       $(CORE_DIR)/src/emucore/Random.cxx \

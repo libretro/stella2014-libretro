@@ -21,27 +21,52 @@
 #include "Joystick.hxx"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Joystick::Joystick(Jack jack, const Event& event, const System& system)
+Joystick::Joystick(Jack jack, const Event& event, const System& system,
+                   bool second)
   : Controller(jack, event, system, Controller::Joystick),
     myControlID(-1)
 {
   if(myJack == Left)
   {
-    myUpEvent    = Event::JoystickZeroUp;
-    myDownEvent  = Event::JoystickZeroDown;
-    myLeftEvent  = Event::JoystickZeroLeft;
-    myRightEvent = Event::JoystickZeroRight;
-    myFireEvent  = Event::JoystickZeroFire;
+    if(!second)
+    {
+      myUpEvent    = Event::JoystickZeroUp;
+      myDownEvent  = Event::JoystickZeroDown;
+      myLeftEvent  = Event::JoystickZeroLeft;
+      myRightEvent = Event::JoystickZeroRight;
+      myFireEvent  = Event::JoystickZeroFire;
+    }
+    else
+    {
+      /* QuadTari second controller on the left jack -> player 3 */
+      myUpEvent    = Event::JoystickTwoUp;
+      myDownEvent  = Event::JoystickTwoDown;
+      myLeftEvent  = Event::JoystickTwoLeft;
+      myRightEvent = Event::JoystickTwoRight;
+      myFireEvent  = Event::JoystickTwoFire;
+    }
     myXAxisValue = Event::SALeftAxis0Value;
     myYAxisValue = Event::SALeftAxis1Value;
   }
   else
   {
-    myUpEvent    = Event::JoystickOneUp;
-    myDownEvent  = Event::JoystickOneDown;
-    myLeftEvent  = Event::JoystickOneLeft;
-    myRightEvent = Event::JoystickOneRight;
-    myFireEvent  = Event::JoystickOneFire;
+    if(!second)
+    {
+      myUpEvent    = Event::JoystickOneUp;
+      myDownEvent  = Event::JoystickOneDown;
+      myLeftEvent  = Event::JoystickOneLeft;
+      myRightEvent = Event::JoystickOneRight;
+      myFireEvent  = Event::JoystickOneFire;
+    }
+    else
+    {
+      /* QuadTari second controller on the right jack -> player 4 */
+      myUpEvent    = Event::JoystickThreeUp;
+      myDownEvent  = Event::JoystickThreeDown;
+      myLeftEvent  = Event::JoystickThreeLeft;
+      myRightEvent = Event::JoystickThreeRight;
+      myFireEvent  = Event::JoystickThreeFire;
+    }
     myXAxisValue = Event::SARightAxis0Value;
     myYAxisValue = Event::SARightAxis1Value;
   }
