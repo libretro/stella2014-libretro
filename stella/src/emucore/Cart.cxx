@@ -56,6 +56,7 @@
 #include "CartFC.hxx"
 #include "CartFE.hxx"
 #include "CartMC.hxx"
+#include "CartMDM.hxx"
 #include "CartSB.hxx"
 #include "CartTVBoy.hxx"
 #include "Cart0FA0.hxx"
@@ -245,6 +246,8 @@ Cartridge* Cartridge::create(const uint8_t* image, uint32_t size, string& md5,
     cartridge = new CartridgeFE(image, size, settings);
   else if(type == "MC")
     cartridge = new CartridgeMC(image, size, settings);
+  else if(type == "MDM")
+    cartridge = new CartridgeMDM(image, size, settings);
   else if(type == "UA")
     cartridge = new CartridgeUA(image, size, settings);
   else if(type == "SB")
@@ -382,6 +385,12 @@ string Cartridge::autodetectType(const uint8_t* image, uint32_t size)
   if((size % 8448) == 0 || size == 6144)
   {
     type = "AR";
+  }
+  else if(isProbablyMDM(image, size))
+  {
+    // MDM is identified by a definitive 'MDMC' key and can be any
+    // power-of-two size, so it is checked before the size-based dispatch.
+    type = "MDM";
   }
   else if(size < 2048)  // Sub2K images
   {
@@ -1043,6 +1052,14 @@ bool Cartridge::isProbablyFC(const uint8_t* image, uint32_t size)
     if(searchForBytes(image, size, signature[i], 6, 1))
       return true;
   return false;
+}
+
+bool Cartridge::isProbablyMDM(const uint8_t* image, uint32_t size)
+{
+  // MDM is identified by the key 'MDMC' in the first 8K of ROM.
+  static const uint8_t mdmc[4] = { 'M', 'D', 'M', 'C' };
+  uint32_t searchSize = size < 8192 ? size : 8192;
+  return searchForBytes(image, searchSize, mdmc, 4, 1);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
