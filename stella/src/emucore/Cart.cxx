@@ -541,20 +541,24 @@ bool Cartridge::searchForBytes(const uint8_t* image, uint32_t imagesize,
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool Cartridge::isProbablySC(const uint8_t* image, uint32_t size)
 {
-  // We assume a Superchip cart contains the same bytes for its entire
-  // RAM area; obviously this test will fail if it doesn't
-  // The RAM area will be the first 256 bytes of each 4K bank
-  uint32_t banks = size / 4096;
-  for(uint32_t i = 0; i < banks; ++i)
+  // A Superchip cart has 128 bytes of RAM at the start of each 4K bank:
+  // the first 128 bytes are the write port and the next 128 the read
+  // port, so in the ROM image the two 128-byte halves of that 256-byte
+  // area mirror each other. Testing for that mirror (as Stella 7 does) is
+  // more accurate than the core's previous test, which required all 256
+  // bytes to be one repeated value and so missed Superchip carts whose
+  // RAM area isn't a single constant (a false negative that misdetected
+  // them as plain F4/F6).
+  uint32_t offset = 0;
+  bool sawBank = false;
+  while(offset + 256 <= size)
   {
-    uint8_t first = image[i*4096];
-    for(uint32_t j = 0; j < 256; ++j)
-    {
-      if(image[i*4096+j] != first)
-        return false;
-    }
+    if(memcmp(image + offset, image + offset + 128, 128) != 0)
+      return false;
+    sawBank = true;
+    offset += 4096;
   }
-  return true;
+  return sawBank;
 }
 
 bool Cartridge::isProbably4KSC(const uint8_t* image, uint32_t size)
@@ -845,14 +849,18 @@ bool Cartridge::isProbablyFE(const uint8_t* image, uint32_t size)
 {
   // FE bankswitching is very weird, but always seems to include a
   // 'JSR $xxxx'
-  // These signatures are attributed to the MESS project
-  uint8_t signature[4][5] = {
-    { 0x20, 0x00, 0xD0, 0xC6, 0xC5 },  // JSR $D000; DEC $C5
-    { 0x20, 0xC3, 0xF8, 0xA5, 0x82 },  // JSR $F8C3; LDA $82
-    { 0xD0, 0xFB, 0x20, 0x73, 0xFE },  // BNE $FB; JSR $FE73
-    { 0x20, 0x00, 0xF0, 0x84, 0xD6 }   // JSR $F000; STY $D6
+  // These signatures are (mostly) attributed to the MESS project.
+  // The fourth entry (SECAM Space Shuttle) is backported from Stella 7;
+  // its JSR target differs from the NTSC/PAL release, so without it the
+  // SECAM version was misdetected.
+  uint8_t signature[5][5] = {
+    { 0x20, 0x00, 0xD0, 0xC6, 0xC5 },  // JSR $D000; DEC $C5   Decathlon
+    { 0x20, 0xC3, 0xF8, 0xA5, 0x82 },  // JSR $F8C3; LDA $82   Robot Tank
+    { 0xD0, 0xFB, 0x20, 0x73, 0xFE },  // BNE $FB; JSR $FE73   Space Shuttle (NTSC/PAL)
+    { 0xD0, 0xFB, 0x20, 0x68, 0xFE },  // BNE $FB; JSR $FE68   Space Shuttle (SECAM)
+    { 0x20, 0x00, 0xF0, 0x84, 0xD6 }   // JSR $F000; STY $D6   Thwocker
   };
-  for(uint32_t i = 0; i < 4; ++i)
+  for(uint32_t i = 0; i < 5; ++i)
     if(searchForBytes(image, size, signature[i], 5, 1))
       return true;
 
