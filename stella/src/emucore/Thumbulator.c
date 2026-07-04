@@ -29,6 +29,7 @@ static void thumb_do_add_vflag(Thumbulator* self, uint32_t a, uint32_t b,
                                uint32_t c);
 static void thumb_do_cflag_bit(Thumbulator* self, uint32_t x);
 static void thumb_do_vflag_bit(Thumbulator* self, uint32_t x);
+static int  thumb_bx_callback(Thumbulator* self, uint32_t pc);
 static int  thumb_execute(Thumbulator* self);
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -66,6 +67,19 @@ void thumb_init_ex(Thumbulator* self, const uint16_t* rom, uint16_t* ram,
   self->c_start = c_start;
   self->c_stack = c_stack;
   self->c_base = c_base;
+
+  self->config = THUMB_CONFIG_DPCPLUS;
+  self->cart = 0;
+  self->callback = 0;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+void thumb_set_callback(Thumbulator* self, int config, void* cart,
+    uint32_t (*cb)(void* cart, uint8_t fn, uint32_t v1, uint32_t v2))
+{
+  self->config = config;
+  self->cart = cart;
+  self->callback = cb;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -506,6 +520,144 @@ void thumb_run(Thumbulator* self)
     if(self->instructions > 500000) /* safety cap, as in the original */
       break;
   }
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/*
+  Handle a BX to an even (non-THUMB) address for the CDF/BUS families.
+  Their ARM drivers branch to fixed addresses that Stella intercepts to
+  run note / waveform helpers in the cartridge. The addresses matched are
+  the driver entry + 4 (ARM pipelining). Returns 1 if the branch was a
+  recognised callback site (and the PC has been set to return via LR),
+  or 0 if it was not handled (the caller then treats it as fatal, exactly
+  as the original interpreter did for an even BX target).
+*/
+static int thumb_bx_callback(Thumbulator* self, uint32_t pc)
+{
+  int handled;
+  uint32_t rc;
+
+  handled = 0;
+  if(self->callback == 0)
+    return 0;
+
+  switch(self->config)
+  {
+    case THUMB_CONFIG_BUS:
+      if(pc == (0x000006da + 4))
+      {
+        self->callback(self->cart, 0, thumb_read_register(self, 2),
+                       thumb_read_register(self, 3));
+        handled = 1;
+      }
+      else if(pc == (0x000006de + 4))
+      {
+        self->callback(self->cart, 1, thumb_read_register(self, 2), 0);
+        handled = 1;
+      }
+      else if(pc == (0x000006e2 + 4))
+      {
+        thumb_write_register(self, 2,
+            self->callback(self->cart, 2, thumb_read_register(self, 2), 0));
+        handled = 1;
+      }
+      else if(pc == (0x000006e6 + 4))
+      {
+        self->callback(self->cart, 3, thumb_read_register(self, 2),
+                       thumb_read_register(self, 3));
+        handled = 1;
+      }
+      else if(pc == 0x0000083a)
+      {
+        /* no-op site */
+      }
+      else
+      {
+        self->callback(self->cart, 255, 0, 0);
+      }
+      break;
+
+    case THUMB_CONFIG_CDF:
+      if(pc == (0x000006e2 + 4))
+      {
+        self->callback(self->cart, 0, thumb_read_register(self, 2),
+                       thumb_read_register(self, 3));
+        handled = 1;
+      }
+      else if(pc == (0x000006e6 + 4))
+      {
+        self->callback(self->cart, 1, thumb_read_register(self, 2), 0);
+        handled = 1;
+      }
+      else if(pc == (0x000006ea + 4))
+      {
+        thumb_write_register(self, 2,
+            self->callback(self->cart, 2, thumb_read_register(self, 2), 0));
+        handled = 1;
+      }
+      else if(pc == (0x000006ee + 4))
+      {
+        self->callback(self->cart, 3, thumb_read_register(self, 2),
+                       thumb_read_register(self, 3));
+        handled = 1;
+      }
+      else if(pc == 0x0000083a)
+      {
+        /* no-op site */
+      }
+      else
+      {
+        self->callback(self->cart, 255, 0, 0);
+      }
+      break;
+
+    case THUMB_CONFIG_CDF1: /* CDF1 / CDFJ / CDFJ+ share this map */
+      if(pc == (0x00000752 + 4))
+      {
+        self->callback(self->cart, 0, thumb_read_register(self, 2),
+                       thumb_read_register(self, 3));
+        handled = 1;
+      }
+      else if(pc == (0x00000756 + 4))
+      {
+        self->callback(self->cart, 1, thumb_read_register(self, 2), 0);
+        handled = 1;
+      }
+      else if(pc == (0x0000075a + 4))
+      {
+        thumb_write_register(self, 2,
+            self->callback(self->cart, 2, thumb_read_register(self, 2), 0));
+        handled = 1;
+      }
+      else if(pc == (0x0000075e + 4))
+      {
+        self->callback(self->cart, 3, thumb_read_register(self, 2),
+                       thumb_read_register(self, 3));
+        handled = 1;
+      }
+      else if(pc == 0x0000083a)
+      {
+        /* no-op site */
+      }
+      else
+      {
+        self->callback(self->cart, 255, 0, 0);
+      }
+      break;
+
+    default: /* THUMB_CONFIG_DPCPLUS: no callback sites */
+      break;
+  }
+
+  if(handled)
+  {
+    /* Return from the intercepted helper via the link register. */
+    rc = thumb_read_register(self, 14);
+    rc += 2;
+    thumb_write_register(self, 15, rc);
+    return 1;
+  }
+  return 0;
 }
 
 /* The large instruction interpreter body follows, included to keep this

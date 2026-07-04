@@ -94,6 +94,19 @@ typedef struct Thumbulator
   uint32_t c_start;        /* entry PC (the +2/THUMB adjustment is applied) */
   uint32_t c_stack;        /* initial SP (r13) */
   uint32_t c_base;         /* initial LR (r14) */
+
+  /*
+    ARM-to-cartridge callback, used by CDF and BUS. Their ARM drivers
+    branch (BX) to fixed addresses that Stella intercepts to run note /
+    waveform helpers in the cart. Since this C interpreter cannot call a
+    C++ method, the cartridge registers a trampoline function pointer plus
+    an opaque self pointer via thumb_set_callback(). 'config' selects the
+    address map (see THUMB_CONFIG_*); it is THUMB_CONFIG_DPCPLUS by
+    default, which disables the hook entirely.
+  */
+  int      config;
+  void*    cart;
+  uint32_t (*callback)(void* cart, uint8_t fn, uint32_t v1, uint32_t v2);
 } Thumbulator;
 
 /*
@@ -122,6 +135,23 @@ int thumb_reset(Thumbulator* self);
 /* Memory-mapped LPC2103 Timer 1 registers (used by CDF/BUS ARM audio) */
 #define THUMB_T1TCR 0xE0008004u  /* Timer 1 control register */
 #define THUMB_T1TC  0xE0008008u  /* Timer 1 counter          */
+
+/*
+  ARM driver configuration, selecting the BX callback address map. Only
+  the CDF/BUS families use the callback; DPC+ leaves it disabled.
+*/
+#define THUMB_CONFIG_DPCPLUS  0
+#define THUMB_CONFIG_CDF      1  /* CDF0                          */
+#define THUMB_CONFIG_CDF1     2  /* CDF1 / CDFJ / CDFJ+ address map */
+#define THUMB_CONFIG_BUS      3
+
+/*
+  Register the cartridge callback. 'cart' is passed back verbatim to 'cb';
+  'config' selects which address map the BX handler uses. Passing
+  THUMB_CONFIG_DPCPLUS (or a NULL cb) disables the hook.
+*/
+void thumb_set_callback(Thumbulator* self, int config, void* cart,
+    uint32_t (*cb)(void* cart, uint8_t fn, uint32_t v1, uint32_t v2));
 
 /*
   Set the ARM timer scaling as an exact integer ratio of ARM ticks per

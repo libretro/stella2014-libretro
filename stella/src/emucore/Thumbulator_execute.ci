@@ -457,7 +457,12 @@ static int thumb_execute(Thumbulator* self)
     }
     else
     {
-      /*  fxq: or maybe this one?? */
+      /* Even target: for the CDF/BUS families this is an intercepted
+         call into the cartridge (note/waveform helpers). If the current
+         pc is a recognised callback site it is handled and we continue;
+         otherwise it is fatal, as in the original interpreter. */
+      if(thumb_bx_callback(self, pc))
+        return(0);
       return(1);
     }
   }
