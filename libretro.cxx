@@ -109,6 +109,60 @@ static struct retro_input_descriptor retropad_inputs_gamepad0_gamepad1[] = {
    { 0 },
 };
 
+/* Descriptor labels for the 2600 keyboard/keypad controller, matching the
+ * mapping in update_input(): Y=1 X=2 L=3 / Up=4 B=5 R=6 / Left=7 Down=8
+ * Right=9 / L2=* A=0 R2=#. Applied when a loaded ROM's controller type is
+ * Keyboard (detected in init_paddles), so RetroArch labels the buttons
+ * with their keypad keys instead of "Fire"/"Up"/etc. Two variants cover
+ * left-port-keypad and right-port-keypad; the non-keypad port keeps the
+ * normal gamepad labels. */
+#define KEYPAD_PORT_DESCRIPTORS(port)                                         \
+   { port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y,     "Keypad 1" }, \
+   { port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X,     "Keypad 2" }, \
+   { port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L,     "Keypad 3" }, \
+   { port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,    "Keypad 4" }, \
+   { port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "Keypad 5" }, \
+   { port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R,     "Keypad 6" }, \
+   { port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "Keypad 7" }, \
+   { port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "Keypad 8" }, \
+   { port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "Keypad 9" }, \
+   { port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2,    "Keypad *" }, \
+   { port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "Keypad 0" }, \
+   { port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2,    "Keypad #" }
+
+#define GAMEPAD_PORT_DESCRIPTORS(port)                                            \
+   { port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,   "Left" },        \
+   { port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,     "Up" },          \
+   { port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,   "Down" },        \
+   { port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT,  "Right" },       \
+   { port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,      "Fire" }
+
+static struct retro_input_descriptor retropad_inputs_keypad0_gamepad1[] = {
+   KEYPAD_PORT_DESCRIPTORS(0),
+   GAMEPAD_PORT_DESCRIPTORS(1),
+   { 0 },
+};
+
+static struct retro_input_descriptor retropad_inputs_gamepad0_keypad1[] = {
+   GAMEPAD_PORT_DESCRIPTORS(0),
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L,      "Left Difficulty A" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2,     "Left Difficulty B" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L3,     "Color" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R,      "Right Difficulty A" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2,     "Right Difficulty B" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R3,     "Black/White" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
+   { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START,  "Reset" },
+   KEYPAD_PORT_DESCRIPTORS(1),
+   { 0 },
+};
+
+static struct retro_input_descriptor retropad_inputs_keypad0_keypad1[] = {
+   KEYPAD_PORT_DESCRIPTORS(0),
+   KEYPAD_PORT_DESCRIPTORS(1),
+   { 0 },
+};
+
 static struct retro_input_descriptor retropad_inputs_gamepad0_paddles1[] = {
    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,   "Left" },
    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,     "Up" },
@@ -1473,6 +1527,22 @@ bool retro_load_game(const struct retro_game_info *info)
 
    // Init paddle controls
    init_paddles();
+
+   /* If the ROM uses keyboard/keypad controllers, relabel the RetroPad
+    * buttons with their keypad keys so the mapping is discoverable in the
+    * frontend. Only applies when a port's detected Stella controller is
+    * Keyboard; other ports keep the normal gamepad labels. The paddle
+    * descriptor sets are handled separately via the libretro device type. */
+   {
+      bool kb0 = (left_controller_type  == Controller::Keyboard);
+      bool kb1 = (right_controller_type == Controller::Keyboard);
+      if (kb0 && kb1)
+         environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, retropad_inputs_keypad0_keypad1);
+      else if (kb0)
+         environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, retropad_inputs_keypad0_gamepad1);
+      else if (kb1)
+         environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, retropad_inputs_gamepad0_keypad1);
+   }
 
    // Get the ROM's width and height
    TIA& tia = console->tia();
