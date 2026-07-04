@@ -241,6 +241,13 @@ class TIA : public Device
     bool partialFrame() const { return myPartialFrameFlag; }
 
     /**
+      Answers the current VBLANK register value. The QuadTari controller
+      multiplexes two sub-controllers per jack and selects between them
+      using VBLANK bit 7 (the "dump to ground" line the console toggles).
+    */
+    uint8_t registerVBLANK() const { return myVBLANK; }
+
+    /**
       Answers the first scanline at which drawing occured in the last frame.
 
       @return The starting scanline

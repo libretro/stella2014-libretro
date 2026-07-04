@@ -47,6 +47,10 @@ class Event
         JoystickZeroFire, JoystickZeroFire5, JoystickZeroFire9,
       JoystickOneUp, JoystickOneDown, JoystickOneLeft, JoystickOneRight,
         JoystickOneFire, JoystickOneFire5, JoystickOneFire9,
+      JoystickTwoUp, JoystickTwoDown, JoystickTwoLeft, JoystickTwoRight,
+        JoystickTwoFire,
+      JoystickThreeUp, JoystickThreeDown, JoystickThreeLeft, JoystickThreeRight,
+        JoystickThreeFire,
 
       PaddleZeroDecrease, PaddleZeroIncrease, PaddleZeroAnalog, PaddleZeroFire,
       PaddleOneDecrease, PaddleOneIncrease, PaddleOneAnalog, PaddleOneFire,
