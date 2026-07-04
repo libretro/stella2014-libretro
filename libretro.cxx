@@ -230,6 +230,25 @@ static int32_t low_pass_range      = 0;
 static int32_t low_pass_left_prev  = 0;
 static int32_t low_pass_right_prev = 0;
 
+/* DC-blocking high-pass filter state.
+ *
+ * The TIA audio is unipolar: each channel's output is a non-negative
+ * volume (AUDV 0..15, scaled), so the mixed sample sits well above zero
+ * whenever sound plays and steps back toward zero when it stops. That
+ * large, sound-dependent DC offset is an audible low-frequency thump on
+ * playback chains that reproduce sub-bass (many PC speakers), though it
+ * is inaudible on small speakers / phones that high-pass it away. A
+ * one-pole high-pass with a ~20 Hz cutoff removes the offset while
+ * leaving the game tones (>=100 Hz) essentially untouched:
+ *   y[n] = x[n] - x[n-1] + R*y[n-1],  R = 0.996 (Q16 = 65274).
+ * State is per channel and carried across frames; reset on game load. */
+static int32_t dc_block_x_prev_l = 0;
+static int32_t dc_block_y_prev_l = 0;
+static int32_t dc_block_x_prev_r = 0;
+static int32_t dc_block_y_prev_r = 0;
+/* R in 16.16 fixed point: 20 Hz cutoff at the 31.4 kHz TIA sample rate. */
+#define DC_BLOCK_R 65274
+
 static retro_log_printf_t log_cb;
 static retro_video_refresh_t video_cb;
 static retro_input_poll_t input_poll_cb;
@@ -538,6 +557,67 @@ static void init_frame_blending(enum frame_blend_method blend_method)
          blend_frames_32 = blend_frames_null_32;
          break;
    }
+}
+
+/************************************
+ * DC-blocking high-pass filter
+ ************************************/
+
+/* Reset the DC-blocker state. Called on game load so the cold-start
+ * output is reproducible (the harness relies on this). */
+static void dc_block_reset(void)
+{
+   dc_block_x_prev_l = dc_block_y_prev_l = 0;
+   dc_block_x_prev_r = dc_block_y_prev_r = 0;
+}
+
+/* On vectorisation:
+ * A one-pole high-pass is a feedback recurrence --
+ *   y[n] = x[n] - x[n-1] + R*y[n-1]
+ * -- so y[n] depends on y[n-1] and the loop cannot be vectorised along
+ * the sample axis (SSE2/NEON parallelise independent lanes, not a serial
+ * dependency chain). The only independent axis is the two channels, but
+ * for the TIA they are identical (mono duplicated into L and R), so a
+ * 2-lane SIMD step would compute the same value twice for no gain over
+ * the scalar path -- and the load/store shuffle per sample would very
+ * likely be slower than the handful of scalar integer ops here. There is
+ * therefore no useful SSE2/NEON form of this filter; the scalar loop is
+ * the right implementation. (A block-parallel scan reformulation exists in
+ * theory but is far more complex and pointless at ~525 samples/frame.)
+ * The filter is off the hot path regardless: it runs once over the ~525
+ * samples of a frame, dwarfed by TIA emulation. */
+static void apply_dc_block_filter(int16_t *buf, int frames)
+{
+   int32_t xl_prev = dc_block_x_prev_l, yl_prev = dc_block_y_prev_l;
+   int32_t xr_prev = dc_block_x_prev_r, yr_prev = dc_block_y_prev_r;
+   int i;
+
+   if (frames <= 0)
+      return;
+
+   for (i = 0; i < frames; i++)
+   {
+      int32_t xl = buf[2*i];
+      int32_t xr = buf[2*i + 1];
+      /* R*y_prev in 64-bit to avoid the ~31-bit product overflowing. */
+      int32_t yl = (int32_t)(xl - xl_prev +
+                    (((int64_t)DC_BLOCK_R * yl_prev) >> 16));
+      int32_t yr = (int32_t)(xr - xr_prev +
+                    (((int64_t)DC_BLOCK_R * yr_prev) >> 16));
+
+      /* Clamp to int16 range before storing. */
+      if (yl >  32767) yl =  32767; else if (yl < -32768) yl = -32768;
+      if (yr >  32767) yr =  32767; else if (yr < -32768) yr = -32768;
+
+      buf[2*i]     = (int16_t)yl;
+      buf[2*i + 1] = (int16_t)yr;
+
+      xl_prev = xl; yl_prev = yl;
+      xr_prev = xr; yr_prev = yr;
+   }
+
+   dc_block_x_prev_l = xl_prev; dc_block_y_prev_l = yl_prev;
+   dc_block_x_prev_r = xr_prev; dc_block_y_prev_r = yr_prev;
 }
 
 /************************************
@@ -1127,8 +1207,13 @@ void retro_set_controller_port_device(unsigned port, unsigned device)
  * tagged trailer after the Stella state blob so that states written
  * before this trailer existed still load (the filter state then
  * resets to a deterministic zero). */
-#define LPF_TRAILER_MAGIC 0x4C504631u /* 'LPF1' */
-#define LPF_TRAILER_SIZE  12u         /* magic + left + right */
+#define LPF_TRAILER_MAGIC 0x4C504631u /* 'LPF1': low-pass state only        */
+#define LPF_TRAILER_SIZE  12u         /* magic + lp_left + lp_right          */
+/* Extended trailer: low-pass state plus the DC-blocker's per-channel
+ * x_prev/y_prev, so that audio output stays deterministic across a
+ * savestate round-trip (the filters keep state across frames). */
+#define AF_TRAILER_MAGIC  0x41463256u /* 'AF2V'                              */
+#define AF_TRAILER_SIZE   28u         /* magic + lp(2) + dc(4), all u32      */
 
 static void write_u32(uint8_t *p, uint32_t v)
 {
@@ -1149,7 +1234,7 @@ size_t retro_serialize_size(void)
    Serializer state;
    if(!stateManager.saveState(state))
       return 0;
-   return state.get().size() + LPF_TRAILER_SIZE;
+   return state.get().size() + AF_TRAILER_SIZE;
 }
 
 bool retro_serialize(void *data, size_t size)
@@ -1158,14 +1243,18 @@ bool retro_serialize(void *data, size_t size)
     if(!stateManager.saveState(state))
         return false;
     std::string s = state.get();
-    if(size < s.size() + LPF_TRAILER_SIZE)
+    if(size < s.size() + AF_TRAILER_SIZE)
         return false;
     memcpy(data, s.data(), s.size());
 
     uint8_t *trailer = (uint8_t*)data + s.size();
-    write_u32(trailer + 0, LPF_TRAILER_MAGIC);
-    write_u32(trailer + 4, (uint32_t)low_pass_left_prev);
-    write_u32(trailer + 8, (uint32_t)low_pass_right_prev);
+    write_u32(trailer +  0, AF_TRAILER_MAGIC);
+    write_u32(trailer +  4, (uint32_t)low_pass_left_prev);
+    write_u32(trailer +  8, (uint32_t)low_pass_right_prev);
+    write_u32(trailer + 12, (uint32_t)dc_block_x_prev_l);
+    write_u32(trailer + 16, (uint32_t)dc_block_y_prev_l);
+    write_u32(trailer + 20, (uint32_t)dc_block_x_prev_r);
+    write_u32(trailer + 24, (uint32_t)dc_block_y_prev_r);
     return true;
 }
 
@@ -1193,6 +1282,23 @@ bool retro_unserialize(const void *data, size_t size)
       return false;
    }
 
+   /* Restore the audio-filter state that lives outside the Console. Try
+    * the extended trailer first, then the legacy low-pass-only trailer,
+    * then fall back to deterministic defaults for older states. */
+   if(size >= AF_TRAILER_SIZE)
+   {
+      const uint8_t *trailer = (const uint8_t*)data + size - AF_TRAILER_SIZE;
+      if(read_u32(trailer) == AF_TRAILER_MAGIC)
+      {
+         low_pass_left_prev  = (int32_t)read_u32(trailer +  4);
+         low_pass_right_prev = (int32_t)read_u32(trailer +  8);
+         dc_block_x_prev_l   = (int32_t)read_u32(trailer + 12);
+         dc_block_y_prev_l   = (int32_t)read_u32(trailer + 16);
+         dc_block_x_prev_r   = (int32_t)read_u32(trailer + 20);
+         dc_block_y_prev_r   = (int32_t)read_u32(trailer + 24);
+         return true;
+      }
+   }
    if(size >= LPF_TRAILER_SIZE)
    {
       const uint8_t *trailer = (const uint8_t*)data + size - LPF_TRAILER_SIZE;
@@ -1200,12 +1306,14 @@ bool retro_unserialize(const void *data, size_t size)
       {
          low_pass_left_prev  = (int32_t)read_u32(trailer + 4);
          low_pass_right_prev = (int32_t)read_u32(trailer + 8);
+         dc_block_reset();
          return true;
       }
    }
    /* State predates the trailer: reset to a deterministic default */
    low_pass_left_prev  = 0;
    low_pass_right_prev = 0;
+   dc_block_reset();
    return true;
 }
 
@@ -1295,6 +1403,9 @@ bool retro_load_game(const struct retro_game_info *info)
    // Init sound and video
    console->initializeVideo();
    console->initializeAudio();
+
+   // Reset the DC-blocker so cold-start audio output is reproducible
+   dc_block_reset();
 
    // Check number of audio channels
    if (console->properties().get(Cartridge_Sound) == "STEREO")
@@ -1482,6 +1593,11 @@ void retro_run(void)
    video_cb(frameBuffer, videoWidth, videoHeight, videoWidth * framePixelBytes);
 
    osystem.sound().processFragment(sampleBuffer, tiaSamplesPerFrame);
+
+   /* Remove the TIA's unipolar DC offset before output. Always on: the
+    * offset is never wanted, and the ~20 Hz cutoff leaves game audio
+    * (>=100 Hz) untouched. */
+   apply_dc_block_filter(sampleBuffer, tiaSamplesPerFrame);
 
    if (low_pass_enabled)
       apply_low_pass_filter(sampleBuffer, tiaSamplesPerFrame);
