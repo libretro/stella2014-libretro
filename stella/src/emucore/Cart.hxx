@@ -320,6 +320,12 @@ class Cartridge : public Device
     static bool isProbablyCTY(const uint8_t* image, uint32_t size);
 
     /**
+      Returns true if the image is probably a CDF/CDFJ/CDFJ+ bankswitching
+      cartridge (it embeds a "CDF" or "PLUSCDFJ" driver signature).
+    */
+    static bool isProbablyCDF(const uint8_t* image, uint32_t size);
+
+    /**
       Returns true if the image is probably a CV bankswitching cartridge
     */
     static bool isProbablyCV(const uint8_t* image, uint32_t size);

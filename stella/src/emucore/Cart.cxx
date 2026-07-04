@@ -30,6 +30,7 @@
 #include "Cart4KSC.hxx"
 #include "CartAR.hxx"
 #include "CartCM.hxx"
+#include "CartCDF.hxx"
 #include "CartCTY.hxx"
 #include "CartCV.hxx"
 #include "CartDPC.hxx"
@@ -186,6 +187,8 @@ Cartridge* Cartridge::create(const uint8_t* image, uint32_t size, string& md5,
     cartridge = new CartridgeAR(image, size, settings);
   else if(type == "CM")
     cartridge = new CartridgeCM(image, size, settings);
+  else if(type == "CDF")
+    cartridge = new CartridgeCDF(image, size, settings);
   else if(type == "CTY")
     cartridge = new CartridgeCTY(image, size, osystem);
   else if(type == "CV")
@@ -441,7 +444,9 @@ string Cartridge::autodetectType(const uint8_t* image, uint32_t size)
   }
   else if(size == 32*1024)  // 32K
   {
-    if(isProbablySC(image, size))
+    if(isProbablyCDF(image, size))
+      type = "CDF";
+    else if(isProbablySC(image, size))
       type = "F4SC";
     else if(isProbably3E(image, size))
       type = "3E";
@@ -458,7 +463,9 @@ string Cartridge::autodetectType(const uint8_t* image, uint32_t size)
   }
   else if(size == 64*1024)  // 64K
   {
-    if(isProbably3E(image, size))
+    if(isProbablyCDF(image, size))
+      type = "CDF";
+    else if(isProbably3E(image, size))
       type = "3E";
     else if(isProbably3F(image, size))
       type = "3F";
@@ -473,7 +480,9 @@ string Cartridge::autodetectType(const uint8_t* image, uint32_t size)
   }
   else if(size == 128*1024)  // 128K
   {
-    if(isProbably3E(image, size))
+    if(isProbablyCDF(image, size))
+      type = "CDF";
+    else if(isProbably3E(image, size))
       type = "3E";
     else if(isProbablyDF(image, size, type))
       ; // type has been set directly in the function
@@ -488,7 +497,9 @@ string Cartridge::autodetectType(const uint8_t* image, uint32_t size)
   }
   else if(size == 256*1024)  // 256K
   {
-    if(isProbably3E(image, size))
+    if(isProbablyCDF(image, size))
+      type = "CDF";
+    else if(isProbably3E(image, size))
       type = "3E";
     else if(isProbablyBF(image, size, type))
       ; // type has been set directly in the function
@@ -670,6 +681,18 @@ bool Cartridge::isProbablyCTY(const uint8_t* image, uint32_t size)
   // from Stella 7.
   uint8_t signature[5] = { 'L', 'E', 'N', 'I', 'N' };
   return searchForBytes(image, size, signature, 5, 1);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+bool Cartridge::isProbablyCDF(const uint8_t* image, uint32_t size)
+{
+  // CDF/CDFJ images repeat the ASCII marker "CDF" in the driver; CDFJ+
+  // images instead carry a "PLUSCDFJ" signature. (Backported from
+  // Stella 7.)
+  uint8_t cdf[3]      = { 'C', 'D', 'F' };
+  uint8_t cdfjplus[8] = { 'P', 'L', 'U', 'S', 'C', 'D', 'F', 'J' };
+  return searchForBytes(image, size, cdf, 3, 3) ||
+         searchForBytes(image, size, cdfjplus, 8, 1);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
