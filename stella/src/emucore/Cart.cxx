@@ -587,10 +587,14 @@ bool Cartridge::isProbablyARM(const uint8_t* image, uint32_t size)
     { 0xA0, 0xC1, 0x1F, 0xE0 },
     { 0x00, 0x80, 0x02, 0xE0 }
   };
-  if(searchForBytes(image, 1024, signature[0], 4, 1))
+  // Search only within the first 1K, but never past the end of the image:
+  // a sub-1K image would otherwise be read out of bounds (guard backported
+  // from Stella 7).
+  uint32_t searchSize = size < 1024 ? size : 1024;
+  if(searchForBytes(image, searchSize, signature[0], 4, 1))
     return true;
   else
-    return searchForBytes(image, 1024, signature[1], 4, 1);
+    return searchForBytes(image, searchSize, signature[1], 4, 1);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -660,7 +664,12 @@ bool Cartridge::isProbably4A50(const uint8_t* image, uint32_t size)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool Cartridge::isProbablyCTY(const uint8_t* image, uint32_t size)
 {
-  return false;  // TODO - add autodetection
+  // CTY (Chetiry/CDF-family) images embed the ASCII marker "LENIN".
+  // This was previously a stub that always returned false, so CTY carts
+  // could not be autodetected at all; the signature search is backported
+  // from Stella 7.
+  uint8_t signature[5] = { 'L', 'E', 'N', 'I', 'N' };
+  return searchForBytes(image, size, signature, 5, 1);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
