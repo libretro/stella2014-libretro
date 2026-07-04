@@ -636,6 +636,13 @@ else
 ifneq (,$(findstring msvc,$(platform)))
    CFLAGS   += -MT
    CXXFLAGS += -MT
+   # Enable C++ unwind semantics for the STL. Without this, every MSVC
+   # translation unit that pulls in <string>/<ostream>/<map> emits a
+   # storm of C4530 warnings ("C++ exception handler used, but unwind
+   # semantics are not enabled"). -EHsc turns those off by actually
+   # enabling the unwinding the STL assumes. (msvc2017 already sets its
+   # own -EHsc in MSVC2017CompileFlags; this covers 2003/2005/2010.)
+   CXXFLAGS += -EHsc
 endif
    CFLAGS   += -O2 -DNDEBUG
    CXXFLAGS += -O2 -DNDEBUG
