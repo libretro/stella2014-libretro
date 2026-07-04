@@ -1121,7 +1121,14 @@ void TIA::clearBuffers()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-inline uint8_t TIA::dumpedInputPort(int resistance)
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// NB: deliberately NOT inline. The 64-bit division below makes the MSVC
+// 2005 optimizer abort with an internal compiler error (C1001) when this
+// body is inlined into its callers in updatePaddle(). Keeping it as an
+// out-of-line function avoids that fold while the arithmetic is unchanged.
+// It is called at most four times per scanline on the paddle path, so the
+// call overhead is irrelevant to performance.
+uint8_t TIA::dumpedInputPort(int resistance)
 {
   if(resistance == Controller::minimumResistance)
   {
@@ -1136,12 +1143,7 @@ inline uint8_t TIA::dumpedInputPort(int resistance)
     // Constant is derived from '1.6 * 0.01e-6 * 228 / 3' = 1.216e-6,
     // expressed exactly as the rational 76 / 62500000; the framerate is
     // the exact rational num/den, so this is pure integer arithmetic.
-    //
-    // The computation is deliberately broken into separate 64-bit steps
-    // with named intermediates rather than one chained expression. The
-    // single-expression form triggers an internal compiler error (C1001)
-    // in the MSVC 2005 optimizer (this is a supported build target); the
-    // stepwise form is arithmetically identical and compiles cleanly.
+    // 64-bit is genuinely required: the numerator reaches ~50 bits.
     uint64_t numer = (uint64_t)resistance * myScanlineCountForLastFrame;
     numer *= myConsole.getFramerateNum();
     numer *= 76;
