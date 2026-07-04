@@ -513,6 +513,18 @@ string Cartridge::autodetectType(const uint8_t* image, uint32_t size)
     else /*if(isProbablySB(image, size))*/
       type = "SB";
   }
+  else if(size == 512*1024)  // 512K
+  {
+    // Only CDFJ+ reaches this size in the types this core supports.
+    if(isProbablyCDF(image, size))
+      type = "CDF";
+    else if(isProbably3E(image, size))
+      type = "3E";
+    else if(isProbably3F(image, size))
+      type = "3F";
+    else
+      type = "4K";
+  }
   else  // what else can we do?
   {
     if(isProbably3E(image, size))

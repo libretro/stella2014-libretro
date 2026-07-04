@@ -1223,7 +1223,13 @@ bool retro_load_game(const struct retro_game_info *info)
 {
    enum retro_pixel_format fmt;
 
-   if (!info || info->size >= 96*1024)
+   /* Reject empty images and anything larger than the largest supported
+    * cartridge. The historical limit was 96K, which predates the CDF/CDFJ
+    * ARM mappers: CDF images run to 128K/256K and CDFJ+ up to 512K. The
+    * ROM data is handed straight to Cartridge::create (each cart copies
+    * out the portion it needs), so the cap is only a sanity gate, not a
+    * buffer bound. */
+   if (!info || info->size > 512*1024)
       return false;
 
    /* Release any state from a previous load (repeat retro_load_game
