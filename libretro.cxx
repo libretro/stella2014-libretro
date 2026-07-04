@@ -1228,8 +1228,10 @@ bool retro_load_game(const struct retro_game_info *info)
     * ARM mappers: CDF images run to 128K/256K and CDFJ+ up to 512K. The
     * ROM data is handed straight to Cartridge::create (each cart copies
     * out the portion it needs), so the cap is only a sanity gate, not a
-    * buffer bound. */
-   if (!info || info->size > 512*1024)
+    * buffer bound. Also reject anything below the smallest real cartridge
+    * (2K): the size-based detectors index near the end of the image
+    * (image[size-8] etc.), so a too-small image would read out of bounds. */
+   if (!info || info->size < 2*1024 || info->size > 512*1024)
       return false;
 
    /* Release any state from a previous load (repeat retro_load_game

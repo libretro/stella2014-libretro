@@ -544,6 +544,12 @@ bool Cartridge::searchForBytes(const uint8_t* image, uint32_t imagesize,
                                uint32_t minhits)
 {
   uint32_t count = 0;
+
+  /* Guard against images smaller than the signature: the loop bound
+     imagesize - sigsize is unsigned and would otherwise wrap to a huge
+     value and read out of bounds. */
+  if(imagesize < sigsize)
+    return false;
   for(uint32_t i = 0; i < imagesize - sigsize; ++i)
   {
     uint32_t matches = 0;
