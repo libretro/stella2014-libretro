@@ -418,6 +418,14 @@ class Cartridge : public Device
     static bool isProbablyWD(const uint8_t* image, uint32_t size);
 
     /**
+      Returns true if the image is probably an FC (Amiga Power Play) cart.
+
+      @param image  A pointer to the ROM image
+      @param size   The size of the ROM image
+    */
+    static bool isProbablyFC(const uint8_t* image, uint32_t size);
+
+    /**
       Returns true if the image is probably a UA bankswitching cartridge
     */
     static bool isProbablyUA(const uint8_t* image, uint32_t size);

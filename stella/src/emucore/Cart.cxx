@@ -53,6 +53,7 @@
 #include "CartF8SC.hxx"
 #include "CartFA.hxx"
 #include "CartFA2.hxx"
+#include "CartFC.hxx"
 #include "CartFE.hxx"
 #include "CartMC.hxx"
 #include "CartSB.hxx"
@@ -238,6 +239,8 @@ Cartridge* Cartridge::create(const uint8_t* image, uint32_t size, string& md5,
     cartridge = new CartridgeFA(image, size, settings);
   else if(type == "FA2")
     cartridge = new CartridgeFA2(image, size, osystem);
+  else if(type == "FC")
+    cartridge = new CartridgeFC(image, size, settings);
   else if(type == "FE")
     cartridge = new CartridgeFE(image, size, settings);
   else if(type == "MC")
@@ -391,7 +394,9 @@ string Cartridge::autodetectType(const uint8_t* image, uint32_t size)
   }
   else if(size == 4096)
   {
-    if(isProbablyCV(image,size))
+    if(isProbablyFC(image, size))
+      type = "FC";
+    else if(isProbablyCV(image,size))
       type = "CV";
     else if(isProbably4KSC(image,size))
       type = "4KSC";
@@ -422,6 +427,8 @@ string Cartridge::autodetectType(const uint8_t* image, uint32_t size)
       type = "0FA0";
     else if(isProbably03E0(image, size))
       type = "03E0";
+    else if(isProbablyFC(image, size))
+      type = "FC";
     else if(isProbablyFE(image, size) && !f8)
       type = "FE";
     else if(isProbably0840(image, size))
@@ -439,7 +446,9 @@ string Cartridge::autodetectType(const uint8_t* image, uint32_t size)
   }
   else if(size == 16*1024)  // 16K
   {
-    if(isProbablySC(image, size))
+    if(isProbablyFC(image, size))
+      type = "FC";
+    else if(isProbablySC(image, size))
       type = "F6SC";
     else if(isProbablyE7(image, size))
       type = "E7";
@@ -465,7 +474,9 @@ string Cartridge::autodetectType(const uint8_t* image, uint32_t size)
   }
   else if(size == 32*1024)  // 32K
   {
-    if(isProbablyTVBoy(image, size))
+    if(isProbablyFC(image, size))
+      type = "FC";
+    else if(isProbablyTVBoy(image, size))
       type = "TVBOY";
     else if(isProbablyCDF(image, size))
       type = "CDF";
@@ -1017,6 +1028,21 @@ bool Cartridge::isProbablyWD(const uint8_t* image, uint32_t size)
   // does 'LDA $39' then 'JMP'.
   static const uint8_t signature[3] = { 0xA5, 0x39, 0x4C };  // LDA $39, JMP
   return searchForBytes(image, size, signature, 3, 1);
+}
+
+bool Cartridge::isProbablyFC(const uint8_t* image, uint32_t size)
+{
+  // FC (Amiga Power Play) uses consecutive writes to its target-bank
+  // registers and the commit hotspot.
+  static const uint8_t signature[3][6] = {
+    { 0x8d, 0xf8, 0x1f, 0x4a, 0x4a, 0x8d }, // STA $1FF8, LSR, LSR, STA...
+    { 0x8d, 0xf8, 0xff, 0x8d, 0xfc, 0xff }, // STA $FFF8, STA $FFFC (Surf's Up 4K)
+    { 0x8c, 0xf9, 0xff, 0xad, 0xfc, 0xff }  // STY $FFF9, LDA $FFFC (3-D Havoc)
+  };
+  for(int i = 0; i < 3; ++i)
+    if(searchForBytes(image, size, signature[i], 6, 1))
+      return true;
+  return false;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
