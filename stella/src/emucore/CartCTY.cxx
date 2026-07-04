@@ -376,8 +376,9 @@ uint8_t CartridgeCTY::ramReadWrite()
       case 1:  // Load tune (index = tune)
         if(index < 7)
         {
-          // Add 0.5 s delay for read
-          myRamAccessTimeout = myOSystem.getTicks() + 500000;
+          // 0.5 s read delay, as emulated 6507 cycles (NTSC ~1.19 MHz):
+          //   0.5 s -> 596591 cycles. Deterministic and host-independent.
+          myRamAccessTimeout = mySystem->cycles() + 596591;
           loadTune(index);
         }
         break;
@@ -385,31 +386,35 @@ uint8_t CartridgeCTY::ramReadWrite()
         if(index < 4)
         {
           // Add 0.5 s delay for read
-          myRamAccessTimeout = myOSystem.getTicks() + 500000;
+          myRamAccessTimeout = mySystem->cycles() + 596591;
           loadScore(index);
         }
         break;
       case 3:  // Save score table (index = table)
         if(index < 4)
         {
-          // Add 1 s delay for write
-          myRamAccessTimeout = myOSystem.getTicks() + 1000000;
+          // 1 s write delay -> 1193182 cycles
+          myRamAccessTimeout = mySystem->cycles() + 1193182;
           saveScore(index);
         }
         break;
       case 4:  // Wipe all score tables
         // Add 1 s delay for write
-        myRamAccessTimeout = myOSystem.getTicks() + 1000000;
+        myRamAccessTimeout = mySystem->cycles() + 1193182;
         wipeAllScores();
         break;
     }
+    // keep 0 reserved as the "idle" sentinel across the cycle-counter wrap
+    if(myRamAccessTimeout == 0)
+      myRamAccessTimeout = 1;
     // Bit 6 is 1, busy
     return myImage[myCurrentBank + 0xFF4] | 0x40;
   }
   else
   {
-    // Have we reached the timeout value yet?
-    if(myOSystem.getTicks() >= myRamAccessTimeout)
+    // Have we reached the timeout value yet? Signed difference so the
+    // comparison is correct even across the 32-bit cycle-counter wrap.
+    if((int32_t)((uint32_t)mySystem->cycles() - (uint32_t)myRamAccessTimeout) >= 0)
     {
       myRamAccessTimeout = 0;  // Turn off timer
       myRAM[0] = 0;            // Successful operation

@@ -358,8 +358,15 @@ uint8_t CartridgeFA2::ramReadWrite()
   // First access sets the timer
   if(myRamAccessTimeout == 0)
   {
-    // Remember when the first access was made
-    myRamAccessTimeout = myOSystem.getTicks();
+    // Remember (as an emulated-cycle deadline) when the access completes.
+    // The real Harmony flash delay is a fixed physical time; expressing it
+    // in 6507 cycles keeps it both deterministic (independent of host
+    // speed) and accurate in the domain the game actually measures -- the
+    // cycles it burns polling the busy bit. NTSC 6507 clock ~1.19 MHz:
+    //   0.5 ms read  ->    597 cycles
+    //   101 ms write -> 120511 cycles
+    // (the <1% NTSC/PAL clock difference is immaterial for a busy-wait).
+    uint32_t delay = 0;
 
     // We go ahead and do the access now, and only return when a sufficient
     // amount of time has passed
@@ -369,21 +376,25 @@ uint8_t CartridgeFA2::ramReadWrite()
       if(myRAM[255] == 1)       // read
       {
         serializer.getByteArray(myRAM, 256);
-        myRamAccessTimeout += 500;  // Add 0.5 ms delay for read
+        delay = 597;            // 0.5 ms read delay
       }
       else if(myRAM[255] == 2)  // write
       {
         serializer.putByteArray(myRAM, 256);
-        myRamAccessTimeout += 101000;  // Add 101 ms delay for write
+        delay = 120511;         // 101 ms write delay
       }
     }
+    myRamAccessTimeout = mySystem->cycles() + delay;
+    if(myRamAccessTimeout == 0)  // keep 0 reserved as the "idle" sentinel
+      myRamAccessTimeout = 1;
     // Bit 6 is 1, busy
     return myImage[(myCurrentBank << 12) + 0xFF4] | 0x40;
   }
   else
   {
-    // Have we reached the timeout value yet?
-    if(myOSystem.getTicks() >= myRamAccessTimeout)
+    // Have we reached the timeout value yet? Signed difference so the
+    // comparison is correct even across the 32-bit cycle-counter wrap.
+    if((int32_t)((uint32_t)mySystem->cycles() - (uint32_t)myRamAccessTimeout) >= 0)
     {
       myRamAccessTimeout = 0;  // Turn off timer
       myRAM[255] = 0;          // Successful operation
