@@ -8,6 +8,11 @@ cd "$(dirname "$0")/.."
 CORE="${1:-./stella2014_libretro.so}"
 [ -f "$CORE" ] || make -j"$(nproc 2>/dev/null || echo 2)"
 
+# Compile-configuration guard: the ARM-cart classes must build both with
+# and without THUMB_SUPPORT (the latter is the libretro platform / Android
+# configuration, which the desktop build never exercises).
+sh test/build_configs.sh
+
 cc -O2 -o test/determinism_harness test/determinism_harness.c \
    -I libretro-common/include -ldl
 
