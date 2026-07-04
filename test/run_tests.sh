@@ -14,8 +14,12 @@ cc -O2 -o test/determinism_harness test/determinism_harness.c \
 cc -O1 -g -o test/malformed_state test/malformed_state.c \
    -I libretro-common/include -ldl
 
+cc -O2 -o test/arm_cart_determinism test/arm_cart_determinism.c \
+   -I libretro-common/include -ldl
+
 ./test/determinism_harness "$CORE"
 ./test/malformed_state "$CORE"   # malformed-savestate robustness
+./test/arm_cart_determinism "$CORE"  # CDF/BUS ARM-mapper determinism
 
 if command -v valgrind >/dev/null 2>&1; then
     echo "running under valgrind..."
@@ -23,6 +27,8 @@ if command -v valgrind >/dev/null 2>&1; then
         ./test/determinism_harness "$CORE" >/dev/null
     valgrind -q --leak-check=full --error-exitcode=42 \
         ./test/malformed_state "$CORE" >/dev/null
+    valgrind -q --leak-check=full --error-exitcode=42 \
+        ./test/arm_cart_determinism "$CORE" >/dev/null
     echo "valgrind: clean"
 else
     echo "valgrind not found: skipping leak check"
