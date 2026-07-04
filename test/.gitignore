@@ -1,0 +1,7 @@
+# Compiled test harnesses (built from the .c sources by run_tests.sh).
+# These are build outputs and should never be committed.
+arm_cart_determinism
+determinism_harness
+fuzz_states
+malformed_state
+thumb_timer_test
