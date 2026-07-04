@@ -69,6 +69,21 @@ typedef struct Thumbulator
   uint64_t fetches;
   uint64_t reads;
   uint64_t writes;
+
+  /*
+    Cycle-accounting state, needed by the CDF/BUS cartridges (DPC+ does
+    not use it). The ARM code paces its audio from a memory-mapped LPC2103
+    Timer 1, which advances by an exact integer ratio of ARM ticks per
+    6507 cycle (the 70 MHz ARM vs the ~1.19 MHz 6507). The ratio is
+    carried as num/den with an integer remainder so the timer is exact
+    and deterministic -- no floating point, matching the core's DPC music
+    clock approach. thumb_run() (DPC+) leaves all of this at zero.
+  */
+  uint32_t t1_tcr;         /* Timer 1 control register (bit 0 = enable)   */
+  uint32_t t1_tc;          /* Timer 1 counter (read by ARM audio code)    */
+  uint32_t timer_num;      /* ARM-ticks-per-6507-cycle ratio numerator    */
+  uint32_t timer_den;      /* ...denominator                              */
+  uint32_t timer_frac;     /* fractional remainder, units of 1/timer_den  */
 } Thumbulator;
 
 /*
@@ -83,6 +98,31 @@ void thumb_init(Thumbulator* self, const uint16_t* rom, uint16_t* ram,
   Reset to the power-on state and set the entry point. Returns 0.
 */
 int thumb_reset(Thumbulator* self);
+
+/* Memory-mapped LPC2103 Timer 1 registers (used by CDF/BUS ARM audio) */
+#define THUMB_T1TCR 0xE0008004u  /* Timer 1 control register */
+#define THUMB_T1TC  0xE0008008u  /* Timer 1 counter          */
+
+/*
+  Set the ARM timer scaling as an exact integer ratio of ARM ticks per
+  6507 cycle, selected from the console's TV format. Called by the CDF/BUS
+  carts at construction / console change. Exact ratios:
+    NTSC   70 / (3579545/3000000) = 42000000/715909
+    PAL    70 / 1.18138           = 3500000/59069
+    SECAM  70 / 1.18750           = 1120/19
+*/
+void thumb_set_timer_rate(Thumbulator* self, uint32_t num, uint32_t den);
+
+/*
+  Run ARM code with a 6507 cycle budget (the CDF/BUS execution model).
+  Advances Timer 1 by 'cycles' 6507 cycles (scaled by the timer ratio)
+  before running the ARM code to completion. 'irq_driven_audio' selects
+  the ARM entry behaviour (function 254 vs 255); it is accepted for
+  source parity and, as in the reference, needs no special handling here
+  because the ARM code runs in zero 6507 cycles. Returns 0 on normal
+  completion.
+*/
+int thumb_run_cycles(Thumbulator* self, uint32_t cycles, int irq_driven_audio);
 
 /*
   Run ARM code to completion (until the driver returns to its link

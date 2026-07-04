@@ -56,6 +56,12 @@ void thumb_init(Thumbulator* self, const uint16_t* rom, uint16_t* ram,
   self->fetches = 0;
   self->reads = 0;
   self->writes = 0;
+
+  self->t1_tcr = 0;
+  self->t1_tc = 0;
+  self->timer_num = 42000000u;  /* default to NTSC until the cart sets it */
+  self->timer_den = 715909u;
+  self->timer_frac = 0;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -176,7 +182,11 @@ static void thumb_write32(Thumbulator* self, uint32_t addr, uint32_t data)
     case 0xE0000000: /* periph */
       switch(addr)
       {
-        case 0xE0000000:
+        case THUMB_T1TCR: /* Timer 1 control register */
+          self->t1_tcr = data;
+          break;
+        case THUMB_T1TC:  /* Timer 1 counter */
+          self->t1_tc = data;
           break;
         default:
           break;
@@ -259,6 +269,13 @@ static uint32_t thumb_read32(Thumbulator* self, uint32_t addr)
       data <<= 16;
       data |= thumb_read16(self, addr + 0);
       return data;
+
+    case 0xE0000000: /* periph */
+      if(addr == THUMB_T1TC)      /* ARM audio code reads the timer */
+        return self->t1_tc;
+      else if(addr == THUMB_T1TCR)
+        return self->t1_tcr;
+      break;
 
     default:
       break;
@@ -396,6 +413,71 @@ int thumb_reset(Thumbulator* self)
   self->reads = 0;
   self->writes = 0;
 
+  return 0;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+void thumb_set_timer_rate(Thumbulator* self, uint32_t num, uint32_t den)
+{
+  if(den != 0)
+  {
+    self->timer_num = num;
+    self->timer_den = den;
+  }
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* The 64-bit division below is kept in its own function with optimization
+   disabled under MSVC. The MSVC 2005 optimizer aborts with an internal
+   compiler error (C1001) during instruction selection for an inlined
+   uint64_t divide (the same failure fixed earlier in the TIA paddle path);
+   isolating it here avoids that while leaving every other function fully
+   optimized and every other compiler unaffected. */
+#if defined(_MSC_VER)
+  #pragma optimize("", off)
+#endif
+static uint32_t thumb_timer_ticks(uint32_t cycles, uint32_t num,
+                                  uint32_t den, uint32_t* frac)
+{
+  uint64_t acc;
+  uint32_t ticks;
+
+  acc = (uint64_t)cycles * num + *frac;
+  ticks = (uint32_t)(acc / den);
+  *frac = (uint32_t)(acc % den);
+  return ticks;
+}
+#if defined(_MSC_VER)
+  #pragma optimize("", on)
+#endif
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+static void thumb_update_timer(Thumbulator* self, uint32_t cycles)
+{
+  /* Timer 1 only advances while enabled (control bit 0). Advance it by
+     'cycles' 6507 cycles scaled by the exact ARM-ticks-per-6507-cycle
+     ratio, carrying the fractional remainder so the timer is exact and
+     bit-for-bit deterministic across platforms. */
+  if(self->t1_tcr & 1)
+    self->t1_tc += thumb_timer_ticks(cycles, self->timer_num,
+                                     self->timer_den, &self->timer_frac);
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+int thumb_run_cycles(Thumbulator* self, uint32_t cycles, int irq_driven_audio)
+{
+  (void)irq_driven_audio;  /* ARM code runs in zero 6507 cycles; no special
+                              handling needed here, as in the reference. */
+  thumb_update_timer(self, cycles);
+
+  thumb_reset(self);
+  for(;;)
+  {
+    if(thumb_execute(self))
+      break;
+    if(self->instructions > 500000) /* safety cap, as in the original */
+      break;
+  }
   return 0;
 }
 
