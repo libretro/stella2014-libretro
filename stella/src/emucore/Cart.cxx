@@ -877,13 +877,21 @@ bool Cartridge::isProbablySB(const uint8_t* image, uint32_t size)
 bool Cartridge::isProbablyUA(const uint8_t* image, uint32_t size)
 {
   // UA cart bankswitching switches to bank 1 by accessing address 0x240
-  // using 'STA $240' or 'LDA $240'
-  uint8_t signature[3][3] = {
-    { 0x8D, 0x40, 0x02 },  // STA $240
+  // using 'STA $240' or 'LDA $240'.
+  // Brazilian (Digivision) clones instead switch bank by accessing
+  // address 0x2C0 using 'BIT $2C0', 'STA $2C0' or 'LDA $2C0'. Detecting
+  // those signatures (backported from Stella 7) lets Time Pilot, Fathom,
+  // Vanguard and Mickey autodetect as UA instead of falling through to
+  // the wrong mapper.
+  uint8_t signature[6][3] = {
+    { 0x8D, 0x40, 0x02 },  // STA $240 (Funky Fish, Pleiades)
     { 0xAD, 0x40, 0x02 },  // LDA $240
-    { 0xBD, 0x1F, 0x02 }   // LDA $21F,X
+    { 0xBD, 0x1F, 0x02 },  // LDA $21F,X (Gingerbread Man)
+    { 0x2C, 0xC0, 0x02 },  // BIT $2C0 (Time Pilot)
+    { 0x8D, 0xC0, 0x02 },  // STA $2C0 (Fathom, Vanguard)
+    { 0xAD, 0xC0, 0x02 }   // LDA $2C0 (Mickey)
   };
-  for(uint32_t i = 0; i < 3; ++i)
+  for(uint32_t i = 0; i < 6; ++i)
     if(searchForBytes(image, size, signature[i], 3, 1))
       return true;
 
