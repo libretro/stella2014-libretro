@@ -1122,12 +1122,42 @@ void TIA::clearBuffers()
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// NB: deliberately NOT inline. The 64-bit division below makes the MSVC
-// 2005 optimizer abort with an internal compiler error (C1001) when this
-// body is inlined into its callers in updatePaddle(). Keeping it as an
-// out-of-line function avoids that fold while the arithmetic is unchanged.
-// It is called at most four times per scanline on the paddle path, so the
-// call overhead is irrelevant to performance.
+// 64-bit division helper, deliberately isolated.
+//
+// The paddle-charge threshold below needs an exact 64-bit division
+// (the numerator reaches ~50 bits, so it cannot be done in 32 bits
+// without changing the result, and this is a determinism-sensitive
+// path that must stay bit-identical). The MSVC 2005 optimizer aborts
+// with a fatal internal compiler error (C1001) during instruction
+// selection for this uint64_t divide under /O2 -- regardless of
+// whether the enclosing function is inlined or how the expression is
+// arranged, because the crash is in the divide's code generation, not
+// in inlining or expression shape.
+//
+// Turning the optimizer off for just this one tiny helper avoids the
+// crash while leaving every other function fully optimized and every
+// other compiler completely unaffected. The result is exact, so
+// behavior and determinism are unchanged.
+#if defined(_MSC_VER)
+  #pragma optimize("", off)
+#endif
+static uint32_t paddleChargeCycles(uint32_t resistance,
+                                   uint32_t scanlines,
+                                   uint32_t framerateNum,
+                                   uint32_t framerateDen)
+{
+  // 1.216e-6 == 76/62500000 == 19/15625000 exactly (reduced by 4)
+  uint64_t numer = (uint64_t)resistance * scanlines;
+  numer *= framerateNum;
+  numer *= 19u;
+  uint64_t denom = (uint64_t)framerateDen * 15625000u;
+  return (uint32_t)(numer / denom);
+}
+#if defined(_MSC_VER)
+  #pragma optimize("", on)
+#endif
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 uint8_t TIA::dumpedInputPort(int resistance)
 {
   if(resistance == Controller::minimumResistance)
@@ -1140,15 +1170,11 @@ uint8_t TIA::dumpedInputPort(int resistance)
   }
   else
   {
-    // Constant is derived from '1.6 * 0.01e-6 * 228 / 3' = 1.216e-6,
-    // expressed exactly as the rational 76 / 62500000; the framerate is
-    // the exact rational num/den, so this is pure integer arithmetic.
-    // 64-bit is genuinely required: the numerator reaches ~50 bits.
-    uint64_t numer = (uint64_t)resistance * myScanlineCountForLastFrame;
-    numer *= myConsole.getFramerateNum();
-    numer *= 76;
-    uint64_t denom = (uint64_t)myConsole.getFramerateDen() * 62500000;
-    uint32_t needed = (uint32_t)(numer / denom);
+    uint32_t needed = paddleChargeCycles(
+        (uint32_t)resistance,
+        myScanlineCountForLastFrame,
+        myConsole.getFramerateNum(),
+        myConsole.getFramerateDen());
     if((mySystem->cycles() - myDumpDisabledCycle) > needed)
       return 0x80;
     else
