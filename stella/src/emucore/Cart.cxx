@@ -57,6 +57,7 @@
 #include "CartMC.hxx"
 #include "CartSB.hxx"
 #include "CartTVBoy.hxx"
+#include "Cart0FA0.hxx"
 #include "CartUA.hxx"
 #include "CartX07.hxx"
 #include "MD5.hxx"
@@ -245,6 +246,8 @@ Cartridge* Cartridge::create(const uint8_t* image, uint32_t size, string& md5,
     cartridge = new CartridgeSB(image, size, settings);
   else if(type == "TVBOY")
     cartridge = new CartridgeTVBoy(image, size, settings);
+  else if(type == "0FA0")
+    cartridge = new Cartridge0FA0(image, size, settings);
   else if(type == "X07")
     cartridge = new CartridgeX07(image, size, settings);
   else if(dtype == "WRONG_SIZE")
@@ -407,6 +410,8 @@ string Cartridge::autodetectType(const uint8_t* image, uint32_t size)
       type = "3F";
     else if(isProbablyUA(image, size))
       type = "UA";
+    else if(isProbably0FA0(image, size))
+      type = "0FA0";
     else if(isProbablyFE(image, size) && !f8)
       type = "FE";
     else if(isProbably0840(image, size))
@@ -964,6 +969,22 @@ bool Cartridge::isProbablyTVBoy(const uint8_t* image, uint32_t size)
   // 0x1800..0x187F; the menu code does "STA ($82),Y" then "JMP ($FFFC)".
   static const uint8_t signature[5] = { 0x91, 0x82, 0x6c, 0xfc, 0xff };
   return searchForBytes(image, size, signature, 5, 1);
+}
+
+bool Cartridge::isProbably0FA0(const uint8_t* image, uint32_t size)
+{
+  // 0FA0 (Brazilian) bankswitching switches banks by accessing address
+  // 0x0FC0 (BIT/STA/LDA $FC0), and a Motocross variant via BIT $EFC0.
+  static const uint8_t signature[4][3] = {
+    { 0x2C, 0xC0, 0x0F },  // BIT $FC0
+    { 0x8D, 0xC0, 0x0F },  // STA $FC0
+    { 0xAD, 0xC0, 0x0F },  // LDA $FC0
+    { 0x2C, 0xC0, 0xEF }   // BIT $EFC0 (Motocross)
+  };
+  for(int i = 0; i < 4; ++i)
+    if(searchForBytes(image, size, signature[i], 3, 1))
+      return true;
+  return false;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
