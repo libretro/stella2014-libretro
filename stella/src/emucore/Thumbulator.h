@@ -84,6 +84,16 @@ typedef struct Thumbulator
   uint32_t timer_num;      /* ARM-ticks-per-6507-cycle ratio numerator    */
   uint32_t timer_den;      /* ...denominator                              */
   uint32_t timer_frac;     /* fractional remainder, units of 1/timer_den  */
+
+  /*
+    Configurable reset vectors. DPC+ enters at 0xc0b with SP 0x40001fb4
+    and LR 0xc00; the CDF/BUS drivers enter elsewhere. These are set by
+    thumb_init_ex() (thumb_init keeps the DPC+ defaults), so a single
+    interpreter serves every ARM cartridge.
+  */
+  uint32_t c_start;        /* entry PC (the +2/THUMB adjustment is applied) */
+  uint32_t c_stack;        /* initial SP (r13) */
+  uint32_t c_base;         /* initial LR (r14) */
 } Thumbulator;
 
 /*
@@ -93,6 +103,16 @@ typedef struct Thumbulator
 */
 void thumb_init(Thumbulator* self, const uint16_t* rom, uint16_t* ram,
                 int traponfatal);
+
+/*
+  Like thumb_init, but with an explicit entry point / stack / link value,
+  for cartridges whose ARM driver does not use the DPC+ layout (CDF, BUS).
+  thumb_init() is equivalent to thumb_init_ex() with the DPC+ defaults
+  (start 0xc09, stack 0x40001fb4, base 0xc00).
+*/
+void thumb_init_ex(Thumbulator* self, const uint16_t* rom, uint16_t* ram,
+                   int traponfatal,
+                   uint32_t c_start, uint32_t c_stack, uint32_t c_base);
 
 /*
   Reset to the power-on state and set the entry point. Returns 0.

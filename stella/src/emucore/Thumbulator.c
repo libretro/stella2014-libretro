@@ -32,22 +32,22 @@ static void thumb_do_vflag_bit(Thumbulator* self, uint32_t x);
 static int  thumb_execute(Thumbulator* self);
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void thumb_init(Thumbulator* self, const uint16_t* rom, uint16_t* ram,
-                int traponfatal)
+void thumb_init_ex(Thumbulator* self, const uint16_t* rom, uint16_t* ram,
+                   int traponfatal,
+                   uint32_t c_start, uint32_t c_stack, uint32_t c_base)
 {
+  int i;
+
   /* Reference the (upstream-dead) fetch32 helper so it is retained for
      parity without tripping unused-function diagnostics. */
   (void)traponfatal;
   (void)thumb_fetch32;
   self->rom = rom;
   self->ram = ram;
+  for(i = 0; i < 16; ++i)
   {
-    int i;
-    for(i = 0; i < 16; ++i)
-    {
-      self->reg_sys[i] = 0;
-      self->reg_svc[i] = 0;
-    }
+    self->reg_sys[i] = 0;
+    self->reg_svc[i] = 0;
   }
   self->halfadd = 0;
   self->cpsr = 0;
@@ -62,6 +62,20 @@ void thumb_init(Thumbulator* self, const uint16_t* rom, uint16_t* ram,
   self->timer_num = 42000000u;  /* default to NTSC until the cart sets it */
   self->timer_den = 715909u;
   self->timer_frac = 0;
+
+  self->c_start = c_start;
+  self->c_stack = c_stack;
+  self->c_base = c_base;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+void thumb_init(Thumbulator* self, const uint16_t* rom, uint16_t* ram,
+                int traponfatal)
+{
+  /* DPC+ layout: entry 0xc09 (reset applies +2 -> 0xc0b), SP 0x40001fb4,
+     LR 0xc00. */
+  thumb_init_ex(self, rom, ram, traponfatal,
+                0x00000c09u, 0x40001fb4u, 0x00000c00u);
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -403,9 +417,9 @@ int thumb_reset(Thumbulator* self)
 {
   self->cpsr = THUMB_CPSR_T | THUMB_CPSR_I | THUMB_CPSR_F | THUMB_MODE_SVC;
 
-  self->reg_svc[13] = 0x40001fb4;  /* sp                     */
-  self->reg_svc[14] = 0x00000c00;  /* lr                     */
-  self->reg_sys[15] = 0x00000c0b;  /* entry point 0xc09 + 2  */
+  self->reg_svc[13] = self->c_stack;         /* sp                        */
+  self->reg_svc[14] = self->c_base;          /* lr                        */
+  self->reg_sys[15] = self->c_start + 2;     /* entry point (+2 pipeline) */
   self->mamcr = 0;
 
   self->instructions = 0;
