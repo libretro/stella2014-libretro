@@ -183,6 +183,7 @@ static struct retro_input_descriptor retropad_inputs_paddles0_paddles1[] = {
 
 /* Regular gamepad-related parameters */
 static Controller::Type left_controller_type = Controller::Joystick;
+static Controller::Type right_controller_type = Controller::Joystick;
 static int paddle_digital_sensitivity = 50;
 
 #define PADDLE_ANALOG_RANGE 0x8000
@@ -724,7 +725,8 @@ static int32_t get_stelladaptor_analog_center(int center)
 static void init_paddles(void)
 {
    /* Check whether paddles are active */
-   left_controller_type = console->controller(Controller::Left).type();
+   left_controller_type  = console->controller(Controller::Left).type();
+   right_controller_type = console->controller(Controller::Right).type();
 
    if (left_controller_type == Controller::Paddles)
    {
@@ -757,6 +759,40 @@ static void init_paddles(void)
          MouseButtonValue1 = Event::MouseButtonRightValue;
       }
    }
+}
+
+/* Map a RetroPad's buttons onto the 12 keys of a 2600 keyboard/keypad
+ * controller. The keypad is a phone-style 4x3 grid:
+ *
+ *     1 2 3        ->   Y      X      L
+ *     4 5 6        ->   Up     B      R      (B is the natural "5"/centre)
+ *     7 8 9        ->   Left   Down   Right
+ *     * 0 #        ->   L2     A      R2
+ *
+ * The exact assignment is arbitrary (12 keys do not map to an obvious
+ * gamepad layout), but it is stable and every key is reachable. 'base' is
+ * Event::KeyboardZero1 or Event::KeyboardOne1; the 12 key events are
+ * contiguous from there, so we index off it. */
+static void set_keypad_events(Event& ev, int base, int16_t joy_bits)
+{
+   /* order matches the enum: 1,2,3,4,5,6,7,8,9,*,0,# */
+   static const int btn[12] = {
+      RETRO_DEVICE_ID_JOYPAD_Y,     /* 1 */
+      RETRO_DEVICE_ID_JOYPAD_X,     /* 2 */
+      RETRO_DEVICE_ID_JOYPAD_L,     /* 3 */
+      RETRO_DEVICE_ID_JOYPAD_UP,    /* 4 */
+      RETRO_DEVICE_ID_JOYPAD_B,     /* 5 */
+      RETRO_DEVICE_ID_JOYPAD_R,     /* 6 */
+      RETRO_DEVICE_ID_JOYPAD_LEFT,  /* 7 */
+      RETRO_DEVICE_ID_JOYPAD_DOWN,  /* 8 */
+      RETRO_DEVICE_ID_JOYPAD_RIGHT, /* 9 */
+      RETRO_DEVICE_ID_JOYPAD_L2,    /* * */
+      RETRO_DEVICE_ID_JOYPAD_A,     /* 0 */
+      RETRO_DEVICE_ID_JOYPAD_R2     /* # */
+   };
+   int k;
+   for (k = 0; k < 12; k++)
+      ev.set(Event::Type(base + k), joy_bits & (1 << btn[k]));
 }
 
 static void update_input()
@@ -847,12 +883,22 @@ static void update_input()
          /* Handle regular gamepad devices */
          if (i == 0)
          {
+            if (left_controller_type == Controller::Keyboard)
+            {
+               /* Left player's keyboard/keypad controller */
+               set_keypad_events(ev, Event::KeyboardZero1, joy_bits);
+            }
+            else
+            {
             /* Events for left player's joystick */
             ev.set(Event::Type(Event::JoystickZeroUp),    joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_UP));
             ev.set(Event::Type(Event::JoystickZeroDown),  joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_DOWN));
             ev.set(Event::Type(Event::JoystickZeroLeft),  joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_LEFT));
             ev.set(Event::Type(Event::JoystickZeroRight), joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_RIGHT));
             ev.set(Event::Type(Event::JoystickZeroFire),  joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_B));
+            /* Genesis/Sega pad second button (maps to the A button) */
+            if (left_controller_type == Controller::Genesis)
+               ev.set(Event::Type(Event::JoystickZeroFire5), joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_A));
             ev.set(Event::Type(Event::ConsoleLeftDiffA),  joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_L));
             ev.set(Event::Type(Event::ConsoleLeftDiffB),  joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_L2));
             ev.set(Event::Type(Event::ConsoleColor),      joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_L3));
@@ -861,15 +907,27 @@ static void update_input()
             ev.set(Event::Type(Event::ConsoleBlackWhite), joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_R3));
             ev.set(Event::Type(Event::ConsoleSelect),     joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_SELECT));
             ev.set(Event::Type(Event::ConsoleReset),      joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_START));
+            }
          }
          else
          {
+            if (right_controller_type == Controller::Keyboard)
+            {
+               /* Right player's keyboard/keypad controller */
+               set_keypad_events(ev, Event::KeyboardOne1, joy_bits);
+            }
+            else
+            {
             /* Events for right player's joystick */
             ev.set(Event::Type(Event::JoystickOneUp),    joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_UP));
             ev.set(Event::Type(Event::JoystickOneDown),  joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_DOWN));
             ev.set(Event::Type(Event::JoystickOneLeft),  joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_LEFT));
             ev.set(Event::Type(Event::JoystickOneRight), joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_RIGHT));
             ev.set(Event::Type(Event::JoystickOneFire),  joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_B));
+            /* Genesis/Sega pad second button (maps to the A button) */
+            if (right_controller_type == Controller::Genesis)
+               ev.set(Event::Type(Event::JoystickOneFire5), joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_A));
+            }
          }
 
          /* Read analog paddle input, if required */
@@ -1511,6 +1569,7 @@ void retro_deinit(void)
 {
    libretro_supports_bitmasks = false;
    left_controller_type       = Controller::Joystick;
+   right_controller_type      = Controller::Joystick;
    MouseAxisValue0            = Event::MouseAxisXValue;
    MouseButtonValue0          = Event::MouseButtonLeftValue;
    MouseAxisValue1            = Event::MouseAxisYValue;
