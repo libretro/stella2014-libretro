@@ -76,7 +76,6 @@ SOURCES_CXX := $(CORE_DIR)/src/common/Base.cxx \
 	       $(CORE_DIR)/src/emucore/StateManager.cxx \
 	       $(CORE_DIR)/src/emucore/Switches.cxx \
 	       $(CORE_DIR)/src/emucore/System.cxx \
-	       $(CORE_DIR)/src/emucore/Thumbulator.cxx \
 	       $(CORE_DIR)/src/emucore/TIA.cxx \
 	       $(CORE_DIR)/src/emucore/TIASnd.cxx \
 	       $(CORE_DIR)/src/emucore/TIATables.cxx \
@@ -84,6 +83,7 @@ SOURCES_CXX := $(CORE_DIR)/src/common/Base.cxx \
 	       $(LIBRETRO_DIR)/libretro.cxx
 
 SOURCES_C := \
+	     $(CORE_DIR)/src/emucore/Thumbulator.c \
 	     $(LIBRETRO_COMM_DIR)/compat/compat_posix_string.c \
 	     $(LIBRETRO_COMM_DIR)/compat/compat_strcasestr.c \
 	     $(LIBRETRO_COMM_DIR)/compat/compat_snprintf.c \

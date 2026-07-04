@@ -22,7 +22,7 @@
 
 class System;
 #ifdef THUMB_SUPPORT
-class Thumbulator;
+struct Thumbulator;
 #endif
 
 #include "bspf.hxx"

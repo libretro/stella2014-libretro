@@ -1,0 +1,1341 @@
+static int thumb_execute(Thumbulator* self)
+{
+  uint32_t pc, sp, inst,
+         ra,rb,rc,
+         rm,rd,rn,rs,
+         op;
+
+  pc=thumb_read_register(self, 15);
+  inst=thumb_fetch16(self, pc-2);
+  pc+=2;
+  thumb_write_register(self, 15,pc);
+
+  self->instructions++;
+
+  /* ADC */
+  if((inst&0xFFC0)==0x4140)
+  {
+    rd=(inst>>0)&0x07;
+    rm=(inst>>3)&0x07;
+    ra=thumb_read_register(self, rd);
+    rb=thumb_read_register(self, rm);
+    rc=ra+rb;
+    if(self->cpsr&THUMB_CPSR_C)
+      rc++;
+    thumb_write_register(self, rd,rc);
+    thumb_do_nflag(self, rc);
+    thumb_do_zflag(self, rc);
+    if(self->cpsr&THUMB_CPSR_C) thumb_do_cflag(self, ra,rb,1);
+    else            thumb_do_cflag(self, ra,rb,0);
+    thumb_do_add_vflag(self, ra,rb,rc);
+    return(0);
+  }
+
+  /* ADD(1) small immediate two registers */
+  if((inst&0xFE00)==0x1C00)
+  {
+    rd=(inst>>0)&0x7;
+    rn=(inst>>3)&0x7;
+    rb=(inst>>6)&0x7;
+    if(rb)
+    {
+      ra=thumb_read_register(self, rn);
+      rc=ra+rb;
+      thumb_write_register(self, rd,rc);
+      thumb_do_nflag(self, rc);
+      thumb_do_zflag(self, rc);
+      thumb_do_cflag(self, ra,rb,0);
+      thumb_do_add_vflag(self, ra,rb,rc);
+      return(0);
+    }
+    else
+    {
+      /* this is a mov */
+    }
+  }
+
+  /* ADD(2) big immediate one register */
+  if((inst&0xF800)==0x3000)
+  {
+    rb=(inst>>0)&0xFF;
+    rd=(inst>>8)&0x7;
+    ra=thumb_read_register(self, rd);
+    rc=ra+rb;
+    thumb_write_register(self, rd,rc);
+    thumb_do_nflag(self, rc);
+    thumb_do_zflag(self, rc);
+    thumb_do_cflag(self, ra,rb,0);
+    thumb_do_add_vflag(self, ra,-rb,rc);
+    return(0);
+  }
+
+  /* ADD(3) three registers */
+  if((inst&0xFE00)==0x1800)
+  {
+    rd=(inst>>0)&0x7;
+    rn=(inst>>3)&0x7;
+    rm=(inst>>6)&0x7;
+    ra=thumb_read_register(self, rn);
+    rb=thumb_read_register(self, rm);
+    rc=ra+rb;
+    thumb_write_register(self, rd,rc);
+    thumb_do_nflag(self, rc);
+    thumb_do_zflag(self, rc);
+    thumb_do_cflag(self, ra,rb,0);
+    thumb_do_add_vflag(self, ra,rb,rc);
+    return(0);
+  }
+
+  /* ADD(4) two registers one or both high no flags */
+  if((inst&0xFF00)==0x4400)
+  {
+    if((inst>>6)&3)
+    {
+      /* UNPREDICTABLE */
+    }
+    rd=(inst>>0)&0x7;
+    rd|=(inst>>4)&0x8;
+    rm=(inst>>3)&0xF;
+    ra=thumb_read_register(self, rd);
+    rb=thumb_read_register(self, rm);
+    rc=ra+rb;
+    thumb_write_register(self, rd,rc);
+    return(0);
+  }
+
+  /* ADD(5) rd = pc plus immediate */
+  if((inst&0xF800)==0xA000)
+  {
+    rb=(inst>>0)&0xFF;
+    rd=(inst>>8)&0x7;
+    rb<<=2;
+    ra=thumb_read_register(self, 15);
+    rc=(ra&(~3))+rb;
+    thumb_write_register(self, rd,rc);
+    return(0);
+  }
+
+  /* ADD(6) rd = sp plus immediate */
+  if((inst&0xF800)==0xA800)
+  {
+    rb=(inst>>0)&0xFF;
+    rd=(inst>>8)&0x7;
+    rb<<=2;
+    ra=thumb_read_register(self, 13);
+    rc=ra+rb;
+    thumb_write_register(self, rd,rc);
+    return(0);
+  }
+
+  /* ADD(7) sp plus immediate */
+  if((inst&0xFF80)==0xB000)
+  {
+    rb=(inst>>0)&0x7F;
+    rb<<=2;
+    ra=thumb_read_register(self, 13);
+    rc=ra+rb;
+    thumb_write_register(self, 13,rc);
+    return(0);
+  }
+
+  /* AND */
+  if((inst&0xFFC0)==0x4000)
+  {
+    rd=(inst>>0)&0x7;
+    rm=(inst>>3)&0x7;
+    ra=thumb_read_register(self, rd);
+    rb=thumb_read_register(self, rm);
+    rc=ra&rb;
+    thumb_write_register(self, rd,rc);
+    thumb_do_nflag(self, rc);
+    thumb_do_zflag(self, rc);
+    return(0);
+  }
+
+  /* ASR(1) two register immediate */
+  if((inst&0xF800)==0x1000)
+  {
+    rd=(inst>>0)&0x07;
+    rm=(inst>>3)&0x07;
+    rb=(inst>>6)&0x1F;
+    rc=thumb_read_register(self, rm);
+    if(rb==0)
+    {
+      if(rc&0x80000000)
+      {
+        thumb_do_cflag_bit(self, 1);
+        rc=~0;
+      }
+      else
+      {
+        thumb_do_cflag_bit(self, 0);
+        rc=0;
+      }
+    }
+    else
+    {
+      thumb_do_cflag_bit(self, rc&(1<<(rb-1)));
+      ra=rc&0x80000000;
+      rc>>=rb;
+      if(ra) /* asr, sign is shifted in */
+      {
+        rc|=(~0)<<(32-rb);
+      }
+    }
+    thumb_write_register(self, rd,rc);
+    thumb_do_nflag(self, rc);
+    thumb_do_zflag(self, rc);
+    return(0);
+  }
+
+  /* ASR(2) two register */
+  if((inst&0xFFC0)==0x4100)
+  {
+    rd=(inst>>0)&0x07;
+    rs=(inst>>3)&0x07;
+    rc=thumb_read_register(self, rd);
+    rb=thumb_read_register(self, rs);
+    rb&=0xFF;
+    if(rb==0)
+    {
+    }
+    else if(rb<32)
+    {
+      thumb_do_cflag_bit(self, rc&(1<<(rb-1)));
+      ra=rc&0x80000000;
+      rc>>=rb;
+      if(ra) /* asr, sign is shifted in */
+      {
+        rc|=(~0)<<(32-rb);
+      }
+    }
+    else
+    {
+      if(rc&0x80000000)
+      {
+        thumb_do_cflag_bit(self, 1);
+        rc=(~0);
+      }
+      else
+      {
+        thumb_do_cflag_bit(self, 0);
+        rc=0;
+      }
+    }
+    thumb_write_register(self, rd,rc);
+    thumb_do_nflag(self, rc);
+    thumb_do_zflag(self, rc);
+    return(0);
+  }
+
+  /* B(1) conditional branch */
+  if((inst&0xF000)==0xD000)
+  {
+    rb=(inst>>0)&0xFF;
+    if(rb&0x80)
+      rb|=(~0)<<8;
+    op=(inst>>8)&0xF;
+    rb<<=1;
+    rb+=pc;
+    rb+=2;
+    switch(op)
+    {
+      case 0x0: /* b eq  z set */
+        if(self->cpsr&THUMB_CPSR_Z)
+        {
+          thumb_write_register(self, 15,rb);
+        }
+        return(0);
+
+      case 0x1: /* b ne  z clear */
+        if(!(self->cpsr&THUMB_CPSR_Z))
+        {
+          thumb_write_register(self, 15,rb);
+        }
+        return(0);
+
+      case 0x2: /* b cs c set */
+        if(self->cpsr&THUMB_CPSR_C)
+        {
+          thumb_write_register(self, 15,rb);
+        }
+        return(0);
+
+      case 0x3: /* b cc c clear */
+        if(!(self->cpsr&THUMB_CPSR_C))
+        {
+          thumb_write_register(self, 15,rb);
+        }
+        return(0);
+
+      case 0x4: /* b mi n set */
+        if(self->cpsr&THUMB_CPSR_N)
+        {
+          thumb_write_register(self, 15,rb);
+        }
+        return(0);
+
+      case 0x5: /* b pl n clear */
+        if(!(self->cpsr&THUMB_CPSR_N))
+        {
+          thumb_write_register(self, 15,rb);
+        }
+        return(0);
+
+      case 0x6: /* b vs v set */
+        if(self->cpsr&THUMB_CPSR_V)
+        {
+          thumb_write_register(self, 15,rb);
+        }
+        return(0);
+
+      case 0x7: /* b vc v clear */
+        if(!(self->cpsr&THUMB_CPSR_V))
+        {
+          thumb_write_register(self, 15,rb);
+        }
+        return(0);
+
+      case 0x8: /* b hi c set z clear */
+        if((self->cpsr&THUMB_CPSR_C)&&(!(self->cpsr&THUMB_CPSR_Z)))
+        {
+          thumb_write_register(self, 15,rb);
+        }
+        return(0);
+
+      case 0x9: /* b ls c clear or z set */
+        if((self->cpsr&THUMB_CPSR_Z)||(!(self->cpsr&THUMB_CPSR_C)))
+        {
+          thumb_write_register(self, 15,rb);
+        }
+        return(0);
+
+      case 0xA: /* b ge N == V */
+        ra=0;
+        if(  (self->cpsr&THUMB_CPSR_N) &&  (self->cpsr&THUMB_CPSR_V) ) ra++;
+        if((!(self->cpsr&THUMB_CPSR_N))&&(!(self->cpsr&THUMB_CPSR_V))) ra++;
+        if(ra)
+        {
+          thumb_write_register(self, 15,rb);
+        }
+        return(0);
+
+      case 0xB: /* b lt N != V */
+        ra=0;
+        if((!(self->cpsr&THUMB_CPSR_N))&&(self->cpsr&THUMB_CPSR_V)) ra++;
+        if((!(self->cpsr&THUMB_CPSR_V))&&(self->cpsr&THUMB_CPSR_N)) ra++;
+        if(ra)
+        {
+          thumb_write_register(self, 15,rb);
+        }
+        return(0);
+
+      case 0xC: /* b gt Z==0 and N == V */
+        ra=0;
+        if(  (self->cpsr&THUMB_CPSR_N) &&  (self->cpsr&THUMB_CPSR_V) ) ra++;
+        if((!(self->cpsr&THUMB_CPSR_N))&&(!(self->cpsr&THUMB_CPSR_V))) ra++;
+        if(self->cpsr&THUMB_CPSR_Z) ra=0;
+        if(ra)
+        {
+          thumb_write_register(self, 15,rb);
+        }
+        return(0);
+
+      case 0xD: /* b le Z==1 or N != V */
+        ra=0;
+        if((!(self->cpsr&THUMB_CPSR_N))&&(self->cpsr&THUMB_CPSR_V)) ra++;
+        if((!(self->cpsr&THUMB_CPSR_V))&&(self->cpsr&THUMB_CPSR_N)) ra++;
+        if(self->cpsr&THUMB_CPSR_Z) ra++;
+        if(ra)
+        {
+          thumb_write_register(self, 15,rb);
+        }
+        return(0);
+
+      case 0xE:
+        /* undefined instruction */
+        break;
+
+      case 0xF:
+        /* swi */
+        break;
+    }
+  }
+
+  /* B(2) unconditional branch */
+  if((inst&0xF800)==0xE000)
+  {
+    rb=(inst>>0)&0x7FF;
+    if(rb&(1<<10))
+      rb|=(~0)<<11;
+    rb<<=1;
+    rb+=pc;
+    rb+=2;
+    thumb_write_register(self, 15,rb);
+    return(0);
+  }
+
+  /* BIC */
+  if((inst&0xFFC0)==0x4380)
+  {
+    rd=(inst>>0)&0x7;
+    rm=(inst>>3)&0x7;
+    ra=thumb_read_register(self, rd);
+    rb=thumb_read_register(self, rm);
+    rc=ra&(~rb);
+    thumb_write_register(self, rd,rc);
+    thumb_do_nflag(self, rc);
+    thumb_do_zflag(self, rc);
+    return(0);
+  }
+
+  /* BKPT */
+  if((inst&0xFF00)==0xBE00)
+  {
+    rb=(inst>>0)&0xFF;
+    return(1);
+  }
+
+  /* BL/BLX(1) */
+  if((inst&0xE000)==0xE000) /* BL,BLX */
+  {
+    if((inst&0x1800)==0x1000) /* H=b10 */
+    {
+      self->halfadd=inst;
+      return(0);
+    }
+    else if((inst&0x1800)==0x1800) /* H=b11 */
+    {
+      /* branch to thumb */
+      rb=self->halfadd&((1<<11)-1);
+      if(rb&1<<10)
+        rb|=(~((1<<11)-1)); /* sign extend */
+      rb<<=11;
+      rb|=inst&((1<<11)-1);
+      rb<<=1;
+      rb+=pc;
+      thumb_write_register(self, 14,pc-2);
+      thumb_write_register(self, 15,rb);
+      return(0);
+    }
+    else if((inst&0x1800)==0x0800) /* H=b01 */
+    {
+      /*  fxq: this should exit the code without having to detect it */
+      return(1);
+    }
+  }
+
+  /* BLX(2) */
+  if((inst&0xFF87)==0x4780)
+  {
+    rm=(inst>>3)&0xF;
+    rc=thumb_read_register(self, rm);
+    rc+=2;
+    if(rc&1)
+    {
+      thumb_write_register(self, 14,pc-2);
+      thumb_write_register(self, 15,rc);
+      return(0);
+    }
+    else
+    {
+      /*  fxq: this could serve as exit code */
+      return(1);
+    }
+  }
+
+  /* BX */
+  if((inst&0xFF87)==0x4700)
+  {
+    rm=(inst>>3)&0xF;
+    rc=thumb_read_register(self, rm);
+    rc+=2;
+    if(rc&1)
+    {
+      thumb_write_register(self, 15,rc);
+      return(0);
+    }
+    else
+    {
+      /*  fxq: or maybe this one?? */
+      return(1);
+    }
+  }
+
+  /* CMN */
+  if((inst&0xFFC0)==0x42C0)
+  {
+    rn=(inst>>0)&0x7;
+    rm=(inst>>3)&0x7;
+    ra=thumb_read_register(self, rn);
+    rb=thumb_read_register(self, rm);
+    rc=ra+rb;
+    thumb_do_nflag(self, rc);
+    thumb_do_zflag(self, rc);
+    thumb_do_cflag(self, ra,rb,0);
+    thumb_do_add_vflag(self, ra,rb,rc);
+    return(0);
+  }
+
+  /* CMP(1) compare immediate */
+  if((inst&0xF800)==0x2800)
+  {
+    rb=(inst>>0)&0xFF;
+    rn=(inst>>8)&0x07;
+    ra=thumb_read_register(self, rn);
+    rc=ra-rb;
+    thumb_do_nflag(self, rc);
+    thumb_do_zflag(self, rc);
+    thumb_do_cflag(self, ra,~rb,1);
+    thumb_do_sub_vflag(self, ra,rb,rc);
+    return(0);
+  }
+
+  /* CMP(2) compare register */
+  if((inst&0xFFC0)==0x4280)
+  {
+    rn=(inst>>0)&0x7;
+    rm=(inst>>3)&0x7;
+    ra=thumb_read_register(self, rn);
+    rb=thumb_read_register(self, rm);
+    rc=ra-rb;
+    thumb_do_nflag(self, rc);
+    thumb_do_zflag(self, rc);
+    thumb_do_cflag(self, ra,~rb,1);
+    thumb_do_sub_vflag(self, ra,rb,rc);
+    return(0);
+  }
+
+  /* CMP(3) compare high register */
+  if((inst&0xFF00)==0x4500)
+  {
+    if(((inst>>6)&3)==0x0)
+    {
+      /* UNPREDICTABLE */
+    }
+    rn=(inst>>0)&0x7;
+    rn|=(inst>>4)&0x8;
+    if(rn==0xF)
+    {
+      /* UNPREDICTABLE */
+    }
+    rm=(inst>>3)&0xF;
+    ra=thumb_read_register(self, rn);
+    rb=thumb_read_register(self, rm);
+    rc=ra-rb;
+    thumb_do_nflag(self, rc);
+    thumb_do_zflag(self, rc);
+    thumb_do_cflag(self, ra,~rb,1);
+    thumb_do_sub_vflag(self, ra,rb,rc);
+    return(0);
+  }
+
+  /* CPS */
+  if((inst&0xFFE8)==0xB660)
+    return(1);
+
+  /* CPY copy high register */
+  if((inst&0xFFC0)==0x4600)
+  {
+    /* same as mov except you can use both low registers */
+    /* going to let mov handle high registers */
+    rd=(inst>>0)&0x7;
+    rm=(inst>>3)&0x7;
+    rc=thumb_read_register(self, rm);
+    thumb_write_register(self, rd,rc);
+    return(0);
+  }
+
+  /* EOR */
+  if((inst&0xFFC0)==0x4040)
+  {
+    rd=(inst>>0)&0x7;
+    rm=(inst>>3)&0x7;
+    ra=thumb_read_register(self, rd);
+    rb=thumb_read_register(self, rm);
+    rc=ra^rb;
+    thumb_write_register(self, rd,rc);
+    thumb_do_nflag(self, rc);
+    thumb_do_zflag(self, rc);
+    return(0);
+  }
+
+  /* LDMIA */
+  if((inst&0xF800)==0xC800)
+  {
+    rn=(inst>>8)&0x7;
+    sp=thumb_read_register(self, rn);
+    for(ra=0,rb=0x01;rb;rb=(rb<<1)&0xFF,ra++)
+    {
+      if(inst&rb)
+      {
+        thumb_write_register(self, ra,thumb_read32(self, sp));
+        sp+=4;
+      }
+    }
+    thumb_write_register(self, rn,sp);
+    return(0);
+  }
+
+  /* LDR(1) two register immediate */
+  if((inst&0xF800)==0x6800)
+  {
+    rd=(inst>>0)&0x07;
+    rn=(inst>>3)&0x07;
+    rb=(inst>>6)&0x1F;
+    rb<<=2;
+    rb=thumb_read_register(self, rn)+rb;
+    rc=thumb_read32(self, rb);
+    thumb_write_register(self, rd,rc);
+    return(0);
+  }
+
+  /* LDR(2) three register */
+  if((inst&0xFE00)==0x5800)
+  {
+    rd=(inst>>0)&0x7;
+    rn=(inst>>3)&0x7;
+    rm=(inst>>6)&0x7;
+    rb=thumb_read_register(self, rn)+thumb_read_register(self, rm);
+    rc=thumb_read32(self, rb);
+    thumb_write_register(self, rd,rc);
+    return(0);
+  }
+
+  /* LDR(3) */
+  if((inst&0xF800)==0x4800)
+  {
+    rb=(inst>>0)&0xFF;
+    rd=(inst>>8)&0x07;
+    rb<<=2;
+    ra=thumb_read_register(self, 15);
+    ra&=~3;
+    rb+=ra;
+    rc=thumb_read32(self, rb);
+    thumb_write_register(self, rd,rc);
+    return(0);
+  }
+
+  /* LDR(4) */
+  if((inst&0xF800)==0x9800)
+  {
+    rb=(inst>>0)&0xFF;
+    rd=(inst>>8)&0x07;
+    rb<<=2;
+    ra=thumb_read_register(self, 13);
+    /* ra&=~3; */
+    rb+=ra;
+    rc=thumb_read32(self, rb);
+    thumb_write_register(self, rd,rc);
+    return(0);
+  }
+
+  /* LDRB(1) */
+  if((inst&0xF800)==0x7800)
+  {
+    rd=(inst>>0)&0x07;
+    rn=(inst>>3)&0x07;
+    rb=(inst>>6)&0x1F;
+    rb=thumb_read_register(self, rn)+rb;
+    rc=thumb_read16(self, rb&(~1));
+    if(rb&1)
+    {
+      rc>>=8;
+    }
+    else
+    {
+    }
+    thumb_write_register(self, rd,rc&0xFF);
+    return(0);
+  }
+
+  /* LDRB(2) */
+  if((inst&0xFE00)==0x5C00)
+  {
+    rd=(inst>>0)&0x7;
+    rn=(inst>>3)&0x7;
+    rm=(inst>>6)&0x7;
+    rb=thumb_read_register(self, rn)+thumb_read_register(self, rm);
+    rc=thumb_read16(self, rb&(~1));
+    if(rb&1)
+    {
+      rc>>=8;
+    }
+    else
+    {
+    }
+    thumb_write_register(self, rd,rc&0xFF);
+    return(0);
+  }
+
+  /* LDRH(1) */
+  if((inst&0xF800)==0x8800)
+  {
+    rd=(inst>>0)&0x07;
+    rn=(inst>>3)&0x07;
+    rb=(inst>>6)&0x1F;
+    rb<<=1;
+    rb=thumb_read_register(self, rn)+rb;
+    rc=thumb_read16(self, rb);
+    thumb_write_register(self, rd,rc&0xFFFF);
+    return(0);
+  }
+
+  /* LDRH(2) */
+  if((inst&0xFE00)==0x5A00)
+  {
+    rd=(inst>>0)&0x7;
+    rn=(inst>>3)&0x7;
+    rm=(inst>>6)&0x7;
+    rb=thumb_read_register(self, rn)+thumb_read_register(self, rm);
+    rc=thumb_read16(self, rb);
+    thumb_write_register(self, rd,rc&0xFFFF);
+    return(0);
+  }
+
+  /* LDRSB */
+  if((inst&0xFE00)==0x5600)
+  {
+    rd=(inst>>0)&0x7;
+    rn=(inst>>3)&0x7;
+    rm=(inst>>6)&0x7;
+    rb=thumb_read_register(self, rn)+thumb_read_register(self, rm);
+    rc=thumb_read16(self, rb&(~1));
+    if(rb&1)
+    {
+      rc>>=8;
+    }
+    else
+    {
+    }
+    rc&=0xFF;
+    if(rc&0x80) rc|=((~0)<<8);
+    thumb_write_register(self, rd,rc);
+    return(0);
+  }
+
+  /* LDRSH */
+  if((inst&0xFE00)==0x5E00)
+  {
+    rd=(inst>>0)&0x7;
+    rn=(inst>>3)&0x7;
+    rm=(inst>>6)&0x7;
+    rb=thumb_read_register(self, rn)+thumb_read_register(self, rm);
+    rc=thumb_read16(self, rb);
+    rc&=0xFFFF;
+    if(rc&0x8000) rc|=((~0)<<16);
+    thumb_write_register(self, rd,rc);
+    return(0);
+  }
+
+  /* LSL(1) */
+  if((inst&0xF800)==0x0000)
+  {
+    rd=(inst>>0)&0x07;
+    rm=(inst>>3)&0x07;
+    rb=(inst>>6)&0x1F;
+    rc=thumb_read_register(self, rm);
+    if(rb==0)
+    {
+      /* if immed_5 == 0 */
+      /* C unnaffected */
+      /* result not shifted */
+    }
+    else
+    {
+      /* else immed_5 > 0 */
+      thumb_do_cflag_bit(self, rc&(1<<(32-rb)));
+      rc<<=rb;
+    }
+    thumb_write_register(self, rd,rc);
+    thumb_do_nflag(self, rc);
+    thumb_do_zflag(self, rc);
+    return(0);
+  }
+
+  /* LSL(2) two register */
+  if((inst&0xFFC0)==0x4080)
+  {
+    rd=(inst>>0)&0x07;
+    rs=(inst>>3)&0x07;
+    rc=thumb_read_register(self, rd);
+    rb=thumb_read_register(self, rs);
+    rb&=0xFF;
+    if(rb==0)
+    {
+    }
+    else if(rb<32)
+    {
+      thumb_do_cflag_bit(self, rc&(1<<(32-rb)));
+      rc<<=rb;
+    }
+    else if(rb==32)
+    {
+      thumb_do_cflag_bit(self, rc&1);
+      rc=0;
+    }
+    else
+    {
+      thumb_do_cflag_bit(self, 0);
+      rc=0;
+    }
+    thumb_write_register(self, rd,rc);
+    thumb_do_nflag(self, rc);
+    thumb_do_zflag(self, rc);
+    return(0);
+  }
+
+  /* LSR(1) two register immediate */
+  if((inst&0xF800)==0x0800)
+  {
+    rd=(inst>>0)&0x07;
+    rm=(inst>>3)&0x07;
+    rb=(inst>>6)&0x1F;
+    rc=thumb_read_register(self, rm);
+    if(rb==0)
+    {
+      thumb_do_cflag_bit(self, rc&0x80000000);
+      rc=0;
+    }
+    else
+    {
+      thumb_do_cflag_bit(self, rc&(1<<(rb-1)));
+      rc>>=rb;
+    }
+    thumb_write_register(self, rd,rc);
+    thumb_do_nflag(self, rc);
+    thumb_do_zflag(self, rc);
+    return(0);
+  }
+
+  /* LSR(2) two register */
+  if((inst&0xFFC0)==0x40C0)
+  {
+    rd=(inst>>0)&0x07;
+    rs=(inst>>3)&0x07;
+    rc=thumb_read_register(self, rd);
+    rb=thumb_read_register(self, rs);
+    rb&=0xFF;
+    if(rb==0)
+    {
+    }
+    else if(rb<32)
+    {
+      thumb_do_cflag_bit(self, rc&(1<<(32-rb)));
+      rc>>=rb;
+    }
+    else if(rb==32)
+    {
+      thumb_do_cflag_bit(self, rc&0x80000000);
+      rc=0;
+    }
+    else
+    {
+      thumb_do_cflag_bit(self, 0);
+      rc=0;
+    }
+    thumb_write_register(self, rd,rc);
+    thumb_do_nflag(self, rc);
+    thumb_do_zflag(self, rc);
+    return(0);
+  }
+
+  /* MOV(1) immediate */
+  if((inst&0xF800)==0x2000)
+  {
+    rb=(inst>>0)&0xFF;
+    rd=(inst>>8)&0x07;
+    thumb_write_register(self, rd,rb);
+    thumb_do_nflag(self, rb);
+    thumb_do_zflag(self, rb);
+    return(0);
+  }
+
+  /* MOV(2) two low registers */
+  if((inst&0xFFC0)==0x1C00)
+  {
+    rd=(inst>>0)&7;
+    rn=(inst>>3)&7;
+    rc=thumb_read_register(self, rn);
+    thumb_write_register(self, rd,rc);
+    thumb_do_nflag(self, rc);
+    thumb_do_zflag(self, rc);
+    thumb_do_cflag_bit(self, 0);
+    thumb_do_vflag_bit(self, 0);
+    return(0);
+  }
+
+  /* MOV(3) */
+  if((inst&0xFF00)==0x4600)
+  {
+    rd=(inst>>0)&0x7;
+    rd|=(inst>>4)&0x8;
+    rm=(inst>>3)&0xF;
+    rc=thumb_read_register(self, rm);
+    if (rd==15) rc+=2; /*  fxq fix for MOV R15 */
+    thumb_write_register(self, rd,rc);
+    return(0);
+  }
+
+  /* MUL */
+  if((inst&0xFFC0)==0x4340)
+  {
+    rd=(inst>>0)&0x7;
+    rm=(inst>>3)&0x7;
+    ra=thumb_read_register(self, rd);
+    rb=thumb_read_register(self, rm);
+    rc=ra*rb;
+    thumb_write_register(self, rd,rc);
+    thumb_do_nflag(self, rc);
+    thumb_do_zflag(self, rc);
+    return(0);
+  }
+
+  /* MVN */
+  if((inst&0xFFC0)==0x43C0)
+  {
+    rd=(inst>>0)&0x7;
+    rm=(inst>>3)&0x7;
+    ra=thumb_read_register(self, rm);
+    rc=(~ra);
+    thumb_write_register(self, rd,rc);
+    thumb_do_nflag(self, rc);
+    thumb_do_zflag(self, rc);
+    return(0);
+  }
+
+  /* NEG */
+  if((inst&0xFFC0)==0x4240)
+  {
+    rd=(inst>>0)&0x7;
+    rm=(inst>>3)&0x7;
+    ra=thumb_read_register(self, rm);
+    rc=0-ra;
+    thumb_write_register(self, rd,rc);
+    thumb_do_nflag(self, rc);
+    thumb_do_zflag(self, rc);
+    thumb_do_cflag(self, 0,~ra,1);
+    thumb_do_sub_vflag(self, 0,ra,rc);
+    return(0);
+  }
+
+  /* ORR */
+  if((inst&0xFFC0)==0x4300)
+  {
+    rd=(inst>>0)&0x7;
+    rm=(inst>>3)&0x7;
+    ra=thumb_read_register(self, rd);
+    rb=thumb_read_register(self, rm);
+    rc=ra|rb;
+    thumb_write_register(self, rd,rc);
+    thumb_do_nflag(self, rc);
+    thumb_do_zflag(self, rc);
+    return(0);
+  }
+
+  /* POP */
+  if((inst&0xFE00)==0xBC00)
+  {
+
+    sp=thumb_read_register(self, 13);
+    for(ra=0,rb=0x01;rb;rb=(rb<<1)&0xFF,ra++)
+    {
+      if(inst&rb)
+      {
+        thumb_write_register(self, ra,thumb_read32(self, sp));
+        sp+=4;
+      }
+    }
+    if(inst&0x100)
+    {
+      rc=thumb_read32(self, sp);
+      rc+=2;
+      thumb_write_register(self, 15,rc);
+      sp+=4;
+    }
+    thumb_write_register(self, 13,sp);
+    return(0);
+  }
+
+  /* PUSH */
+  if((inst&0xFE00)==0xB400)
+  {
+
+    sp=thumb_read_register(self, 13);
+    for(ra=0,rb=0x01,rc=0;rb;rb=(rb<<1)&0xFF,ra++)
+    {
+      if(inst&rb)
+      {
+        rc++;
+      }
+    }
+    if(inst&0x100) rc++;
+    rc<<=2;
+    sp-=rc;
+    rd=sp;
+    for(ra=0,rb=0x01;rb;rb=(rb<<1)&0xFF,ra++)
+    {
+      if(inst&rb)
+      {
+        thumb_write32(self, rd,thumb_read_register(self, ra));
+        rd+=4;
+      }
+    }
+    if(inst&0x100)
+    {
+      thumb_write32(self, rd,thumb_read_register(self, 14));
+    }
+    thumb_write_register(self, 13,sp);
+    return(0);
+  }
+
+  /* REV */
+  if((inst&0xFFC0)==0xBA00)
+  {
+    rd=(inst>>0)&0x7;
+    rn=(inst>>3)&0x7;
+    ra=thumb_read_register(self, rn);
+    rc =((ra>> 0)&0xFF)<<24;
+    rc|=((ra>> 8)&0xFF)<<16;
+    rc|=((ra>>16)&0xFF)<< 8;
+    rc|=((ra>>24)&0xFF)<< 0;
+    thumb_write_register(self, rd,rc);
+    return(0);
+  }
+
+  /* REV16 */
+  if((inst&0xFFC0)==0xBA40)
+  {
+    rd=(inst>>0)&0x7;
+    rn=(inst>>3)&0x7;
+    ra=thumb_read_register(self, rn);
+    rc =((ra>> 0)&0xFF)<< 8;
+    rc|=((ra>> 8)&0xFF)<< 0;
+    rc|=((ra>>16)&0xFF)<<24;
+    rc|=((ra>>24)&0xFF)<<16;
+    thumb_write_register(self, rd,rc);
+    return(0);
+  }
+
+  /* REVSH */
+  if((inst&0xFFC0)==0xBAC0)
+  {
+    rd=(inst>>0)&0x7;
+    rn=(inst>>3)&0x7;
+    ra=thumb_read_register(self, rn);
+    rc =((ra>> 0)&0xFF)<< 8;
+    rc|=((ra>> 8)&0xFF)<< 0;
+    if(rc&0x8000) rc|=0xFFFF0000;
+    else          rc&=0x0000FFFF;
+    thumb_write_register(self, rd,rc);
+    return(0);
+  }
+
+  /* ROR */
+  if((inst&0xFFC0)==0x41C0)
+  {
+    rd=(inst>>0)&0x7;
+    rs=(inst>>3)&0x7;
+    rc=thumb_read_register(self, rd);
+    ra=thumb_read_register(self, rs);
+    ra&=0xFF;
+    if(ra==0)
+    {
+    }
+    else
+    {
+      ra&=0x1F;
+      if(ra==0)
+      {
+        thumb_do_cflag_bit(self, rc&0x80000000);
+      }
+      else
+      {
+        thumb_do_cflag_bit(self, rc&(1<<(ra-1)));
+        rb=rc<<(32-ra);
+        rc>>=ra;
+        rc|=rb;
+      }
+    }
+    thumb_write_register(self, rd,rc);
+    thumb_do_nflag(self, rc);
+    thumb_do_zflag(self, rc);
+    return(0);
+  }
+
+  /* SBC */
+  if((inst&0xFFC0)==0x4180)
+  {
+    rd=(inst>>0)&0x7;
+    rm=(inst>>3)&0x7;
+    ra=thumb_read_register(self, rd);
+    rb=thumb_read_register(self, rm);
+    rc=ra-rb;
+    if(!(self->cpsr&THUMB_CPSR_C)) rc--;
+    thumb_write_register(self, rd,rc);
+    thumb_do_nflag(self, rc);
+    thumb_do_zflag(self, rc);
+    thumb_do_cflag(self, ra,rb,0);
+    thumb_do_sub_vflag(self, ra,rb,rc);
+    return(0);
+  }
+
+  /* SETEND */
+  if((inst&0xFFF7)==0xB650)
+    return(1);
+
+  /* STMIA */
+  if((inst&0xF800)==0xC000)
+  {
+    rn=(inst>>8)&0x7;
+
+    sp=thumb_read_register(self, rn);
+    for(ra=0,rb=0x01;rb;rb=(rb<<1)&0xFF,ra++)
+    {
+      if(inst&rb)
+      {
+        thumb_write32(self, sp,thumb_read_register(self, ra));
+        sp+=4;
+      }
+    }
+    thumb_write_register(self, rn,sp);
+    return(0);
+  }
+
+  /* STR(1) */
+  if((inst&0xF800)==0x6000)
+  {
+    rd=(inst>>0)&0x07;
+    rn=(inst>>3)&0x07;
+    rb=(inst>>6)&0x1F;
+    rb<<=2;
+    rb=thumb_read_register(self, rn)+rb;
+    rc=thumb_read_register(self, rd);
+    thumb_write32(self, rb,rc);
+    return(0);
+  }
+
+  /* STR(2) */
+  if((inst&0xFE00)==0x5000)
+  {
+    rd=(inst>>0)&0x7;
+    rn=(inst>>3)&0x7;
+    rm=(inst>>6)&0x7;
+    rb=thumb_read_register(self, rn)+thumb_read_register(self, rm);
+    rc=thumb_read_register(self, rd);
+    thumb_write32(self, rb,rc);
+    return(0);
+  }
+
+  /* STR(3) */
+  if((inst&0xF800)==0x9000)
+  {
+    rb=(inst>>0)&0xFF;
+    rd=(inst>>8)&0x07;
+    rb<<=2;
+    rb=thumb_read_register(self, 13)+rb;
+    rc=thumb_read_register(self, rd);
+    thumb_write32(self, rb,rc);
+    return(0);
+  }
+
+  /* STRB(1) */
+  if((inst&0xF800)==0x7000)
+  {
+    rd=(inst>>0)&0x07;
+    rn=(inst>>3)&0x07;
+    rb=(inst>>6)&0x1F;
+    rb=thumb_read_register(self, rn)+rb;
+    rc=thumb_read_register(self, rd);
+    ra=thumb_read16(self, rb&(~1));
+    if(rb&1)
+    {
+      ra&=0x00FF;
+      ra|=rc<<8;
+    }
+    else
+    {
+      ra&=0xFF00;
+      ra|=rc&0x00FF;
+    }
+    thumb_write16(self, rb&(~1),ra&0xFFFF);
+    return(0);
+  }
+
+  /* STRB(2) */
+  if((inst&0xFE00)==0x5400)
+  {
+    rd=(inst>>0)&0x7;
+    rn=(inst>>3)&0x7;
+    rm=(inst>>6)&0x7;
+    rb=thumb_read_register(self, rn)+thumb_read_register(self, rm);
+    rc=thumb_read_register(self, rd);
+    ra=thumb_read16(self, rb&(~1));
+    if(rb&1)
+    {
+      ra&=0x00FF;
+      ra|=rc<<8;
+    }
+    else
+    {
+      ra&=0xFF00;
+      ra|=rc&0x00FF;
+    }
+    thumb_write16(self, rb&(~1),ra&0xFFFF);
+    return(0);
+  }
+
+  /* STRH(1) */
+  if((inst&0xF800)==0x8000)
+  {
+    rd=(inst>>0)&0x07;
+    rn=(inst>>3)&0x07;
+    rb=(inst>>6)&0x1F;
+    rb<<=1;
+    rb=thumb_read_register(self, rn)+rb;
+    rc=thumb_read_register(self, rd);
+    thumb_write16(self, rb,rc&0xFFFF);
+    return(0);
+  }
+
+  /* STRH(2) */
+  if((inst&0xFE00)==0x5200)
+  {
+    rd=(inst>>0)&0x7;
+    rn=(inst>>3)&0x7;
+    rm=(inst>>6)&0x7;
+    rb=thumb_read_register(self, rn)+thumb_read_register(self, rm);
+    rc=thumb_read_register(self, rd);
+    thumb_write16(self, rb,rc&0xFFFF);
+    return(0);
+  }
+
+  /* SUB(1) */
+  if((inst&0xFE00)==0x1E00)
+  {
+    rd=(inst>>0)&7;
+    rn=(inst>>3)&7;
+    rb=(inst>>6)&7;
+    ra=thumb_read_register(self, rn);
+    rc=ra-rb;
+    thumb_write_register(self, rd,rc);
+    thumb_do_nflag(self, rc);
+    thumb_do_zflag(self, rc);
+    thumb_do_cflag(self, ra,~rb,1);
+    thumb_do_sub_vflag(self, ra,rb,rc);
+    return(0);
+  }
+
+  /* SUB(2) */
+  if((inst&0xF800)==0x3800)
+  {
+    rb=(inst>>0)&0xFF;
+    rd=(inst>>8)&0x07;
+    ra=thumb_read_register(self, rd);
+    rc=ra-rb;
+    thumb_write_register(self, rd,rc);
+    thumb_do_nflag(self, rc);
+    thumb_do_zflag(self, rc);
+    thumb_do_cflag(self, ra,~rb,1);
+    thumb_do_sub_vflag(self, ra,rb,rc);
+    return(0);
+  }
+
+  /* SUB(3) */
+  if((inst&0xFE00)==0x1A00)
+  {
+    rd=(inst>>0)&0x7;
+    rn=(inst>>3)&0x7;
+    rm=(inst>>6)&0x7;
+    ra=thumb_read_register(self, rn);
+    rb=thumb_read_register(self, rm);
+    rc=ra-rb;
+    thumb_write_register(self, rd,rc);
+    thumb_do_nflag(self, rc);
+    thumb_do_zflag(self, rc);
+    thumb_do_cflag(self, ra,~rb,1);
+    thumb_do_sub_vflag(self, ra,rb,rc);
+    return(0);
+  }
+
+  /* SUB(4) */
+  if((inst&0xFF80)==0xB080)
+  {
+    rb=inst&0x7F;
+    rb<<=2;
+    ra=thumb_read_register(self, 13);
+    ra-=rb;
+    thumb_write_register(self, 13,ra);
+    return(0);
+  }
+
+  /* SWI */
+  if((inst&0xFF00)==0xDF00)
+  {
+    rb=inst&0xFF;
+    return(1);
+  }
+
+  /* SXTB */
+  if((inst&0xFFC0)==0xB240)
+  {
+    rd=(inst>>0)&0x7;
+    rm=(inst>>3)&0x7;
+    ra=thumb_read_register(self, rm);
+    rc=ra&0xFF;
+    if(rc&0x80) rc|=(~0)<<8;
+    thumb_write_register(self, rd,rc);
+    return(0);
+  }
+
+  /* SXTH */
+  if((inst&0xFFC0)==0xB200)
+  {
+    rd=(inst>>0)&0x7;
+    rm=(inst>>3)&0x7;
+    ra=thumb_read_register(self, rm);
+    rc=ra&0xFFFF;
+    if(rc&0x8000) rc|=(~0)<<16;
+    thumb_write_register(self, rd,rc);
+    return(0);
+  }
+
+  /* TST */
+  if((inst&0xFFC0)==0x4200)
+  {
+    rn=(inst>>0)&0x7;
+    rm=(inst>>3)&0x7;
+    ra=thumb_read_register(self, rn);
+    rb=thumb_read_register(self, rm);
+    rc=ra&rb;
+    thumb_do_nflag(self, rc);
+    thumb_do_zflag(self, rc);
+    return(0);
+  }
+
+  /* UXTB */
+  if((inst&0xFFC0)==0xB2C0)
+  {
+    rd=(inst>>0)&0x7;
+    rm=(inst>>3)&0x7;
+    ra=thumb_read_register(self, rm);
+    rc=ra&0xFF;
+    thumb_write_register(self, rd,rc);
+    return(0);
+  }
+
+  /* UXTH */
+  if((inst&0xFFC0)==0xB280)
+  {
+    rd=(inst>>0)&0x7;
+    rm=(inst>>3)&0x7;
+    ra=thumb_read_register(self, rm);
+    rc=ra&0xFFFF;
+    thumb_write_register(self, rd,rc);
+    return(0);
+  }
+
+  return(1);
+}
+
+/*  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */

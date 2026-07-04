@@ -20,7 +20,7 @@
 #include <cstring>
 
 #include "System.hxx"
-#include "Thumbulator.hxx"
+#include "Thumbulator.h"
 #include "CartDPCPlus.hxx"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -57,10 +57,14 @@ CartridgeDPCPlus::CartridgeDPCPlus(const uint8_t* image, uint32_t size,
     myProgramImage += (size - 29 * 1024);
 
 #ifdef THUMB_SUPPORT
-  // Create Thumbulator ARM emulator
-  myThumbEmulator = new Thumbulator((uint16_t*)(myProgramImage-0xC00),
-                                    (uint16_t*)myDPCRAM,
-                                     settings.getBool("thumb.trapfatal"));
+  // Create Thumbulator ARM emulator. The Thumbulator is now a C struct with
+  // a C-style init function rather than a C++ class; allocate it and init it
+  // over the caller-owned ROM/RAM buffers.
+  myThumbEmulator = new Thumbulator;
+  thumb_init(myThumbEmulator,
+             (uint16_t*)(myProgramImage-0xC00),
+             (uint16_t*)myDPCRAM,
+             settings.getBool("thumb.trapfatal"));
 #endif
   setInitialState();
 
@@ -213,7 +217,7 @@ inline void CartridgeDPCPlus::callFunction(uint8_t value)
     case 254:
     case 255:
       // Call user written ARM code (most likely be C compiled for ARM)
-      myThumbEmulator->run();
+      thumb_run(myThumbEmulator);
       break;
 #endif
     // reserved
