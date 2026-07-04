@@ -23,13 +23,13 @@
 #include "CartSB.hxx"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-CartridgeSB::CartridgeSB(const uInt8* image, uInt32 size,
+CartridgeSB::CartridgeSB(const uint8_t* image, uint32_t size,
                          const Settings& settings)
   : Cartridge(settings),
     mySize(size)
 {
   // Allocate array for the ROM image
-  myImage = new uInt8[mySize];
+  myImage = new uint8_t[mySize];
 
   // Copy the ROM image into my buffer
   memcpy(myImage, image, mySize);
@@ -56,7 +56,7 @@ void CartridgeSB::reset()
 void CartridgeSB::install(System& system)
 {
   mySystem     = &system;
-  uInt16 shift = mySystem->pageShift();
+  uint16_t shift = mySystem->pageShift();
 
   // Get the page accessing methods for the hot spots since they overlap
   // areas within the TIA we'll need to forward requests to the TIA
@@ -72,7 +72,7 @@ void CartridgeSB::install(System& system)
   System::PageAccess access(0, 0, 0, this, System::PA_READ);
 
   // Set the page accessing methods for the hot spots
-  for(uInt32 i = 0x0800; i < 0x0FFF; i += (1 << shift))
+  for(uint32_t i = 0x0800; i < 0x0FFF; i += (1 << shift))
     mySystem->setPageAccess(i >> shift, access);
 
   // Install pages for startup bank
@@ -80,7 +80,7 @@ void CartridgeSB::install(System& system)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt8 CartridgeSB::peek(uInt16 address)
+uint8_t CartridgeSB::peek(uint16_t address)
 {
   address &= (0x17FF + (mySize >> 12));
 
@@ -100,7 +100,7 @@ uInt8 CartridgeSB::peek(uInt16 address)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeSB::poke(uInt16 address, uInt8 value)
+bool CartridgeSB::poke(uint16_t address, uint8_t value)
 {
   address &= (0x17FF + (mySize >> 12));
 
@@ -119,20 +119,20 @@ bool CartridgeSB::poke(uInt16 address, uInt8 value)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeSB::bank(uInt16 bank)
+bool CartridgeSB::bank(uint16_t bank)
 { 
   if(bankLocked()) return false;
 
   // Remember what bank we're in
   myCurrentBank = bank;
-  uInt32 offset = myCurrentBank << 12;
-  uInt16 shift = mySystem->pageShift();
+  uint32_t offset = myCurrentBank << 12;
+  uint16_t shift = mySystem->pageShift();
 
   // Setup the page access methods for the current bank
   System::PageAccess access(0, 0, 0, this, System::PA_READ);
 
   // Map ROM image into the system
-  for(uInt32 address = 0x1000; address < 0x2000; address += (1 << shift))
+  for(uint32_t address = 0x1000; address < 0x2000; address += (1 << shift))
   {
     access.directPeekBase = &myImage[offset + (address & 0x0FFF)];
     access.codeAccessBase = &myCodeAccessBase[offset + (address & 0x0FFF)];
@@ -142,26 +142,26 @@ bool CartridgeSB::bank(uInt16 bank)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt16 CartridgeSB::bank() const
+uint16_t CartridgeSB::bank() const
 {
   return myCurrentBank;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt16 CartridgeSB::bankCount() const
+uint16_t CartridgeSB::bankCount() const
 {
   return mySize >> 12;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeSB::patch(uInt16 address, uInt8 value)
+bool CartridgeSB::patch(uint16_t address, uint8_t value)
 {
   myImage[(myCurrentBank << 12) + (address & 0x0FFF)] = value;
   return myBankChanged = true;
 } 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const uInt8* CartridgeSB::getImage(int& size) const
+const uint8_t* CartridgeSB::getImage(int& size) const
 {
   size = mySize;
   return myImage;

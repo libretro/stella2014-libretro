@@ -65,7 +65,7 @@ class TrackBall : public Controller
 
       @return The state of all digital pins
     */
-    uInt8 read();
+    uint8_t read();
 
     /**
       Update the entire digital and analog pin state according to the
@@ -114,16 +114,16 @@ class TrackBall : public Controller
     int myMouseEnabled;  
 
     // CX-22
-    static const uInt32 ourTrakBallTableTB_H[2][2];
-    static const uInt32 ourTrakBallTableTB_V[2][2];
+    static const uint32_t ourTrakBallTableTB_H[2][2];
+    static const uint32_t ourTrakBallTableTB_V[2][2];
 
     // ST mouse / CX-80
-    static const uInt32 ourTrakBallTableST_H[4];
-    static const uInt32 ourTrakBallTableST_V[4];
+    static const uint32_t ourTrakBallTableST_H[4];
+    static const uint32_t ourTrakBallTableST_V[4];
 
     // Amiga mouse
-    static const uInt32 ourTrakBallTableAM_H[4];
-    static const uInt32 ourTrakBallTableAM_V[4];
+    static const uint32_t ourTrakBallTableAM_H[4];
+    static const uint32_t ourTrakBallTableAM_V[4];
 };
 
 #endif

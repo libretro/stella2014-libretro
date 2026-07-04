@@ -121,7 +121,7 @@ class OSystem
     CheatManager& cheat() const { return *myCheatManager; }
 #endif
 
-    uInt32 desktopHeight() const { return 512; }
+    uint32_t desktopHeight() const { return 512; }
 
     /**
       Return the full/complete directory name for storing state files.
@@ -174,7 +174,7 @@ class OSystem
 
       @return Current time in microseconds.
     */
-    virtual uInt64 getTicks() const;
+    virtual uint64_t getTicks() const;
 
     /**
       Informs the OSystem of a change in EventHandler state.

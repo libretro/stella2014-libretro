@@ -24,7 +24,7 @@
 #include "System.hxx"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-System::System(uInt16 n, uInt16 m)
+System::System(uint16_t n, uint16_t m)
   : myAddressMask((1 << n) - 1),
     myPageShift(m),
     myPageMask((1 << m) - 1),
@@ -63,7 +63,7 @@ System::System(uInt16 n, uInt16 m)
 System::~System()
 {
   // Free the devices attached to me, since I own them
-  for(uInt32 i = 0; i < myNumberOfDevices; ++i)
+  for(uint32_t i = 0; i < myNumberOfDevices; ++i)
   {
     delete myDevices[i];
   }
@@ -89,7 +89,7 @@ void System::reset(bool autodetect)
   resetCycles();
 
   // First we reset the devices attached to myself
-  for(uInt32 i = 0; i < myNumberOfDevices; ++i)
+  for(uint32_t i = 0; i < myNumberOfDevices; ++i)
     myDevices[i]->reset();
 
   // Now we reset the processor if it exists
@@ -141,7 +141,7 @@ void System::attach(TIA* tia)
 void System::resetCycles()
 {
   // First we let all of the device attached to me know about the reset
-  for(uInt32 i = 0; i < myNumberOfDevices; ++i)
+  for(uint32_t i = 0; i < myNumberOfDevices; ++i)
   {
     myDevices[i]->systemCyclesReset();
   }
@@ -151,36 +151,36 @@ void System::resetCycles()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void System::setPageAccess(uInt16 page, const PageAccess& access)
+void System::setPageAccess(uint16_t page, const PageAccess& access)
 {
   myPageAccessTable[page] = access;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const System::PageAccess& System::getPageAccess(uInt16 page) const
+const System::PageAccess& System::getPageAccess(uint16_t page) const
 {
   return myPageAccessTable[page];
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-System::PageAccessType System::getPageAccessType(uInt16 addr) const
+System::PageAccessType System::getPageAccessType(uint16_t addr) const
 {
   return myPageAccessTable[(addr & myAddressMask) >> myPageShift].type;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void System::setDirtyPage(uInt16 addr)
+void System::setDirtyPage(uint16_t addr)
 {
   myPageIsDirtyTable[(addr & myAddressMask) >> myPageShift] = true;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool System::isPageDirty(uInt16 start_addr, uInt16 end_addr) const
+bool System::isPageDirty(uint16_t start_addr, uint16_t end_addr) const
 {
-  uInt16 start_page = (start_addr & myAddressMask) >> myPageShift;
-  uInt16 end_page = (end_addr & myAddressMask) >> myPageShift;
+  uint16_t start_page = (start_addr & myAddressMask) >> myPageShift;
+  uint16_t end_page = (end_addr & myAddressMask) >> myPageShift;
 
-  for(uInt16 page = start_page; page <= end_page; ++page)
+  for(uint16_t page = start_page; page <= end_page; ++page)
     if(myPageIsDirtyTable[page])
       return true;
 
@@ -190,14 +190,14 @@ bool System::isPageDirty(uInt16 start_addr, uInt16 end_addr) const
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void System::clearDirtyPages()
 {
-  for(uInt32 i = 0; i < myNumberOfPages; ++i)
+  for(uint32_t i = 0; i < myNumberOfPages; ++i)
     myPageIsDirtyTable[i] = false;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt8 System::peek(uInt16 addr, uInt8 flags)
+uint8_t System::peek(uint16_t addr, uint8_t flags)
 {
-  uInt8 result;
+  uint8_t result;
   PageAccess& access = myPageAccessTable[(addr & myAddressMask) >> myPageShift];
 
   // See if this page uses direct accessing or not 
@@ -212,9 +212,9 @@ uInt8 System::peek(uInt16 addr, uInt8 flags)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void System::poke(uInt16 addr, uInt8 value)
+void System::poke(uint16_t addr, uint8_t value)
 {
-  uInt16 page = (addr & myAddressMask) >> myPageShift;
+  uint16_t page = (addr & myAddressMask) >> myPageShift;
   PageAccess& access = myPageAccessTable[page];
   
   // See if this page uses direct accessing or not 
@@ -256,7 +256,7 @@ bool System::save(Serializer& out) const
       return false;
 
    // Now save the state of each device
-   for(uInt32 i = 0; i < myNumberOfDevices; ++i)
+   for(uint32_t i = 0; i < myNumberOfDevices; ++i)
       if(!myDevices[i]->save(out))
          return false;
 
@@ -277,7 +277,7 @@ bool System::load(Serializer& in)
       return false;
 
    // Now load the state of each device
-   for(uInt32 i = 0; i < myNumberOfDevices; ++i)
+   for(uint32_t i = 0; i < myNumberOfDevices; ++i)
       if(!myDevices[i]->load(in))
          return false;
 

@@ -45,7 +45,7 @@ class Cartridge2K : public Cartridge
       @param size      The size of the ROM image (<= 2048 bytes)
       @param settings  A reference to the various settings (read-only)
     */
-    Cartridge2K(const uInt8* image, uInt32 size, const Settings& settings);
+    Cartridge2K(const uint8_t* image, uint32_t size, const Settings& settings);
  
     /**
       Destructor
@@ -71,17 +71,17 @@ class Cartridge2K : public Cartridge
 
       @param bank The bank that should be installed in the system
     */
-    bool bank(uInt16 bank);
+    bool bank(uint16_t bank);
 
     /**
       Get the current bank.
     */
-    uInt16 bank() const;
+    uint16_t bank() const;
 
     /**
       Query the number of banks supported by the cartridge.
     */
-    uInt16 bankCount() const;
+    uint16_t bankCount() const;
 
     /**
       Patch the cartridge ROM.
@@ -90,7 +90,7 @@ class Cartridge2K : public Cartridge
       @param value    The value to place into the address
       @return    Success or failure of the patch operation
     */
-    bool patch(uInt16 address, uInt8 value);
+    bool patch(uint16_t address, uint8_t value);
 
     /**
       Access the internal ROM image for this cartridge.
@@ -98,7 +98,7 @@ class Cartridge2K : public Cartridge
       @param size  Set to the size of the internal ROM image data
       @return  A pointer to the internal ROM image data
     */
-    const uInt8* getImage(int& size) const;
+    const uint8_t* getImage(int& size) const;
 
     /**
       Save the current state of this cart to the given Serializer.
@@ -129,7 +129,7 @@ class Cartridge2K : public Cartridge
 
       @return The byte at the specified address
     */
-    uInt8 peek(uInt16 address);
+    uint8_t peek(uint16_t address);
 
     /**
       Change the byte at the specified address to the given value
@@ -138,17 +138,17 @@ class Cartridge2K : public Cartridge
       @param value The value to be stored at the address
       @return  True if the poke changed the device address space, else false
     */
-    bool poke(uInt16 address, uInt8 value);
+    bool poke(uint16_t address, uint8_t value);
 
   private:
     // Pointer to a dynamically allocated ROM image of the cartridge
-    uInt8* myImage;
+    uint8_t* myImage;
 
     // Size of the ROM image
-    uInt32 mySize;
+    uint32_t mySize;
 
     // Mask to use for mirroring
-    uInt32 myMask;
+    uint32_t myMask;
 };
 
 #endif

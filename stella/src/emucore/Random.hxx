@@ -52,7 +52,7 @@ class Random
 
       @return A random number
     */
-    uInt32 next();
+    uint32_t next();
 
     /**
       Class method which sets the OSystem in use; the constructor will
@@ -65,7 +65,7 @@ class Random
 
   private:
     // Indicates the next random number
-    uInt32 myValue;
+    uint32_t myValue;
 
     // Set the OSystem we're using
     static const OSystem* ourSystem;

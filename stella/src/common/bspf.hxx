@@ -30,18 +30,10 @@
 
 #include <stdint.h>
 
-// Types for 8-bit signed and unsigned integers
-typedef int8_t Int8;
-typedef uint8_t uInt8;
-// Types for 16-bit signed and unsigned integers
-typedef int16_t Int16;
-typedef uint16_t uInt16;
-// Types for 32-bit signed and unsigned integers
-typedef int32_t Int32;
-typedef uint32_t uInt32;
-// Types for 64-bit signed and unsigned integers
-typedef int64_t Int64;
-typedef uint64_t uInt64;
+// Integer types are used directly from <stdint.h>:
+//   int8_t/uint8_t, int16_t/uint16_t, int32_t/uint32_t, int64_t/uint64_t
+// (Stella's historical uInt8/Int32/... aliases have been removed in this
+//  build in favour of the standard names.)
 
 
 // The following code should provide access to the standard C++ objects and

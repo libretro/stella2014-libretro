@@ -23,7 +23,7 @@
 #include "Cart2K.hxx"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Cartridge2K::Cartridge2K(const uInt8* image, uInt32 size, const Settings& settings)
+Cartridge2K::Cartridge2K(const uint8_t* image, uint32_t size, const Settings& settings)
   : Cartridge(settings)
 {
   // Size can be a maximum of 2K
@@ -41,7 +41,7 @@ Cartridge2K::Cartridge2K(const uInt8* image, uInt32 size, const Settings& settin
     mySize = 64;
 
   // Initialize ROM with illegal 6502 opcode that causes a real 6502 to jam
-  myImage = new uInt8[mySize];
+  myImage = new uint8_t[mySize];
   memset(myImage, 0x02, mySize);
 
   // Copy the ROM image into my buffer
@@ -69,12 +69,12 @@ void Cartridge2K::reset()
 void Cartridge2K::install(System& system)
 {
   mySystem     = &system;
-  uInt16 shift = mySystem->pageShift();
+  uint16_t shift = mySystem->pageShift();
 
   // Map ROM image into the system
   System::PageAccess access(0, 0, 0, this, System::PA_READ);
 
-  for(uInt32 address = 0x1000; address < 0x2000; address += (1 << shift))
+  for(uint32_t address = 0x1000; address < 0x2000; address += (1 << shift))
   {
     access.directPeekBase = &myImage[address & myMask];
     access.codeAccessBase = &myCodeAccessBase[address & myMask];
@@ -83,47 +83,47 @@ void Cartridge2K::install(System& system)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt8 Cartridge2K::peek(uInt16 address)
+uint8_t Cartridge2K::peek(uint16_t address)
 {
   return myImage[address & myMask];
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Cartridge2K::poke(uInt16, uInt8)
+bool Cartridge2K::poke(uint16_t, uint8_t)
 {
   // This is ROM so poking has no effect :-)
   return false;
 } 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Cartridge2K::bank(uInt16 bank)
+bool Cartridge2K::bank(uint16_t bank)
 {
   // Doesn't support bankswitching
   return false;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt16 Cartridge2K::bank() const
+uint16_t Cartridge2K::bank() const
 {
   // Doesn't support bankswitching
   return 0;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt16 Cartridge2K::bankCount() const
+uint16_t Cartridge2K::bankCount() const
 {
   return 1;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Cartridge2K::patch(uInt16 address, uInt8 value)
+bool Cartridge2K::patch(uint16_t address, uint8_t value)
 {
   myImage[address & myMask] = value;
   return myBankChanged = true;
 } 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const uInt8* Cartridge2K::getImage(int& size) const
+const uint8_t* Cartridge2K::getImage(int& size) const
 {
   size = mySize;
   return myImage;

@@ -252,14 +252,14 @@ class Console : public Serializable
       Sets the framerate of the console, which in turn communicates
       this to all applicable subsystems.
     */
-    void setFramerate(uInt32 num, uInt32 den);
+    void setFramerate(uint32_t num, uint32_t den);
 
     /**
       Returns the framerate based on a number of factors
       (whether 'framerate' is set, what display format is in use, etc)
     */
-    uInt32 getFramerateNum() const { return myFramerateNum; }
-    uInt32 getFramerateDen() const { return myFramerateDen; }
+    uint32_t getFramerateNum() const { return myFramerateNum; }
+    uint32_t getFramerateDen() const { return myFramerateDen; }
 
     /**
       Toggles the TIA bit specified in the method name.
@@ -293,7 +293,7 @@ class Console : public Serializable
       Returns a pointer to the palette data for the palette currently defined
       by the ROM properties.
     */
-    const uInt32* getPalette(int direction) const;
+    const uint32_t* getPalette(int direction) const;
 
   private:
     /**
@@ -361,11 +361,11 @@ class Console : public Serializable
     // The currently defined display framerate
     // Framerate as an exact rational (frames per second = num/den),
     // e.g. NTSC 59.92 fps = 1498/25, PAL 49.92 fps = 1248/25
-    uInt32 myFramerateNum;
-    uInt32 myFramerateDen;
+    uint32_t myFramerateNum;
+    uint32_t myFramerateDen;
 
     // Display format currently in use
-    uInt32 myCurrentFormat;
+    uint32_t myCurrentFormat;
 
     // Indicates whether an external palette was found and
     // successfully loaded
@@ -374,22 +374,22 @@ class Console : public Serializable
     // Contains detailed info about this console
     ConsoleInfo myConsoleInfo;
 
-	const uInt32 *currentPalette;
+	const uint32_t *currentPalette;
 
     // Table of RGB values for NTSC, PAL and SECAM
-    static uInt32 ourNTSCPalette[256];
-    static uInt32 ourPALPalette[256];
-    static uInt32 ourSECAMPalette[256];
+    static uint32_t ourNTSCPalette[256];
+    static uint32_t ourPALPalette[256];
+    static uint32_t ourSECAMPalette[256];
 
     // Table of RGB values for NTSC, PAL and SECAM - Z26 version
-    static uInt32 ourNTSCPaletteZ26[256];
-    static uInt32 ourPALPaletteZ26[256];
-    static uInt32 ourSECAMPaletteZ26[256];
+    static uint32_t ourNTSCPaletteZ26[256];
+    static uint32_t ourPALPaletteZ26[256];
+    static uint32_t ourSECAMPaletteZ26[256];
 
     // Table of RGB values for NTSC, PAL and SECAM - user-defined
-    static uInt32 ourUserNTSCPalette[256];
-    static uInt32 ourUserPALPalette[256];
-    static uInt32 ourUserSECAMPalette[256];
+    static uint32_t ourUserNTSCPalette[256];
+    static uint32_t ourUserPALPalette[256];
+    static uint32_t ourUserSECAMPalette[256];
 };
 
 #endif

@@ -317,7 +317,7 @@ void Console::setPalette(const string& type)
 {
   // Look at all the palettes, since we don't know which one is
   // currently active
-  uInt32* palettes[3][3] = {
+  uint32_t* palettes[3][3] = {
     { &ourNTSCPalette[0],    &ourPALPalette[0],    &ourSECAMPalette[0]    },
     { &ourNTSCPaletteZ26[0], &ourPALPaletteZ26[0], &ourSECAMPaletteZ26[0] },
     { 0, 0, 0 }
@@ -347,7 +347,7 @@ void Console::setPalette(const string& type)
   //myOSystem->frameBuffer().setTIAPalette(currentPalette);
 }
 
-const uInt32* Console::getPalette(int direction) const
+const uint32_t* Console::getPalette(int direction) const
 {
 	return currentPalette;
 }
@@ -402,13 +402,13 @@ void Console::initializeAudio()
 void Console::fry() const
 {
   for (int ZPmem=0; ZPmem<0x100; ZPmem += rand() % 4)
-    mySystem->poke(ZPmem, mySystem->peek(ZPmem) & (uInt8)rand() % 256);
+    mySystem->poke(ZPmem, mySystem->peek(ZPmem) & (uint8_t)rand() % 256);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Console::changeYStart(int direction)
 {
-  uInt32 ystart = myTIA->ystart();
+  uint32_t ystart = myTIA->ystart();
 
   if(direction == +1)       // increase YStart
   {
@@ -436,7 +436,7 @@ void Console::changeYStart(int direction)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Console::changeHeight(int direction)
 {
-  uInt32 height = myTIA->height();
+  uint32_t height = myTIA->height();
 
   if(direction == +1)       // increase Height
   {
@@ -466,9 +466,9 @@ void Console::changeHeight(int direction)
 void Console::setTIAProperties()
 {
   // TODO - query these values directly from the TIA if value is 'AUTO'
-  uInt32 ystart = atoi(myProperties.get(Display_YStart).c_str());
+  uint32_t ystart = atoi(myProperties.get(Display_YStart).c_str());
   if(ystart > 64) ystart = 64;
-  uInt32 height = atoi(myProperties.get(Display_Height).c_str());
+  uint32_t height = atoi(myProperties.get(Display_Height).c_str());
   if(height < 210)      height = 210;
   else if(height > 256) height = 256;
 
@@ -685,33 +685,33 @@ void Console::loadUserPalette()
   }
 
   // Now that we have valid data, create the user-defined palettes
-  uInt8 pixbuf[3];  // Temporary buffer for one 24-bit pixel
+  uint8_t pixbuf[3];  // Temporary buffer for one 24-bit pixel
 
   for(int i = 0; i < 128; i++)  // NTSC palette
   {
     in.read((char*)pixbuf, 3);
-    uInt32 pixel = ((int)pixbuf[0] << R_SHIFT) + ((int)pixbuf[1] << G_SHIFT) + ((int)pixbuf[2] << B_SHIFT);
+    uint32_t pixel = ((int)pixbuf[0] << R_SHIFT) + ((int)pixbuf[1] << G_SHIFT) + ((int)pixbuf[2] << B_SHIFT);
     ourUserNTSCPalette[(i<<1)] = pixel;
   }
   for(int i = 0; i < 128; i++)  // PAL palette
   {
     in.read((char*)pixbuf, 3);
-    uInt32 pixel = ((int)pixbuf[0] << R_SHIFT) + ((int)pixbuf[1] << G_SHIFT) + ((int)pixbuf[2] << B_SHIFT);
+    uint32_t pixel = ((int)pixbuf[0] << R_SHIFT) + ((int)pixbuf[1] << G_SHIFT) + ((int)pixbuf[2] << B_SHIFT);
     ourUserPALPalette[(i<<1)] = pixel;
   }
 
-  uInt32 secam[16];  // All 8 24-bit pixels, plus 8 colorloss pixels
+  uint32_t secam[16];  // All 8 24-bit pixels, plus 8 colorloss pixels
   for(int i = 0; i < 8; i++)    // SECAM palette
   {
     in.read((char*)pixbuf, 3);
-    uInt32 pixel = ((int)pixbuf[0] << R_SHIFT) + ((int)pixbuf[1] << G_SHIFT) + ((int)pixbuf[2] << B_SHIFT);
+    uint32_t pixel = ((int)pixbuf[0] << R_SHIFT) + ((int)pixbuf[1] << G_SHIFT) + ((int)pixbuf[2] << B_SHIFT);
     secam[(i<<1)]   = pixel;
     secam[(i<<1)+1] = 0;
   }
-  uInt32* ptr = ourUserSECAMPalette;
+  uint32_t* ptr = ourUserSECAMPalette;
   for(int i = 0; i < 16; ++i)
   {
-    uInt32* s = secam;
+    uint32_t* s = secam;
     for(int j = 0; j < 16; ++j)
       *ptr++ = *s++;
   }
@@ -725,7 +725,7 @@ void Console::setColorLossPalette()
 {
   // Look at all the palettes, since we don't know which one is
   // currently active
-  uInt32* palette[9] = {
+  uint32_t* palette[9] = {
     &ourNTSCPalette[0],    &ourPALPalette[0],    &ourSECAMPalette[0],
     &ourNTSCPaletteZ26[0], &ourPALPaletteZ26[0], &ourSECAMPaletteZ26[0],
     0, 0, 0
@@ -746,20 +746,20 @@ void Console::setColorLossPalette()
     // using the standard RGB -> grayscale conversion formula)
     for(int j = 0; j < 128; ++j)
     {
-      uInt32 pixel = palette[i][(j<<1)];
-      uInt8 r = (pixel >> R_SHIFT) & 0xff;
-      uInt8 g = (pixel >> G_SHIFT)  & 0xff;
-      uInt8 b = (pixel >> B_SHIFT)  & 0xff;
+      uint32_t pixel = palette[i][(j<<1)];
+      uint8_t r = (pixel >> R_SHIFT) & 0xff;
+      uint8_t g = (pixel >> G_SHIFT)  & 0xff;
+      uint8_t b = (pixel >> B_SHIFT)  & 0xff;
       // Integer luma weights: 77/256, 150/256, 29/256 (sum = 256),
       // matching the 0.2989/0.5870/0.1140 float weights to within 1 LSB
-      uInt8 sum = (uInt8)((r * 77 + g * 150 + b * 29) >> 8);
+      uint8_t sum = (uint8_t)((r * 77 + g * 150 + b * 29) >> 8);
       palette[i][(j<<1)+1] = (sum << 16) + (sum << 8) + sum;
     }
   }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Console::setFramerate(uInt32 num, uInt32 den)
+void Console::setFramerate(uint32_t num, uint32_t den)
 {
   myFramerateNum = num;
   myFramerateDen = (den == 0) ? 1 : den;
@@ -810,7 +810,7 @@ void Console::stateChanged(EventHandler::State state)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt32 Console::ourNTSCPalette[256] = {
+uint32_t Console::ourNTSCPalette[256] = {
 #if defined(XBGR8888)
   0x000000, 0, 0x4a4a4a, 0, 0x6f6f6f, 0, 0x8e8e8e, 0,
   0xaaaaaa, 0, 0xc0c0c0, 0, 0xd6d6d6, 0, 0xececec, 0,
@@ -881,7 +881,7 @@ uInt32 Console::ourNTSCPalette[256] = {
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt32 Console::ourPALPalette[256] = {
+uint32_t Console::ourPALPalette[256] = {
 #if defined(XBGR8888)
   0x000000, 0, 0x2b2b2b, 0, 0x525252, 0, 0x767676, 0,
   0x979797, 0, 0xb6b6b6, 0, 0xd2d2d2, 0, 0xececec, 0,
@@ -952,7 +952,7 @@ uInt32 Console::ourPALPalette[256] = {
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt32 Console::ourSECAMPalette[256] = {
+uint32_t Console::ourSECAMPalette[256] = {
 #if defined(XBGR8888)
   0x000000, 0, 0xff2121, 0, 0x793cf0, 0, 0xff50ff, 0, 
   0x00ff7f, 0, 0xffff7f, 0, 0x3fffff, 0, 0xffffff, 0, 
@@ -1023,7 +1023,7 @@ uInt32 Console::ourSECAMPalette[256] = {
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt32 Console::ourNTSCPaletteZ26[256] = {
+uint32_t Console::ourNTSCPaletteZ26[256] = {
 #if defined(XBGR8888)
   0x000000, 0, 0x505050, 0, 0x646464, 0, 0x787878, 0,
   0x8c8c8c, 0, 0xa0a0a0, 0, 0xb4b4b4, 0, 0xc8c8c8, 0,
@@ -1095,7 +1095,7 @@ uInt32 Console::ourNTSCPaletteZ26[256] = {
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt32 Console::ourPALPaletteZ26[256] = {
+uint32_t Console::ourPALPaletteZ26[256] = {
 #if defined(XBGR8888)
   0x000000, 0, 0x4c4c4c, 0, 0x606060, 0, 0x747474, 0,
   0x888888, 0, 0x9c9c9c, 0, 0xb0b0b0, 0, 0xc4c4c4, 0,
@@ -1166,7 +1166,7 @@ uInt32 Console::ourPALPaletteZ26[256] = {
 }; 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt32 Console::ourSECAMPaletteZ26[256] = {
+uint32_t Console::ourSECAMPaletteZ26[256] = {
 #if defined(XBGR8888)
   0x000000, 0, 0xff2121, 0, 0x793cf0, 0, 0xff3cff, 0, 
   0x00ff7f, 0, 0xffff7f, 0, 0x3fffff, 0, 0xffffff, 0, 
@@ -1237,13 +1237,13 @@ uInt32 Console::ourSECAMPaletteZ26[256] = {
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt32 Console::ourUserNTSCPalette[256]  = { 0 }; // filled from external file
+uint32_t Console::ourUserNTSCPalette[256]  = { 0 }; // filled from external file
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt32 Console::ourUserPALPalette[256]   = { 0 }; // filled from external file
+uint32_t Console::ourUserPALPalette[256]   = { 0 }; // filled from external file
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt32 Console::ourUserSECAMPalette[256] = { 0 }; // filled from external file
+uint32_t Console::ourUserSECAMPalette[256] = { 0 }; // filled from external file
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Console::Console(const Console& console)

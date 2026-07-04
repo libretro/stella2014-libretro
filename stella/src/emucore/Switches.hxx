@@ -59,7 +59,7 @@ class Switches : public Serializable
 
       @return The 8 bits which represent the state of the console switches
     */
-    uInt8 read() const { return mySwitches; }
+    uint8_t read() const { return mySwitches; }
 
     /**
       Update the switches variable
@@ -94,7 +94,7 @@ class Switches : public Serializable
     const Event& myEvent;
 
     // State of the console switches
-    uInt8 mySwitches;
+    uint8_t mySwitches;
 };
 
 #endif

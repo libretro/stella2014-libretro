@@ -52,7 +52,7 @@ class CartridgeDPCPlus : public Cartridge
       @param size      The size of the ROM image
       @param settings  A reference to the various settings (read-only)
     */
-    CartridgeDPCPlus(const uInt8* image, uInt32 size, const Settings& settings);
+    CartridgeDPCPlus(const uint8_t* image, uint32_t size, const Settings& settings);
  
     /**
       Destructor
@@ -85,17 +85,17 @@ class CartridgeDPCPlus : public Cartridge
 
       @param bank The bank that should be installed in the system
     */
-    bool bank(uInt16 bank);
+    bool bank(uint16_t bank);
 
     /**
       Get the current bank.
     */
-    uInt16 bank() const;
+    uint16_t bank() const;
 
     /**
       Query the number of banks supported by the cartridge.
     */
-    uInt16 bankCount() const;
+    uint16_t bankCount() const;
 
     /**
       Patch the cartridge ROM.
@@ -104,7 +104,7 @@ class CartridgeDPCPlus : public Cartridge
       @param value    The value to place into the address
       @return    Success or failure of the patch operation
     */
-    bool patch(uInt16 address, uInt8 value);
+    bool patch(uint16_t address, uint8_t value);
 
     /**
       Access the internal ROM image for this cartridge.
@@ -112,7 +112,7 @@ class CartridgeDPCPlus : public Cartridge
       @param size  Set to the size of the internal ROM image data
       @return  A pointer to the internal ROM image data
     */
-    const uInt8* getImage(int& size) const;
+    const uint8_t* getImage(int& size) const;
 
     /**
       Save the current state of this cart to the given Serializer.
@@ -143,7 +143,7 @@ class CartridgeDPCPlus : public Cartridge
 
       @return The byte at the specified address
     */
-    uInt8 peek(uInt16 address);
+    uint8_t peek(uint16_t address);
 
     /**
       Change the byte at the specified address to the given value
@@ -152,7 +152,7 @@ class CartridgeDPCPlus : public Cartridge
       @param value The value to be stored at the address
       @return  True if the poke changed the device address space, else false
     */
-    bool poke(uInt16 address, uInt8 value);
+    bool poke(uint16_t address, uint8_t value);
 
   private:
     /** 
@@ -179,21 +179,21 @@ class CartridgeDPCPlus : public Cartridge
     /** 
       Call Special Functions
     */
-    void callFunction(uInt8 value);
+    void callFunction(uint8_t value);
 
   private:
     // The ROM image and size
-    uInt8* myImage;
-    uInt32 mySize;
+    uint8_t* myImage;
+    uint32_t mySize;
 
     // Pointer to the 24K program ROM image of the cartridge
-    uInt8* myProgramImage;
+    uint8_t* myProgramImage;
 
     // Pointer to the 4K display ROM image of the cartridge
-    uInt8* myDisplayImage;
+    uint8_t* myDisplayImage;
 
     // The DPC 8k RAM image
-    uInt8 myDPCRAM[8192];
+    uint8_t myDPCRAM[8192];
 
 #ifdef THUMB_SUPPORT
     // Pointer to the Thumb ARM emulator object
@@ -201,25 +201,25 @@ class CartridgeDPCPlus : public Cartridge
 #endif
 
     // Pointer to the 1K frequency table
-    uInt8* myFrequencyImage;
+    uint8_t* myFrequencyImage;
 
     // Indicates which bank is currently active
-    uInt16 myCurrentBank;
+    uint16_t myCurrentBank;
   
     // The top registers for the data fetchers
-    uInt8 myTops[8];
+    uint8_t myTops[8];
 
     // The bottom registers for the data fetchers
-    uInt8 myBottoms[8];
+    uint8_t myBottoms[8];
 
     // The counter registers for the data fetchers
-    uInt16 myCounters[8];
+    uint16_t myCounters[8];
   
     // The counter registers for the fractional data fetchers
-    uInt32 myFractionalCounters[8];
+    uint32_t myFractionalCounters[8];
 
     // The fractional increments for the data fetchers
-    uInt8 myFractionalIncrements[8];
+    uint8_t myFractionalIncrements[8];
 
     // The Fast Fetcher Enabled flag
     bool myFastFetch;
@@ -228,37 +228,37 @@ class CartridgeDPCPlus : public Cartridge
     bool myLDAimmediate;
 
     // Parameter for special functions
-    uInt8 myParameter[8];
+    uint8_t myParameter[8];
 
     // Parameter pointer for special functions
-    uInt8 myParameterPointer;
+    uint8_t myParameterPointer;
 
     // The music mode counters
-    uInt32 myMusicCounters[3];
+    uint32_t myMusicCounters[3];
 
     // The music frequency
-    uInt32 myMusicFrequencies[3];
+    uint32_t myMusicFrequencies[3];
   
     // The music waveforms
-    uInt16 myMusicWaveforms[3];
+    uint16_t myMusicWaveforms[3];
   
     // The random number generator register
-    uInt32 myRandomNumber;
+    uint32_t myRandomNumber;
 
     // System cycle count when the last update to music data fetchers occurred
-    Int32 mySystemCycles;
+    int32_t mySystemCycles;
 
     // Fractional DPC music OSC clocks unused during the last update,
     // as an integer remainder in units of 1/myDpcClockDen of an OSC clock
-    uInt32 myFractionalClocks;
+    uint32_t myFractionalClocks;
 
     // DPC music-oscillator clock rate as an exact integer ratio
     // (OSC clocks per CPU cycle = num/den), chosen from the TV format
-    uInt32 myDpcClockNum;
-    uInt32 myDpcClockDen;
+    uint32_t myDpcClockNum;
+    uint32_t myDpcClockDen;
 
   public:
-    void setDpcClockRate(uInt32 num, uInt32 den);
+    void setDpcClockRate(uint32_t num, uint32_t den);
 
   private:
 };

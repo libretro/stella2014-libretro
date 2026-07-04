@@ -34,10 +34,10 @@ class CheetahCheat : public Cheat
     virtual void evaluate();
 
   private:
-    uInt8  savedRom[16];
-    uInt16 address;
-    uInt8  value;
-    uInt8  count;
+    uint8_t  savedRom[16];
+    uint16_t address;
+    uint8_t  value;
+    uint8_t  count;
 };
 
 #endif

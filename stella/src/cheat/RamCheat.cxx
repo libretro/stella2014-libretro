@@ -28,8 +28,8 @@
 RamCheat::RamCheat(OSystem* os, const string& name, const string& code)
   : Cheat(os, name, code)
 {
-  address = (uInt16) unhex(myCode.substr(0, 2));
-  value   = (uInt8) unhex(myCode.substr(2, 2));
+  address = (uint16_t) unhex(myCode.substr(0, 2));
+  value   = (uint8_t) unhex(myCode.substr(2, 2));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

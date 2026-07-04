@@ -128,7 +128,7 @@ class Controller : public Serializable
 
       @return The state of all digital pins
     */
-    virtual uInt8 read();
+    virtual uint8_t read();
 
     /**
       Read the value of the specified digital pin for this controller.
@@ -145,7 +145,7 @@ class Controller : public Serializable
       @param pin The pin of the controller jack to read
       @return The resistance at the specified pin
     */
-    virtual Int32 read(AnalogPin pin);
+    virtual int32_t read(AnalogPin pin);
 
     /**
       Write the given value to the specified digital pin for this 
@@ -163,7 +163,7 @@ class Controller : public Serializable
 
       @param value  The entire contents of the SWCHA register
     */
-    virtual void controlWrite(uInt8 value) { };
+    virtual void controlWrite(uint8_t value) { };
 
     /**
       Update the entire digital and analog pin state according to the
@@ -218,7 +218,7 @@ class Controller : public Serializable
       @param value The value to set on the pin
     */
     void set(DigitalPin pin, bool value);
-    void set(AnalogPin pin, Int32 value);
+    void set(AnalogPin pin, int32_t value);
 
     /**
       Saves the current state of this controller to the given Serializer.
@@ -238,10 +238,10 @@ class Controller : public Serializable
 
   public:
     /// Constant which represents maximum resistance for analog pins
-    static const Int32 maximumResistance;
+    static const int32_t maximumResistance;
 
     /// Constant which represents minimum resistance for analog pins
-    static const Int32 minimumResistance;
+    static const int32_t minimumResistance;
 
   protected:
     /// Specifies which jack the controller is plugged in
@@ -263,7 +263,7 @@ class Controller : public Serializable
     bool myDigitalPinState[5];
 
     /// The analog value on each analog pin
-    Int32 myAnalogPinValue[2];
+    int32_t myAnalogPinValue[2];
 
   protected:
     // Copy constructor isn't supported by controllers so make it private

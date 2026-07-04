@@ -42,13 +42,13 @@ void NullDevice::install(System& system)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt8 NullDevice::peek(uInt16 address)
+uint8_t NullDevice::peek(uint16_t address)
 {
   return 0;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool NullDevice::poke(uInt16 address, uInt8 value)
+bool NullDevice::poke(uint16_t address, uint8_t value)
 {
   return false;
 }

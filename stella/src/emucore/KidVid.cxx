@@ -105,7 +105,7 @@ void KidVid::update()
   }
 
   // Convert separate pin states into a 'register'
-  uInt8 IOPortA = 0xf0;
+  uint8_t IOPortA = 0xf0;
   if(myDigitalPinState[One])   IOPortA |= 0x01;
   if(myDigitalPinState[Two])   IOPortA |= 0x02;
   if(myDigitalPinState[Three]) IOPortA |= 0x04;
@@ -166,7 +166,7 @@ void KidVid::openSampleFile()
   static const char* kvNameTable[6] = {
     "kvs3.wav", "kvs1.wav", "kvs2.wav", "kvb3.wav", "kvb1.wav", "kvb2.wav"
   };
-  static uInt32 StartSong[6] = {
+  static uint32_t StartSong[6] = {
     44+38, 0, 44, 44+38+42+62+80, 44+38+42, 44+38+42+62
   };
 
@@ -221,7 +221,7 @@ void KidVid::setNextSong()
   {
     myBeep = (ourSongPositions[myFilePointer] & 0x80) ? false : true;
 
-    uInt8 temp = ourSongPositions[myFilePointer] & 0x7f;
+    uint8_t temp = ourSongPositions[myFilePointer] & 0x7f;
     mySharedData = (temp < 10);
     mySongCounter = ourSongStart[temp+1] - ourSongStart[temp];
 
@@ -274,13 +274,13 @@ void KidVid::getNextSampleByte()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const uInt8 KidVid::ourKVBlocks[6] = {
+const uint8_t KidVid::ourKVBlocks[6] = {
   2+40, 2+21, 2+35,     /* Smurfs tapes 3, 1, 2 */
   42+60, 42+78, 42+60   /* BBears tapes 1, 2, 3 (40 extra blocks for intro) */
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const uInt8 KidVid::ourKVData[6*8] = {
+const uint8_t KidVid::ourKVData[6*8] = {
 /* KVData44 */
   0x7b,  // 0111 1011b  ; (1)0
   0x1e,  // 0001 1110b  ; 1
@@ -347,7 +347,7 @@ const uInt8 KidVid::ourKVData[6*8] = {
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const uInt8 KidVid::ourSongPositions[44+38+42+62+80+62] = {
+const uint8_t KidVid::ourSongPositions[44+38+42+62+80+62] = {
 /* kvs1 44 */
   11, 12+0x80, 13+0x80, 14, 15+0x80, 16, 8+0x80, 17, 18+0x80, 19, 20+0x80,
   21, 8+0x80, 22, 15+0x80, 23, 18+0x80, 14, 20+0x80, 16, 18+0x80,
@@ -383,7 +383,7 @@ const uInt8 KidVid::ourSongPositions[44+38+42+62+80+62] = {
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const uInt32 KidVid::ourSongStart[104] = {
+const uint32_t KidVid::ourSongStart[104] = {
 /* kvshared */
   44,          /* Welcome + intro Berenstain Bears */
   980829,      /* boulders in the road */

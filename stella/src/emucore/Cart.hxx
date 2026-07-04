@@ -32,7 +32,7 @@ class Properties;
 #include "Settings.hxx"
 
 struct RamArea {
-  uInt16 start;  uInt16 size;  uInt16 roffset;  uInt16 woffset;
+  uint16_t start;  uint16_t size;  uint16_t roffset;  uint16_t woffset;
 };
 typedef Common::Array<RamArea> RamAreaList;
 
@@ -62,7 +62,7 @@ class Cartridge : public Device
       @param settings The settings associated with the system
       @return   Pointer to the new cartridge object allocated on the heap
     */
-    static Cartridge* create(const uInt8* image, uInt32 size, string& md5,
+    static Cartridge* create(const uint8_t* image, uint32_t size, string& md5,
                              string& dtype, string& id,
                              const OSystem& system, Settings& settings);
 
@@ -106,7 +106,7 @@ class Cartridge : public Device
 
       @return  The startup bank
     */
-    uInt16 startBank();
+    uint16_t startBank();
 
     /**
       Answer whether the bank has changed since the last time this
@@ -129,12 +129,12 @@ class Cartridge : public Device
     /**
       Set the specified bank.
     */
-    virtual bool bank(uInt16 bank) = 0;
+    virtual bool bank(uint16_t bank) = 0;
 
     /**
       Get the current bank.
     */
-    virtual uInt16 bank() const = 0;
+    virtual uint16_t bank() const = 0;
 
     /**
       Query the number of 'banks' supported by the cartridge.  Note that
@@ -149,7 +149,7 @@ class Cartridge : public Device
       RAM slices at multiple access points) is so complicated that the
       cart will report having only one 'virtual' bank.
     */
-    virtual uInt16 bankCount() const = 0;
+    virtual uint16_t bankCount() const = 0;
 
     /**
       Patch the cartridge ROM.
@@ -158,7 +158,7 @@ class Cartridge : public Device
       @param value    The value to place into the address
       @return    Success or failure of the patch operation
     */
-    virtual bool patch(uInt16 address, uInt8 value) = 0;
+    virtual bool patch(uint16_t address, uint8_t value) = 0;
 
     /**
       Access the internal ROM image for this cartridge.
@@ -166,7 +166,7 @@ class Cartridge : public Device
       @param size  Set to the size of the internal ROM image data
       @return  A pointer to the internal ROM image data
     */
-    virtual const uInt8* getImage(int& size) const = 0;
+    virtual const uint8_t* getImage(int& size) const = 0;
 
     /**
       Save the current state of this device to the given Serializer.
@@ -202,7 +202,7 @@ class Cartridge : public Device
       the console's TV format, giving PAL/SECAM DPC games a slightly
       wrong music pitch.
     */
-    virtual void setDpcClockRate(uInt32 num, uInt32 den) { (void)num; (void)den; }
+    virtual void setDpcClockRate(uint32_t num, uint32_t den) { (void)num; (void)den; }
 
     /**
       Informs the cartridge about the name of the ROM file used when
@@ -221,14 +221,14 @@ class Cartridge : public Device
       @param roffset  Offset to use when reading from RAM (read port)
       @param woffset  Offset to use when writing to RAM (write port)
     */
-    void registerRamArea(uInt16 start, uInt16 size, uInt16 roffset, uInt16 woffset);
+    void registerRamArea(uint16_t start, uint16_t size, uint16_t roffset, uint16_t woffset);
 
     /**
       Indicate that an illegal read from a write port has occurred.
 
       @param address  The address of the illegal read
     */
-    void triggerReadFromWritePort(uInt16 address);
+    void triggerReadFromWritePort(uint16_t address);
 
     /**
       Create an array that holds code-access information for every byte
@@ -237,7 +237,7 @@ class Cartridge : public Device
 
       @param size  The size of the code-access array to create
     */
-    void createCodeAccessBase(uInt32 size);
+    void createCodeAccessBase(uint32_t size);
 
   private:
     /**
@@ -252,8 +252,8 @@ class Cartridge : public Device
       @param settings The settings associated with the system
       @return   The bankswitch type for the specific cart in the ROM image
     */
-    static string createFromMultiCart(const uInt8*& image, uInt32& size,
-        uInt32 numroms, string& md5, string& id, Settings& settings);
+    static string createFromMultiCart(const uint8_t*& image, uint32_t& size,
+        uint32_t numroms, string& md5, string& id, Settings& settings);
 
     /**
       Try to auto-detect the bankswitching type of the cartridge
@@ -262,7 +262,7 @@ class Cartridge : public Device
       @param size   The size of the ROM image 
       @return The "best guess" for the cartridge type
     */
-    static string autodetectType(const uInt8* image, uInt32 size);
+    static string autodetectType(const uint8_t* image, uint32_t size);
 
     /**
       Search the image for the specified byte signature
@@ -275,127 +275,127 @@ class Cartridge : public Device
 
       @return  True if the signature was found at least 'minhits' time, else false
     */
-    static bool searchForBytes(const uInt8* image, uInt32 imagesize,
-                               const uInt8* signature, uInt32 sigsize,
-                               uInt32 minhits);
+    static bool searchForBytes(const uint8_t* image, uint32_t imagesize,
+                               const uint8_t* signature, uint32_t sigsize,
+                               uint32_t minhits);
 
     /**
       Returns true if the image is probably a SuperChip (256 bytes RAM)
     */
-    static bool isProbablySC(const uInt8* image, uInt32 size);
+    static bool isProbablySC(const uint8_t* image, uint32_t size);
 
     /**
       Returns true if the image is probably a 4K SuperChip (256 bytes RAM)
     */
-    static bool isProbably4KSC(const uInt8* image, uInt32 size);
+    static bool isProbably4KSC(const uint8_t* image, uint32_t size);
 
     /**
       Returns true if the image probably contains ARM code in the first 1K
     */
-    static bool isProbablyARM(const uInt8* image, uInt32 size);
+    static bool isProbablyARM(const uint8_t* image, uint32_t size);
 
     /**
       Returns true if the image is probably a 0840 bankswitching cartridge
     */
-    static bool isProbably0840(const uInt8* image, uInt32 size);
+    static bool isProbably0840(const uint8_t* image, uint32_t size);
 
     /**
       Returns true if the image is probably a 3E bankswitching cartridge
     */
-    static bool isProbably3E(const uInt8* image, uInt32 size);
+    static bool isProbably3E(const uint8_t* image, uint32_t size);
 
     /**
       Returns true if the image is probably a 3F bankswitching cartridge
     */
-    static bool isProbably3F(const uInt8* image, uInt32 size);
+    static bool isProbably3F(const uint8_t* image, uint32_t size);
 
     /**
       Returns true if the image is probably a 4A50 bankswitching cartridge
     */
-    static bool isProbably4A50(const uInt8* image, uInt32 size);
+    static bool isProbably4A50(const uint8_t* image, uint32_t size);
 
     /**
       Returns true if the image is probably a CTY bankswitching cartridge
     */
-    static bool isProbablyCTY(const uInt8* image, uInt32 size);
+    static bool isProbablyCTY(const uint8_t* image, uint32_t size);
 
     /**
       Returns true if the image is probably a CV bankswitching cartridge
     */
-    static bool isProbablyCV(const uInt8* image, uInt32 size);
+    static bool isProbablyCV(const uint8_t* image, uint32_t size);
 
     /**
       Returns true if the image is probably a DPC+ bankswitching cartridge
     */
-    static bool isProbablyDPCplus(const uInt8* image, uInt32 size);
+    static bool isProbablyDPCplus(const uint8_t* image, uint32_t size);
 
     /**
       Returns true if the image is probably a E0 bankswitching cartridge
     */
-    static bool isProbablyE0(const uInt8* image, uInt32 size);
+    static bool isProbablyE0(const uint8_t* image, uint32_t size);
 
     /**
       Returns true if the image is probably a E7 bankswitching cartridge
     */
-    static bool isProbablyE7(const uInt8* image, uInt32 size);
+    static bool isProbablyE7(const uint8_t* image, uint32_t size);
 
     /**
       Returns true if the image is probably an EF/EFSC bankswitching cartridge
     */
-    static bool isProbablyEF(const uInt8* image, uInt32 size, const char*& type);
+    static bool isProbablyEF(const uint8_t* image, uint32_t size, const char*& type);
 
     /**
       Returns true if the image is probably a BF/BFSC bankswitching cartridge
     */
-    static bool isProbablyBF(const uInt8* image, uInt32 size, const char*& type);
+    static bool isProbablyBF(const uint8_t* image, uint32_t size, const char*& type);
     /**
       Returns true if the image is probably a DF/DFSC bankswitching cartridge
     */
-    static bool isProbablyDF(const uInt8* image, uInt32 size, const char*& type);
+    static bool isProbablyDF(const uint8_t* image, uint32_t size, const char*& type);
 
     /**
       Returns true if the image is probably an F6 bankswitching cartridge
     */
-    static bool isProbablyF6(const uInt8* image, uInt32 size);
+    static bool isProbablyF6(const uint8_t* image, uint32_t size);
 
     /**
       Returns true if the image is probably an FA2 bankswitching cartridge
     */
-    static bool isProbablyFA2(const uInt8* image, uInt32 size);
+    static bool isProbablyFA2(const uint8_t* image, uint32_t size);
 
     /**
       Returns true if the image is probably an FE bankswitching cartridge
     */
-    static bool isProbablyFE(const uInt8* image, uInt32 size);
+    static bool isProbablyFE(const uint8_t* image, uint32_t size);
 
     /**
       Returns true if the image is probably a SB bankswitching cartridge
     */
-    static bool isProbablySB(const uInt8* image, uInt32 size);
+    static bool isProbablySB(const uint8_t* image, uint32_t size);
 
     /**
       Returns true if the image is probably a UA bankswitching cartridge
     */
-    static bool isProbablyUA(const uInt8* image, uInt32 size);
+    static bool isProbablyUA(const uint8_t* image, uint32_t size);
 
     /**
       Returns true if the image is probably an X07 bankswitching cartridge
     */
-    static bool isProbablyX07(const uInt8* image, uInt32 size);
+    static bool isProbablyX07(const uint8_t* image, uint32_t size);
 
   protected:
     // Settings class for the application
     const Settings& mySettings;
 
     // The startup bank to use (where to look for the reset vector address)
-    uInt16 myStartBank;
+    uint16_t myStartBank;
 
     // Indicates if the bank has changed somehow (a bankswitch has occurred)
     bool myBankChanged;
 
     // The array containing information about every byte of ROM indicating
     // whether it is used as code.
-    uInt8* myCodeAccessBase;
+    uint8_t* myCodeAccessBase;
 
   private:
     // Contains RamArea entries for those carts with accessible RAM.

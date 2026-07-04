@@ -24,7 +24,7 @@ OSystem::~OSystem()
 bool OSystem::create() { return 1; }
 void OSystem::stateChanged(EventHandler::State state) { }
 
-uInt64 OSystem::getTicks() const
+uint64_t OSystem::getTicks() const
 {
     // DETERMINISM INVARIANT: this must return *emulated* time, never
     // wall-clock time. Random::initSeed() seeds the RNG from getTicks(),

@@ -23,7 +23,7 @@
 #include "CartFE.hxx"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-CartridgeFE::CartridgeFE(const uInt8* image, uInt32 size, const Settings& settings)
+CartridgeFE::CartridgeFE(const uint8_t* image, uint32_t size, const Settings& settings)
   : Cartridge(settings),
     myLastAddress1(0),
     myLastAddress2(0),
@@ -54,17 +54,17 @@ void CartridgeFE::reset()
 void CartridgeFE::install(System& system)
 {
   mySystem     = &system;
-  uInt16 shift = mySystem->pageShift();
+  uint16_t shift = mySystem->pageShift();
 
   System::PageAccess access(0, 0, 0, this, System::PA_READ);
 
   // Map all of the accesses to call peek and poke
-  for(uInt32 i = 0x1000; i < 0x2000; i += (1 << shift))
+  for(uint32_t i = 0x1000; i < 0x2000; i += (1 << shift))
     mySystem->setPageAccess(i >> shift, access);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt8 CartridgeFE::peek(uInt16 address)
+uint8_t CartridgeFE::peek(uint16_t address)
 {
   // The bank is determined by A13 of the processor
   // We keep track of the two most recent accesses to determine which bank
@@ -77,27 +77,27 @@ uInt8 CartridgeFE::peek(uInt16 address)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeFE::poke(uInt16, uInt8)
+bool CartridgeFE::poke(uint16_t, uint8_t)
 {
   return false;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeFE::bank(uInt16)
+bool CartridgeFE::bank(uint16_t)
 {
   // Doesn't support bankswitching in the normal sense
   return false;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt16 CartridgeFE::bank() const
+uint16_t CartridgeFE::bank() const
 {
   // The current bank depends on the last address accessed
   return ((myLastAddress1 & 0x2000) == 0) ? 1 : 0;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt16 CartridgeFE::bankCount() const
+uint16_t CartridgeFE::bankCount() const
 {
   return 2;
 }
@@ -121,14 +121,14 @@ bool CartridgeFE::bankChanged()
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeFE::patch(uInt16 address, uInt8 value)
+bool CartridgeFE::patch(uint16_t address, uint8_t value)
 {
   myImage[(address & 0x0FFF) + (((address & 0x2000) == 0) ? 4096 : 0)] = value;
   return myBankChanged = true;
 } 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const uInt8* CartridgeFE::getImage(int& size) const
+const uint8_t* CartridgeFE::getImage(int& size) const
 {
   size = 8192;
   return myImage;

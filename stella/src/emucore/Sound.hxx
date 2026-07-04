@@ -60,14 +60,14 @@ class Sound : public Serializable
 
       @param amount The amount the cycle counter is being adjusted by
     */
-    void adjustCycleCounter(Int32 amount);
+    void adjustCycleCounter(int32_t amount);
 
     /**
       Sets the number of channels (mono or stereo sound).
 
       @param channels The number of channels
     */
-    void setChannels(uInt32 channels);
+    void setChannels(uint32_t channels);
 
     /**
       Start the sound system, initializing it if necessary.  This must be
@@ -100,7 +100,7 @@ class Sound : public Serializable
       @param value The value to save into the register
       @param cycle The system cycle at which the register is being updated
     */
-    void set(uInt16 addr, uInt8 value, Int32 cycle);
+    void set(uint16_t addr, uint8_t value, int32_t cycle);
 
     /**
       Sets the volume of the sound device to the specified level.  The
@@ -109,7 +109,7 @@ class Sound : public Serializable
 
       @param percent The new volume percentage level for the sound device
     */
-    void setVolume(Int32 percent);
+    void setVolume(int32_t percent);
 
     /**
       Adjusts the volume of the sound device based on the given direction.
@@ -117,7 +117,7 @@ class Sound : public Serializable
       @param direction  Increase or decrease the current volume by a predefined
                         amount based on the direction (1 = increase, -1 =decrease)
     */
-    void adjustVolume(Int8 direction);
+    void adjustVolume(int8_t direction);
 
     /**
       Invoked by the sound callback to process the next sound fragment.
@@ -127,7 +127,7 @@ class Sound : public Serializable
       @param stream  Pointer to the start of the fragment
       @param length  Length of the fragment
     */
-    void processFragment(Int16* stream, uInt32 length);
+    void processFragment(int16_t* stream, uint32_t length);
 
     /**
       Saves the current state of this device to the given Serializer.
@@ -163,9 +163,9 @@ class Sound : public Serializable
     // MiSTer FPGA implementation).
     struct RegWrite
     {
-      uInt16 addr;
-      uInt8 value;
-      uInt32 deltaCycles;
+      uint16_t addr;
+      uint8_t value;
+      uint32_t deltaCycles;
     };
 
     /**
@@ -180,7 +180,7 @@ class Sound : public Serializable
           capacity.  If the queue ever reaches its capacity then it will
           automatically increase its size.
         */
-        RegWriteQueue(uInt32 capacity = 512);
+        RegWriteQueue(uint32_t capacity = 512);
 
         /**
           Destroy this queue instance.
@@ -201,7 +201,7 @@ class Sound : public Serializable
           Return the total duration of all the items in the queue,
           in integer CPU cycles.
         */
-        uInt64 durationCycles();
+        uint64_t durationCycles();
 
         /**
           Enqueue the specified object.
@@ -212,7 +212,7 @@ class Sound : public Serializable
           Return the i-th queued item counted from the front,
           for state serialization.
         */
-        const RegWrite& peek(uInt32 i) const
+        const RegWrite& peek(uint32_t i) const
           { return myBuffer[(myHead + i) % myCapacity]; }
 
         /**
@@ -227,17 +227,17 @@ class Sound : public Serializable
 
           @return  The number of items in the queue.
         */
-        uInt32 size() const;
+        uint32_t size() const;
 
       private:
         // Increase the size of the queue
         void grow();
 
-        uInt32 myCapacity;
+        uint32_t myCapacity;
         RegWrite* myBuffer;
-        uInt32 mySize;
-        uInt32 myHead;
-        uInt32 myTail;
+        uint32_t mySize;
+        uint32_t myHead;
+        uint32_t myTail;
     };
 
   private:
@@ -251,16 +251,16 @@ class Sound : public Serializable
     bool myIsInitializedFlag;
 
     // Indicates the cycle when a sound register was last set
-    Int32 myLastRegisterSetCycle;
+    int32_t myLastRegisterSetCycle;
 
     // Indicates the number of channels (mono or stereo)
-    uInt32 myNumChannels;
+    uint32_t myNumChannels;
 
     // Indicates if the sound is currently muted
     bool myIsMuted;
 
     // Current volume as a percentage (0 - 100)
-    uInt32 myVolume;
+    uint32_t myVolume;
 
     // Queue of TIA register writes
     RegWriteQueue myRegWriteQueue;

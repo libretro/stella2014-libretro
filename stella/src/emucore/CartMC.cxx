@@ -30,7 +30,7 @@
 // TODO (2010-10-03) - support CodeAccessBase functionality somehow
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-CartridgeMC::CartridgeMC(const uInt8* image, uInt32 size,
+CartridgeMC::CartridgeMC(const uint8_t* image, uint32_t size,
                          const Settings& settings)
   : Cartridge(settings),
     mySlot3Locked(false)
@@ -52,7 +52,7 @@ void CartridgeMC::reset()
 {
   // Initialize RAM
   if(mySettings.getBool("ramrandom"))
-    for(uInt32 i = 0; i < 32768; ++i)
+    for(uint32_t i = 0; i < 32768; ++i)
       myRAM[i] = mySystem->randGenerator().next();
   else
     memset(myRAM, 0, 32768);
@@ -64,7 +64,7 @@ void CartridgeMC::reset()
 void CartridgeMC::install(System& system)
 {
   mySystem     = &system;
-  uInt16 shift = mySystem->pageShift();
+  uint16_t shift = mySystem->pageShift();
 
   // Set the page accessing methods for the hot spots in the TIA.  For 
   // correct emulation I would need to chain any accesses below 0x40 to 
@@ -75,19 +75,19 @@ void CartridgeMC::install(System& system)
   //
   System::PageAccess access(0, 0, 0, this, System::PA_READWRITE);
 
-  for(uInt32 i = 0x00; i < 0x40; i += (1 << shift))
+  for(uint32_t i = 0x00; i < 0x40; i += (1 << shift))
     mySystem->setPageAccess(i >> shift, access);
 
   // Map the cartridge into the system
   access.type = System::PA_READ;  // We don't yet indicate RAM areas
-  for(uInt32 j = 0x1000; j < 0x2000; j += (1 << shift))
+  for(uint32_t j = 0x1000; j < 0x2000; j += (1 << shift))
     mySystem->setPageAccess(j >> shift, access);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt8 CartridgeMC::peek(uInt16 address)
+uint8_t CartridgeMC::peek(uint16_t address)
 {
-  uInt16 peekAddress = address;
+  uint16_t peekAddress = address;
   address &= 0x1FFF;
 
   // Accessing the RESET vector so lets handle the powerup special case
@@ -110,7 +110,7 @@ uInt8 CartridgeMC::peek(uInt16 address)
   }
   else
   {
-    uInt8 block;
+    uint8_t block;
 
     if(mySlot3Locked && ((address & 0x0C00) == 0x0C00))
     {
@@ -125,7 +125,7 @@ uInt8 CartridgeMC::peek(uInt16 address)
     if(block & 0x80)
     {
       // ROM access
-      return myImage[(uInt32)((block & 0x7F) << 10) + (address & 0x03FF)];
+      return myImage[(uint32_t)((block & 0x7F) << 10) + (address & 0x03FF)];
     }
     else
     {
@@ -133,20 +133,20 @@ uInt8 CartridgeMC::peek(uInt16 address)
       if(address & 0x0200)
       {
         // Reading from the read port of the RAM block
-        return myRAM[(uInt32)((block & 0x3F) << 9) + (address & 0x01FF)];
+        return myRAM[(uint32_t)((block & 0x3F) << 9) + (address & 0x01FF)];
       }
       else
       {
         // Oops, reading from the write port of the RAM block!
         // Reading from the write port triggers an unwanted write
-        uInt8 value = mySystem->getDataBusState(0xFF);
+        uint8_t value = mySystem->getDataBusState(0xFF);
 
         if(bankLocked())
           return value;
         else
         {
           triggerReadFromWritePort(peekAddress);
-          return myRAM[(uInt32)((block & 0x3F) << 9) + (address & 0x01FF)] = value;
+          return myRAM[(uint32_t)((block & 0x3F) << 9) + (address & 0x01FF)] = value;
         }
       }
     }
@@ -154,7 +154,7 @@ uInt8 CartridgeMC::peek(uInt16 address)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeMC::poke(uInt16 address, uInt8 value)
+bool CartridgeMC::poke(uint16_t address, uint8_t value)
 {
   address &= 0x1FFF;
 
@@ -178,7 +178,7 @@ bool CartridgeMC::poke(uInt16 address, uInt8 value)
   }
   else
   {
-    uInt8 block;
+    uint8_t block;
 
     if(mySlot3Locked && ((address & 0x0C00) == 0x0C00))
     {
@@ -193,7 +193,7 @@ bool CartridgeMC::poke(uInt16 address, uInt8 value)
     if(!(block & 0x80) && !(address & 0x0200))
     {
       // Handle the write to RAM
-      myRAM[(uInt32)((block & 0x3F) << 9) + (address & 0x01FF)] = value;
+      myRAM[(uint32_t)((block & 0x3F) << 9) + (address & 0x01FF)] = value;
       return true;
     }
   }  
@@ -201,35 +201,35 @@ bool CartridgeMC::poke(uInt16 address, uInt8 value)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeMC::bank(uInt16 b)
+bool CartridgeMC::bank(uint16_t b)
 {
   // Doesn't support bankswitching in the normal sense
   return false;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt16 CartridgeMC::bank() const
+uint16_t CartridgeMC::bank() const
 {
   // TODO - add support for debugger
   return 0;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt16 CartridgeMC::bankCount() const
+uint16_t CartridgeMC::bankCount() const
 {
   // TODO - add support for debugger
   return 1;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeMC::patch(uInt16 address, uInt8 value)
+bool CartridgeMC::patch(uint16_t address, uint8_t value)
 {
   // TODO - add support for debugger
   return false;
 } 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const uInt8* CartridgeMC::getImage(int& size) const
+const uint8_t* CartridgeMC::getImage(int& size) const
 {
   size = 128 * 1024;
   return myImage;

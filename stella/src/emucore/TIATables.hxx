@@ -145,47 +145,47 @@ class TIATables
 
     // Player mask table
     // [suppress mode][nusiz][pixel]
-    static uInt8 PxMask[2][8][320];
+    static uint8_t PxMask[2][8][320];
 
     // Missle mask table (entries are true or false)
     // [number][size][pixel]
     // There are actually only 4 possible size combinations on a real system
     // The fifth size is used for simulating the starfield effect in
     // Cosmic Ark and Stay Frosty
-    static uInt8 MxMask[8][5][320];
+    static uint8_t MxMask[8][5][320];
 
     // Ball mask table (entries are true or false)
     // [size][pixel]
-    static uInt8 BLMask[4][320];
+    static uint8_t BLMask[4][320];
 
     // Playfield mask table for reflected and non-reflected playfields
     // [reflect, pixel]
-    static uInt32 PFMask[2][160];
+    static uint32_t PFMask[2][160];
 
     // A mask table which can be used when an object is disabled
-    static uInt8 DisabledMask[640];
+    static uint8_t DisabledMask[640];
 
     // Used to set the collision register to the correct value
-    static uInt16 CollisionMask[64];
+    static uint16_t CollisionMask[64];
 
     // Indicates the update delay associated with poking at a TIA address
-    static const Int16 PokeDelay[64];
+    static const int16_t PokeDelay[64];
 
 #if 0
     // Used to convert value written in a motion register into 
     // its internal representation
-    static const Int32 CompleteMotion[76][16];
+    static const int32_t CompleteMotion[76][16];
 #endif
 
     // Indicates if HMOVE blanks should occur for the corresponding cycle
     static const bool HMOVEBlankEnableCycles[76];
 
     // Used to reflect a players graphics
-    static uInt8 GRPReflect[256];
+    static uint8_t GRPReflect[256];
 
     // Indicates if player is being reset during delay, display or other times
     // [nusiz][old pixel][new pixel]
-    static Int8 PxPosResetWhen[8][160][160];
+    static int8_t PxPosResetWhen[8][160][160];
 
   private:
     // Compute the collision decode table

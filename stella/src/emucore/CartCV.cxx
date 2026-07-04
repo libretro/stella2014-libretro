@@ -23,7 +23,7 @@
 #include "CartCV.hxx"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-CartridgeCV::CartridgeCV(const uInt8* image, uInt32 size,
+CartridgeCV::CartridgeCV(const uint8_t* image, uint32_t size,
                          const Settings& settings)
   : Cartridge(settings),
     myInitialRAM(0),
@@ -43,7 +43,7 @@ CartridgeCV::CartridgeCV(const uInt8* image, uInt32 size,
     memcpy(myImage, image + 2048, 2048);
 
     // Copy the RAM image into a buffer for use in reset()
-    myInitialRAM = new uInt8[1024];
+    myInitialRAM = new uint8_t[1024];
     memcpy(myInitialRAM, image, 1024);
   }
   createCodeAccessBase(2048+1024);
@@ -70,7 +70,7 @@ void CartridgeCV::reset()
   {
     // Initialize RAM
     if(mySettings.getBool("ramrandom"))
-      for(uInt32 i = 0; i < 1024; ++i)
+      for(uint32_t i = 0; i < 1024; ++i)
         myRAM[i] = mySystem->randGenerator().next();
     else
       memset(myRAM, 0, 1024);
@@ -83,12 +83,12 @@ void CartridgeCV::reset()
 void CartridgeCV::install(System& system)
 {
   mySystem     = &system;
-  uInt16 shift = mySystem->pageShift();
+  uint16_t shift = mySystem->pageShift();
 
   System::PageAccess access(0, 0, 0, this, System::PA_READ);
 
   // Map ROM image into the system
-  for(uInt32 address = 0x1800; address < 0x2000; address += (1 << shift))
+  for(uint32_t address = 0x1800; address < 0x2000; address += (1 << shift))
   {
     access.directPeekBase = &myImage[address & 0x07FF];
     access.codeAccessBase = &myCodeAccessBase[address & 0x07FF];
@@ -99,7 +99,7 @@ void CartridgeCV::install(System& system)
   access.directPeekBase = 0;
   access.codeAccessBase = 0;
   access.type = System::PA_WRITE;
-  for(uInt32 j = 0x1400; j < 0x1800; j += (1 << shift))
+  for(uint32_t j = 0x1400; j < 0x1800; j += (1 << shift))
   {
     access.directPokeBase = &myRAM[j & 0x03FF];
     mySystem->setPageAccess(j >> shift, access);
@@ -108,7 +108,7 @@ void CartridgeCV::install(System& system)
   // Set the page accessing method for the RAM reading pages
   access.directPokeBase = 0;
   access.type = System::PA_READ;
-  for(uInt32 k = 0x1000; k < 0x1400; k += (1 << shift))
+  for(uint32_t k = 0x1000; k < 0x1400; k += (1 << shift))
   {
     access.directPeekBase = &myRAM[k & 0x03FF];
     access.codeAccessBase = &myCodeAccessBase[2048 + (k & 0x03FF)];
@@ -117,12 +117,12 @@ void CartridgeCV::install(System& system)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt8 CartridgeCV::peek(uInt16 address)
+uint8_t CartridgeCV::peek(uint16_t address)
 {
   if((address & 0x0FFF) < 0x0800)  // Write port is at 0xF400 - 0xF800 (1024 bytes)
   {                                // Read port is handled in ::install()
     // Reading from the write port triggers an unwanted write
-    uInt8 value = mySystem->getDataBusState(0xFF);
+    uint8_t value = mySystem->getDataBusState(0xFF);
 
     if(bankLocked())
       return value;
@@ -139,7 +139,7 @@ uInt8 CartridgeCV::peek(uInt16 address)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeCV::poke(uInt16, uInt8)
+bool CartridgeCV::poke(uint16_t, uint8_t)
 {
   // NOTE: This does not handle accessing RAM, however, this function 
   // should never be called for RAM because of the way page accessing 
@@ -148,27 +148,27 @@ bool CartridgeCV::poke(uInt16, uInt8)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeCV::bank(uInt16 bank)
+bool CartridgeCV::bank(uint16_t bank)
 {
   // Doesn't support bankswitching
   return false;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt16 CartridgeCV::bank() const
+uint16_t CartridgeCV::bank() const
 {
   // Doesn't support bankswitching
   return 0;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt16 CartridgeCV::bankCount() const
+uint16_t CartridgeCV::bankCount() const
 {
   return 1;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeCV::patch(uInt16 address, uInt8 value)
+bool CartridgeCV::patch(uint16_t address, uint8_t value)
 {
   address &= 0x0FFF;
 
@@ -187,7 +187,7 @@ bool CartridgeCV::patch(uInt16 address, uInt8 value)
 } 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const uInt8* CartridgeCV::getImage(int& size) const
+const uint8_t* CartridgeCV::getImage(int& size) const
 {
   size = 2048;
   return myImage;

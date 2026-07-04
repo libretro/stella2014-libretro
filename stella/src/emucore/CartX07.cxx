@@ -25,7 +25,7 @@
 #include "CartX07.hxx"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-CartridgeX07::CartridgeX07(const uInt8* image, uInt32 size, const Settings& settings)
+CartridgeX07::CartridgeX07(const uint8_t* image, uint32_t size, const Settings& settings)
   : Cartridge(settings)
 {
   // Copy the ROM image into my buffer
@@ -52,13 +52,13 @@ void CartridgeX07::reset()
 void CartridgeX07::install(System& system)
 {
   mySystem     = &system;
-  uInt16 shift = mySystem->pageShift();
+  uint16_t shift = mySystem->pageShift();
 
   // Set the page accessing methods for the hot spots
   // The hotspots use almost all addresses below 0x1000, so we simply grab them
   // all and forward the TIA/RIOT calls from the peek and poke methods.
   System::PageAccess access(0, 0, 0, this, System::PA_READWRITE);
-  for(uInt32 i = 0x00; i < 0x1000; i += (1 << shift))
+  for(uint32_t i = 0x00; i < 0x1000; i += (1 << shift))
     mySystem->setPageAccess(i >> shift, access);
 
   // Install pages for the startup bank
@@ -66,12 +66,12 @@ void CartridgeX07::install(System& system)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt8 CartridgeX07::peek(uInt16 address)
+uint8_t CartridgeX07::peek(uint16_t address)
 {
-  uInt8 value = 0;
+  uint8_t value = 0;
 
   // Check for RAM or TIA mirroring
-  uInt16 lowAddress = address & 0x3ff;
+  uint16_t lowAddress = address & 0x3ff;
   if(lowAddress & 0x80)
     value = mySystem->m6532().peek(address);
   else if(!(lowAddress & 0x200))
@@ -90,10 +90,10 @@ uInt8 CartridgeX07::peek(uInt16 address)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeX07::poke(uInt16 address, uInt8 value)
+bool CartridgeX07::poke(uint16_t address, uint8_t value)
 {
   // Check for RAM or TIA mirroring
-  uInt16 lowAddress = address & 0x3ff;
+  uint16_t lowAddress = address & 0x3ff;
   if(lowAddress & 0x80)
     mySystem->m6532().poke(address, value);
   else if(!(lowAddress & 0x200))
@@ -111,20 +111,20 @@ bool CartridgeX07::poke(uInt16 address, uInt8 value)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeX07::bank(uInt16 bank)
+bool CartridgeX07::bank(uint16_t bank)
 { 
   if(bankLocked()) return false;
 
   // Remember what bank we're in
   myCurrentBank = (bank & 0x0f);
-  uInt32 offset = myCurrentBank << 12;
-  uInt16 shift = mySystem->pageShift();
+  uint32_t offset = myCurrentBank << 12;
+  uint16_t shift = mySystem->pageShift();
 
   // Setup the page access methods for the current bank
   System::PageAccess access(0, 0, 0, this, System::PA_READ);
 
   // Map ROM image into the system
-  for(uInt32 address = 0x1000; address < 0x2000; address += (1 << shift))
+  for(uint32_t address = 0x1000; address < 0x2000; address += (1 << shift))
   {
     access.directPeekBase = &myImage[offset + (address & 0x0FFF)];
     access.codeAccessBase = &myCodeAccessBase[offset + (address & 0x0FFF)];
@@ -134,26 +134,26 @@ bool CartridgeX07::bank(uInt16 bank)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt16 CartridgeX07::bank() const
+uint16_t CartridgeX07::bank() const
 {
   return myCurrentBank;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt16 CartridgeX07::bankCount() const
+uint16_t CartridgeX07::bankCount() const
 {
   return 16;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeX07::patch(uInt16 address, uInt8 value)
+bool CartridgeX07::patch(uint16_t address, uint8_t value)
 {
   myImage[(myCurrentBank << 12) + (address & 0x0FFF)] = value;
   return myBankChanged = true;
 } 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const uInt8* CartridgeX07::getImage(int& size) const
+const uint8_t* CartridgeX07::getImage(int& size) const
 {
   size = 65536;
   return myImage;

@@ -29,7 +29,7 @@
 #include "M6502.hxx"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-M6502::M6502(uInt32 systemCyclesPerProcessorCycle, const Settings& settings)
+M6502::M6502(uint32_t systemCyclesPerProcessorCycle, const Settings& settings)
   : myExecutionStatus(0),
     mySystem(0),
     mySettings(settings),
@@ -48,7 +48,7 @@ M6502::M6502(uInt32 systemCyclesPerProcessorCycle, const Settings& settings)
 {
 
   // Compute the System Cycle table
-  for(uInt32 t = 0; t < 256; ++t)
+  for(uint32_t t = 0; t < 256; ++t)
   {
     myInstructionSystemCycleTable[t] = ourInstructionCycleTable[t] *
         mySystemCyclesPerProcessorCycle;
@@ -92,7 +92,7 @@ void M6502::reset()
   myLastAccessWasRead = true;
 
   // Load PC from the reset vector
-  PC = (uInt16)mySystem->peek(0xfffc) | ((uInt16)mySystem->peek(0xfffd) << 8);
+  PC = (uint16_t)mySystem->peek(0xfffc) | ((uint16_t)mySystem->peek(0xfffd) << 8);
 
   myTotalInstructionCount = 0;
 
@@ -103,7 +103,7 @@ void M6502::reset()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-inline uInt8 M6502::peek(uInt16 address, uInt8 flags)
+inline uint8_t M6502::peek(uint16_t address, uint8_t flags)
 {
   ////////////////////////////////////////////////
   // TODO - move this logic directly into CartAR
@@ -115,14 +115,14 @@ inline uInt8 M6502::peek(uInt16 address, uInt8 flags)
   ////////////////////////////////////////////////
   mySystem->incrementCycles(mySystemCyclesPerProcessorCycle);
 
-  uInt8 result = mySystem->peek(address, flags);
+  uint8_t result = mySystem->peek(address, flags);
   myLastAccessWasRead = true;
   myLastPeekAddress = address;
   return result;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-inline void M6502::poke(uInt16 address, uInt8 value)
+inline void M6502::poke(uint16_t address, uint8_t value)
 {
   ////////////////////////////////////////////////
   // TODO - move this logic directly into CartAR
@@ -140,7 +140,7 @@ inline void M6502::poke(uInt16 address, uInt8 value)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool M6502::execute(uInt32 number)
+bool M6502::execute(uint32_t number)
 {
   // Clear all of the execution status bits except for the fatal error bit
   myExecutionStatus &= FatalErrorBit;
@@ -150,8 +150,8 @@ bool M6502::execute(uInt32 number)
   {
     for(; !myExecutionStatus && (number != 0); --number)
     {
-      uInt16 operandAddress = 0, intermediateAddress = 0;
-      uInt8 operand = 0;
+      uint16_t operandAddress = 0, intermediateAddress = 0;
+      uint8_t operand = 0;
 
       // Reset the peek/poke address pointers
       myLastPeekAddress = myLastPokeAddress = myDataAddressForPoke = 0;
@@ -215,7 +215,7 @@ void M6502::interruptHandler()
     mySystem->poke(0x0100 + SP--, PS() & (~0x10));
     D = false;
     I = true;
-    PC = (uInt16)mySystem->peek(0xFFFE) | ((uInt16)mySystem->peek(0xFFFF) << 8);
+    PC = (uint16_t)mySystem->peek(0xFFFE) | ((uint16_t)mySystem->peek(0xFFFF) << 8);
   }
   else if(myExecutionStatus & NonmaskableInterruptBit)
   {
@@ -224,7 +224,7 @@ void M6502::interruptHandler()
     mySystem->poke(0x0100 + SP--, (PC - 1) & 0x00ff);
     mySystem->poke(0x0100 + SP--, PS() & (~0x10));
     D = false;
-    PC = (uInt16)mySystem->peek(0xFFFA) | ((uInt16)mySystem->peek(0xFFFB) << 8);
+    PC = (uint16_t)mySystem->peek(0xFFFA) | ((uint16_t)mySystem->peek(0xFFFB) << 8);
   }
 
   // Clear the interrupt bits in myExecutionStatus
@@ -315,7 +315,7 @@ bool M6502::load(Serializer& in)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt32 M6502::ourInstructionCycleTable[256] = {
+uint32_t M6502::ourInstructionCycleTable[256] = {
 //  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
     7, 6, 2, 8, 3, 3, 5, 5, 3, 2, 2, 2, 4, 4, 6, 6,  // 0
     2, 5, 2, 8, 4, 4, 6, 6, 2, 4, 2, 7, 4, 4, 7, 7,  // 1

@@ -32,7 +32,7 @@
 using namespace Common;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Thumbulator::Thumbulator(const uInt16* rom_ptr, uInt16* ram_ptr, bool traponfatal)
+Thumbulator::Thumbulator(const uint16_t* rom_ptr, uint16_t* ram_ptr, bool traponfatal)
   : rom(rom_ptr), ram(ram_ptr) { }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -51,11 +51,11 @@ void Thumbulator::run( void )
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt32 Thumbulator::fetch16 ( uInt32 addr )
+uint32_t Thumbulator::fetch16 ( uint32_t addr )
 {
   fetches++;
 
-  uInt32 data;
+  uint32_t data;
   switch(addr&0xF0000000)
   {
     case 0x00000000: //ROM
@@ -85,9 +85,9 @@ uInt32 Thumbulator::fetch16 ( uInt32 addr )
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt32 Thumbulator::fetch32 ( uInt32 addr )
+uint32_t Thumbulator::fetch32 ( uint32_t addr )
 {
-  uInt32 data;
+  uint32_t data;
   switch(addr&0xF0000000)
   {
     case 0x00000000: //ROM
@@ -109,7 +109,7 @@ uInt32 Thumbulator::fetch32 ( uInt32 addr )
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Thumbulator::write16 ( uInt32 addr, uInt32 data )
+void Thumbulator::write16 ( uint32_t addr, uint32_t data )
 {
   if((addr>0x40001fff)&&(addr<0x50000000))
     return;
@@ -142,7 +142,7 @@ void Thumbulator::write16 ( uInt32 addr, uInt32 data )
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Thumbulator::write32 ( uInt32 addr, uInt32 data )
+void Thumbulator::write32 ( uint32_t addr, uint32_t data )
 {
   if(addr&3)
     return;
@@ -175,9 +175,9 @@ void Thumbulator::write32 ( uInt32 addr, uInt32 data )
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt32 Thumbulator::read16 ( uInt32 addr )
+uint32_t Thumbulator::read16 ( uint32_t addr )
 {
-  uInt32 data;
+  uint32_t data;
 
   if((addr>0x40001fff)&&(addr<0x50000000))
     return 0;
@@ -218,12 +218,12 @@ uInt32 Thumbulator::read16 ( uInt32 addr )
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt32 Thumbulator::read32 ( uInt32 addr )
+uint32_t Thumbulator::read32 ( uint32_t addr )
 {
   if(addr&3)
     return 0;
 
-  uInt32 data;
+  uint32_t data;
   switch(addr&0xF0000000)
   {
     case 0x00000000: //ROM
@@ -237,11 +237,11 @@ uInt32 Thumbulator::read32 ( uInt32 addr )
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt32 Thumbulator::read_register ( uInt32 reg )
+uint32_t Thumbulator::read_register ( uint32_t reg )
 {
   reg&=0xF;
 
-  uInt32 data;
+  uint32_t data;
   switch(cpsr&0x1F)
   {
     case MODE_SVC:
@@ -256,7 +256,7 @@ uInt32 Thumbulator::read_register ( uInt32 reg )
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt32 Thumbulator::write_register ( uInt32 reg, uInt32 data )
+uint32_t Thumbulator::write_register ( uint32_t reg, uint32_t data )
 {
   reg&=0xF;
 
@@ -274,23 +274,23 @@ uInt32 Thumbulator::write_register ( uInt32 reg, uInt32 data )
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Thumbulator::do_zflag ( uInt32 x )
+void Thumbulator::do_zflag ( uint32_t x )
 {
   if(x==0) cpsr|=CPSR_Z;
   else     cpsr&=~CPSR_Z;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Thumbulator::do_nflag ( uInt32 x )
+void Thumbulator::do_nflag ( uint32_t x )
 {
   if(x&0x80000000) cpsr|=CPSR_N;
   else             cpsr&=~CPSR_N;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Thumbulator::do_cflag ( uInt32 a, uInt32 b, uInt32 c )
+void Thumbulator::do_cflag ( uint32_t a, uint32_t b, uint32_t c )
 {
-  uInt32 rc;
+  uint32_t rc;
 
   cpsr&=~CPSR_C;
   rc=(a&0x7FFFFFFF)+(b&0x7FFFFFFF)+c; //carry in
@@ -300,7 +300,7 @@ void Thumbulator::do_cflag ( uInt32 a, uInt32 b, uInt32 c )
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Thumbulator::do_sub_vflag ( uInt32 a, uInt32 b, uInt32 c )
+void Thumbulator::do_sub_vflag ( uint32_t a, uint32_t b, uint32_t c )
 {
   cpsr&=~CPSR_V;
 
@@ -314,7 +314,7 @@ void Thumbulator::do_sub_vflag ( uInt32 a, uInt32 b, uInt32 c )
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Thumbulator::do_add_vflag ( uInt32 a, uInt32 b, uInt32 c )
+void Thumbulator::do_add_vflag ( uint32_t a, uint32_t b, uint32_t c )
 {
   cpsr&=~CPSR_V;
 
@@ -328,14 +328,14 @@ void Thumbulator::do_add_vflag ( uInt32 a, uInt32 b, uInt32 c )
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Thumbulator::do_cflag_bit ( uInt32 x )
+void Thumbulator::do_cflag_bit ( uint32_t x )
 {
   if(x) cpsr|=CPSR_C;
   else  cpsr&=~CPSR_C;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Thumbulator::do_vflag_bit ( uInt32 x )
+void Thumbulator::do_vflag_bit ( uint32_t x )
 {
   if(x) cpsr|=CPSR_V;
   else  cpsr&=~CPSR_V;
@@ -344,7 +344,7 @@ void Thumbulator::do_vflag_bit ( uInt32 x )
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int Thumbulator::execute ( void )
 {
-  uInt32 pc, sp, inst,
+  uint32_t pc, sp, inst,
          ra,rb,rc,
          rm,rd,rn,rs,
          op;

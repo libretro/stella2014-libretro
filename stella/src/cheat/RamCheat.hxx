@@ -34,8 +34,8 @@ class RamCheat : public Cheat
     virtual void evaluate();
 
   private:
-    uInt16 address;
-    uInt8  value;
+    uint16_t address;
+    uint8_t  value;
 };
 
 #endif

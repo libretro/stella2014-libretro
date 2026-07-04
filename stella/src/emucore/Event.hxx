@@ -87,22 +87,22 @@ class Event
     /**
       Get the value associated with the event of the specified type
     */
-    Int32 get(Type type) const { return myValues[type]; }
+    int32_t get(Type type) const { return myValues[type]; }
 
     /**
       Set the value associated with the event of the specified type
     */
-    void set(Type type, Int32 value) { myValues[type] = value; }
+    void set(Type type, int32_t value) { myValues[type] = value; }
 
     /**
       Clears the event array (resets to initial state)
     */
     void clear()
     {
-      for(uInt32 i = 0; i < LastType; ++i)
+      for(uint32_t i = 0; i < LastType; ++i)
         myValues[i] = Event::NoType;
 
-      for(uInt32 i = 0; i < KBDK_LAST; ++i)
+      for(uint32_t i = 0; i < KBDK_LAST; ++i)
         myKeyTable[i] = false;
     }
 
@@ -113,7 +113,7 @@ class Event
 
   private:
     // Array of values associated with each event type
-    Int32 myValues[LastType];
+    int32_t myValues[LastType];
 
     // Array of keyboard key states
     bool myKeyTable[KBDK_LAST];

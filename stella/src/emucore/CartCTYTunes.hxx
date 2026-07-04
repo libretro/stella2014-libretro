@@ -27,7 +27,7 @@
 
 #define CHETIRY_TUNES_SIZE 7 * 4096
 
-static const uInt8 CartCTYTunes[CHETIRY_TUNES_SIZE] = {
+static const uint8_t CartCTYTunes[CHETIRY_TUNES_SIZE] = {
   ///////////////////////////
   // Tune 1
   ///////////////////////////

@@ -25,7 +25,7 @@
 #include "CartFA2.hxx"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-CartridgeFA2::CartridgeFA2(const uInt8* image, uInt32 size, const OSystem& osystem)
+CartridgeFA2::CartridgeFA2(const uint8_t* image, uint32_t size, const OSystem& osystem)
   : Cartridge(osystem.settings()),
     myOSystem(osystem),
     myRamAccessTimeout(0),
@@ -39,7 +39,7 @@ CartridgeFA2::CartridgeFA2(const uInt8* image, uInt32 size, const OSystem& osyst
   }
 
   // Allocate array for the ROM image
-  myImage = new uInt8[mySize];
+  myImage = new uint8_t[mySize];
 
   // Copy the ROM image into my buffer
   memcpy(myImage, image, mySize);
@@ -63,7 +63,7 @@ void CartridgeFA2::reset()
 {
   // Initialize RAM
   if(mySettings.getBool("ramrandom"))
-    for(uInt32 i = 0; i < 256; ++i)
+    for(uint32_t i = 0; i < 256; ++i)
       myRAM[i] = mySystem->randGenerator().next();
   else
     memset(myRAM, 0, 256);
@@ -76,13 +76,13 @@ void CartridgeFA2::reset()
 void CartridgeFA2::install(System& system)
 {
   mySystem     = &system;
-  uInt16 shift = mySystem->pageShift();
+  uint16_t shift = mySystem->pageShift();
 
   System::PageAccess access(0, 0, 0, this, System::PA_READ);
 
   // Set the page accessing method for the RAM writing pages
   access.type = System::PA_WRITE;
-  for(uInt32 j = 0x1000; j < 0x1100; j += (1 << shift))
+  for(uint32_t j = 0x1000; j < 0x1100; j += (1 << shift))
   {
     access.directPokeBase = &myRAM[j & 0x00FF];
     access.codeAccessBase = &myCodeAccessBase[j & 0x00FF];
@@ -92,7 +92,7 @@ void CartridgeFA2::install(System& system)
   // Set the page accessing method for the RAM reading pages
   access.directPokeBase = 0;
   access.type = System::PA_READ;
-  for(uInt32 k = 0x1100; k < 0x1200; k += (1 << shift))
+  for(uint32_t k = 0x1100; k < 0x1200; k += (1 << shift))
   {
     access.directPeekBase = &myRAM[k & 0x00FF];
     access.codeAccessBase = &myCodeAccessBase[0x100 + (k & 0x00FF)];
@@ -104,9 +104,9 @@ void CartridgeFA2::install(System& system)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt8 CartridgeFA2::peek(uInt16 address)
+uint8_t CartridgeFA2::peek(uint16_t address)
 {
-  uInt16 peekAddress = address;
+  uint16_t peekAddress = address;
   address &= 0x0FFF;
 
   // Switch banks if necessary
@@ -161,7 +161,7 @@ uInt8 CartridgeFA2::peek(uInt16 address)
   if(address < 0x0100)  // Write port is at 0xF000 - 0xF100 (256 bytes)
   {
     // Reading from the write port triggers an unwanted write
-    uInt8 value = mySystem->getDataBusState(0xFF);
+    uint8_t value = mySystem->getDataBusState(0xFF);
 
     if(bankLocked())
       return value;
@@ -176,7 +176,7 @@ uInt8 CartridgeFA2::peek(uInt16 address)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeFA2::poke(uInt16 address, uInt8)
+bool CartridgeFA2::poke(uint16_t address, uint8_t)
 {
   address &= 0x0FFF;
 
@@ -236,27 +236,27 @@ bool CartridgeFA2::poke(uInt16 address, uInt8)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeFA2::bank(uInt16 bank)
+bool CartridgeFA2::bank(uint16_t bank)
 {
   if(bankLocked()) return false;
 
   // Remember what bank we're in
   myCurrentBank = bank;
-  uInt16 offset = myCurrentBank << 12;
-  uInt16 shift = mySystem->pageShift();
-  uInt16 mask = mySystem->pageMask();
+  uint16_t offset = myCurrentBank << 12;
+  uint16_t shift = mySystem->pageShift();
+  uint16_t mask = mySystem->pageMask();
 
   System::PageAccess access(0, 0, 0, this, System::PA_READ);
 
   // Set the page accessing methods for the hot spots
-  for(uInt32 i = (0x1FF4 & ~mask); i < 0x2000; i += (1 << shift))
+  for(uint32_t i = (0x1FF4 & ~mask); i < 0x2000; i += (1 << shift))
   {
     access.codeAccessBase = &myCodeAccessBase[offset + (i & 0x0FFF)];
     mySystem->setPageAccess(i >> shift, access);
   }
 
   // Setup the page access methods for the current bank
-  for(uInt32 address = 0x1200; address < (0x1FF4U & ~mask);
+  for(uint32_t address = 0x1200; address < (0x1FF4U & ~mask);
       address += (1 << shift))
   {
     access.directPeekBase = &myImage[offset + (address & 0x0FFF)];
@@ -267,19 +267,19 @@ bool CartridgeFA2::bank(uInt16 bank)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt16 CartridgeFA2::bank() const
+uint16_t CartridgeFA2::bank() const
 {
   return myCurrentBank;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt16 CartridgeFA2::bankCount() const
+uint16_t CartridgeFA2::bankCount() const
 {
   return (mySize / 4096);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeFA2::patch(uInt16 address, uInt8 value)
+bool CartridgeFA2::patch(uint16_t address, uint8_t value)
 {
   address &= 0x0FFF;
 
@@ -297,7 +297,7 @@ bool CartridgeFA2::patch(uInt16 address, uInt8 value)
 } 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const uInt8* CartridgeFA2::getImage(int& size) const
+const uint8_t* CartridgeFA2::getImage(int& size) const
 {
   size = mySize;
   return myImage;
@@ -335,7 +335,7 @@ void CartridgeFA2::setRomName(const string& name)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt8 CartridgeFA2::ramReadWrite()
+uint8_t CartridgeFA2::ramReadWrite()
 {
   /* The following algorithm implements accessing Harmony cart flash
 
@@ -398,14 +398,14 @@ uInt8 CartridgeFA2::ramReadWrite()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CartridgeFA2::flash(uInt8 operation)
+void CartridgeFA2::flash(uint8_t operation)
 {
   Serializer serializer(myFlashFile);
   if(serializer.isValid())
   {
     if(operation == 0)       // erase
     {
-      uInt8 buf[256];
+      uint8_t buf[256];
       memset(buf, 0, 256);
       serializer.putByteArray(buf, 256);
     }

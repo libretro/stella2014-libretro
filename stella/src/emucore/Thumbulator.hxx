@@ -63,7 +63,7 @@
 class Thumbulator
 {
   public:
-    Thumbulator(const uInt16* rom, uInt16* ram, bool traponfatal);
+    Thumbulator(const uint16_t* rom, uint16_t* ram, bool traponfatal);
     ~Thumbulator();
 
     /**
@@ -74,40 +74,40 @@ class Thumbulator
     void run();
 
   private:
-    uInt32 read_register ( uInt32 reg );
-    uInt32 write_register ( uInt32 reg, uInt32 data );
-    uInt32 fetch16 ( uInt32 addr );
-    uInt32 fetch32 ( uInt32 addr );
-    uInt32 read16 ( uInt32 addr );
-    uInt32 read32 ( uInt32 );
-    void write16 ( uInt32 addr, uInt32 data );
-    void write32 ( uInt32 addr, uInt32 data );
+    uint32_t read_register ( uint32_t reg );
+    uint32_t write_register ( uint32_t reg, uint32_t data );
+    uint32_t fetch16 ( uint32_t addr );
+    uint32_t fetch32 ( uint32_t addr );
+    uint32_t read16 ( uint32_t addr );
+    uint32_t read32 ( uint32_t );
+    void write16 ( uint32_t addr, uint32_t data );
+    void write32 ( uint32_t addr, uint32_t data );
 
-    void do_zflag ( uInt32 x );
-    void do_nflag ( uInt32 x );
-    void do_cflag ( uInt32 a, uInt32 b, uInt32 c );
-    void do_sub_vflag ( uInt32 a, uInt32 b, uInt32 c );
-    void do_add_vflag ( uInt32 a, uInt32 b, uInt32 c );
-    void do_cflag_bit ( uInt32 x );
-    void do_vflag_bit ( uInt32 x );
+    void do_zflag ( uint32_t x );
+    void do_nflag ( uint32_t x );
+    void do_cflag ( uint32_t a, uint32_t b, uint32_t c );
+    void do_sub_vflag ( uint32_t a, uint32_t b, uint32_t c );
+    void do_add_vflag ( uint32_t a, uint32_t b, uint32_t c );
+    void do_cflag_bit ( uint32_t x );
+    void do_vflag_bit ( uint32_t x );
 
     int execute ( void );
     int reset ( void );
 
   private:
-    const uInt16* rom;
-    uInt16* ram;
+    const uint16_t* rom;
+    uint16_t* ram;
 
-    uInt32 halfadd;
-    uInt32 cpsr;
-    uInt32 reg_sys[16]; //System mode
-    uInt32 reg_svc[16]; //Supervisor mode
-    uInt32 mamcr;
+    uint32_t halfadd;
+    uint32_t cpsr;
+    uint32_t reg_sys[16]; //System mode
+    uint32_t reg_svc[16]; //Supervisor mode
+    uint32_t mamcr;
 
-    uInt64 instructions;
-    uInt64 fetches;
-    uInt64 reads;
-    uInt64 writes;
+    uint64_t instructions;
+    uint64_t fetches;
+    uint64_t reads;
+    uint64_t writes;
 };
 
 #endif

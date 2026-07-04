@@ -44,7 +44,7 @@ class CartridgeSB : public Cartridge
       @param size      The size of the ROM image
       @param settings  A reference to the various settings (read-only)
     */
-    CartridgeSB(const uInt8* image, uInt32 size, const Settings& settings);
+    CartridgeSB(const uint8_t* image, uint32_t size, const Settings& settings);
  
     /**
       Destructor
@@ -70,17 +70,17 @@ class CartridgeSB : public Cartridge
 
       @param bank The bank that should be installed in the system
     */
-    bool bank(uInt16 bank);
+    bool bank(uint16_t bank);
 
     /**
       Get the current bank.
     */
-    uInt16 bank() const;
+    uint16_t bank() const;
 
     /**
       Query the number of banks supported by the cartridge.
     */
-    uInt16 bankCount() const;
+    uint16_t bankCount() const;
 
     /**
       Patch the cartridge ROM.
@@ -89,7 +89,7 @@ class CartridgeSB : public Cartridge
       @param value    The value to place into the address
       @return    Success or failure of the patch operation
     */
-    bool patch(uInt16 address, uInt8 value);
+    bool patch(uint16_t address, uint8_t value);
 
     /**
       Access the internal ROM image for this cartridge.
@@ -97,7 +97,7 @@ class CartridgeSB : public Cartridge
       @param size  Set to the size of the internal ROM image data
       @return  A pointer to the internal ROM image data
     */
-    const uInt8* getImage(int& size) const;
+    const uint8_t* getImage(int& size) const;
 
     /**
       Save the current state of this cart to the given Serializer.
@@ -128,7 +128,7 @@ class CartridgeSB : public Cartridge
 
       @return The byte at the specified address
     */
-    uInt8 peek(uInt16 address);
+    uint8_t peek(uint16_t address);
 
     /**
       Change the byte at the specified address to the given value
@@ -137,15 +137,15 @@ class CartridgeSB : public Cartridge
       @param value The value to be stored at the address
       @return  True if the poke changed the device address space, else false
     */
-    bool poke(uInt16 address, uInt8 value);
+    bool poke(uint16_t address, uint8_t value);
 
   private:
     // The 128-256K ROM image and size of the cartridge
-    uInt8* myImage;
-    uInt32 mySize;
+    uint8_t* myImage;
+    uint32_t mySize;
 
     // Indicates which bank is currently active
-    uInt16 myCurrentBank;
+    uint16_t myCurrentBank;
 
     // Previous Device's page access
     System::PageAccess myHotSpotPageAccess[8];

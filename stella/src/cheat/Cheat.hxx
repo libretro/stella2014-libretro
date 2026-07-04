@@ -49,7 +49,7 @@ class Cheat
     virtual void evaluate() = 0;
 
   protected:
-    static uInt16 unhex(const string& hex)
+    static uint16_t unhex(const string& hex)
     {
       int ret = 0;
 

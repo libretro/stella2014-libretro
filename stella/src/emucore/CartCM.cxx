@@ -24,7 +24,7 @@
 #include "CartCM.hxx"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-CartridgeCM::CartridgeCM(const uInt8* image, uInt32 size, const Settings& settings)
+CartridgeCM::CartridgeCM(const uint8_t* image, uint32_t size, const Settings& settings)
   : Cartridge(settings)
 {
   // Copy the ROM image into my buffer
@@ -51,7 +51,7 @@ void CartridgeCM::reset()
 {
   // Initialize RAM
   if(mySettings.getBool("ramrandom"))
-    for(uInt32 i = 0; i < 2048; ++i)
+    for(uint32_t i = 0; i < 2048; ++i)
       myRAM[i] = mySystem->randGenerator().next();
   else
     memset(myRAM, 0, 2048);
@@ -74,7 +74,7 @@ void CartridgeCM::install(System& system)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt8 CartridgeCM::peek(uInt16 address)
+uint8_t CartridgeCM::peek(uint16_t address)
 {
   // NOTE: This does not handle accessing cart ROM/RAM, however, this function
   // should never be called for ROM/RAM because of the way page accessing
@@ -83,7 +83,7 @@ uInt8 CartridgeCM::peek(uInt16 address)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeCM::poke(uInt16 address, uInt8 value)
+bool CartridgeCM::poke(uint16_t address, uint8_t value)
 {
   // NOTE: This could be called for RIOT writes or cart ROM writes
   // In the latter case, the write is ignored
@@ -103,14 +103,14 @@ bool CartridgeCM::poke(uInt16 address, uInt8 value)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeCM::bank(uInt16 bank)
+bool CartridgeCM::bank(uint16_t bank)
 {
   if(bankLocked()) return false;
 
   // Remember what bank we're in
   myCurrentBank = bank;
-  uInt16 offset = myCurrentBank << 12;
-  uInt16 shift = mySystem->pageShift();
+  uint16_t offset = myCurrentBank << 12;
+  uint16_t shift = mySystem->pageShift();
 
   // Although this scheme contains four 4K ROM banks and one 2K RAM bank,
   // it's easier to think of things in terms of 2K slices, as follows:
@@ -123,7 +123,7 @@ bool CartridgeCM::bank(uInt16 bank)
   System::PageAccess access(0, 0, 0, this, System::PA_READ);
 
   // Lower 2K (always ROM)
-  for(uInt32 address = 0x1000; address < 0x1800; address += (1 << shift))
+  for(uint32_t address = 0x1000; address < 0x1800; address += (1 << shift))
   {
     access.directPeekBase = &myImage[offset + (address & 0x0FFF)];
     access.codeAccessBase = &myCodeAccessBase[offset + (address & 0x0FFF)];
@@ -131,7 +131,7 @@ bool CartridgeCM::bank(uInt16 bank)
   }
 
   // Upper 2K (RAM or ROM)
-  for(uInt32 address = 0x1800; address < 0x2000; address += (1 << shift))
+  for(uint32_t address = 0x1800; address < 0x2000; address += (1 << shift))
   {
     access.type = System::PA_READWRITE;
 
@@ -158,13 +158,13 @@ bool CartridgeCM::bank(uInt16 bank)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt16 CartridgeCM::bank() const
+uint16_t CartridgeCM::bank() const
 {
   return myCurrentBank;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt16 CartridgeCM::bankCount() const
+uint16_t CartridgeCM::bankCount() const
 {
   // We report 4 banks (of ROM), even though RAM can overlap the upper 2K
   // of cart address space at some times
@@ -174,7 +174,7 @@ uInt16 CartridgeCM::bankCount() const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeCM::patch(uInt16 address, uInt8 value)
+bool CartridgeCM::patch(uint16_t address, uint8_t value)
 {
   if((mySWCHA & 0x30) == 0x20)
     myRAM[address & 0x7FF] = value;
@@ -185,7 +185,7 @@ bool CartridgeCM::patch(uInt16 address, uInt8 value)
 } 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const uInt8* CartridgeCM::getImage(int& size) const
+const uint8_t* CartridgeCM::getImage(int& size) const
 {
   size = 16384;
   return myImage;

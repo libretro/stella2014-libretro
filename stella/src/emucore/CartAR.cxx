@@ -24,14 +24,14 @@
 #include "CartAR.hxx"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-CartridgeAR::CartridgeAR(const uInt8* image, uInt32 size,
+CartridgeAR::CartridgeAR(const uint8_t* image, uint32_t size,
                          const Settings& settings)
   : Cartridge(settings),
     my6502(0),
     mySize(MAX(size, 8448u))
 {
   // Create a load image buffer and copy the given image
-  myLoadImages = new uInt8[mySize];
+  myLoadImages = new uint8_t[mySize];
   myNumberOfLoadImages = mySize / 8448;
   memcpy(myLoadImages, image, size);
 
@@ -58,7 +58,7 @@ void CartridgeAR::reset()
   // Initialize RAM
 #if 0  // TODO - figure out actual behaviour of the real cart
   if(mySettings.getBool("ramrandom"))
-    for(uInt32 i = 0; i < 6 * 1024; ++i)
+    for(uint32_t i = 0; i < 6 * 1024; ++i)
       myImage[i] = mySystem->randGenerator().next();
   else
 #endif
@@ -83,7 +83,7 @@ void CartridgeAR::reset()
 void CartridgeAR::systemCyclesReset()
 {
   // Get the current system cycle
-  uInt32 cycles = mySystem->cycles();
+  uint32_t cycles = mySystem->cycles();
 
   // Adjust cycle values
   myPowerRomCycle -= cycles;
@@ -93,21 +93,21 @@ void CartridgeAR::systemCyclesReset()
 void CartridgeAR::install(System& system)
 {
   mySystem     = &system;
-  uInt16 shift = mySystem->pageShift();
+  uint16_t shift = mySystem->pageShift();
 
   my6502       = &(mySystem->m6502());
 
   // Map all of the accesses to call peek and poke (we don't yet indicate RAM areas)
   System::PageAccess access(0, 0, 0, this, System::PA_READ);
 
-  for(uInt32 i = 0x1000; i < 0x2000; i += (1 << shift))
+  for(uint32_t i = 0x1000; i < 0x2000; i += (1 << shift))
     mySystem->setPageAccess(i >> shift, access);
 
   bankConfiguration(0);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt8 CartridgeAR::peek(uInt16 addr)
+uint8_t CartridgeAR::peek(uint16_t addr)
 {
   // In debugger/bank-locked mode, we ignore all hotspots and in general
   // anything that can change the internal state of the cart
@@ -118,7 +118,7 @@ uInt8 CartridgeAR::peek(uInt16 addr)
   if(((addr & 0x1FFF) == 0x1850) && (myImageOffset[1] == (3 << 11)))
   {
     // Get load that's being accessed (BIOS places load number at 0x80)
-    uInt8 load = mySystem->peek(0x0080);
+    uint8_t load = mySystem->peek(0x0080);
 
     // Read the specified load into RAM
     loadIntoRAM(load);
@@ -169,7 +169,7 @@ uInt8 CartridgeAR::peek(uInt16 addr)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeAR::poke(uInt16 addr, uInt8)
+bool CartridgeAR::poke(uint16_t addr, uint8_t)
 {
   bool modified = false;
 
@@ -216,7 +216,7 @@ bool CartridgeAR::poke(uInt16 addr, uInt8)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeAR::bankConfiguration(uInt8 configuration)
+bool CartridgeAR::bankConfiguration(uint8_t configuration)
 {
   // D7-D5 of this byte: Write Pulse Delay (n/a for emulator)
   //
@@ -340,20 +340,20 @@ void CartridgeAR::initializeROM()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt8 CartridgeAR::checksum(uInt8* s, uInt16 length)
+uint8_t CartridgeAR::checksum(uint8_t* s, uint16_t length)
 {
-  uInt8 sum = 0;
+  uint8_t sum = 0;
 
-  for(uInt32 i = 0; i < length; ++i)
+  for(uint32_t i = 0; i < length; ++i)
     sum += s[i];
 
   return sum;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CartridgeAR::loadIntoRAM(uInt8 load)
+void CartridgeAR::loadIntoRAM(uint8_t load)
 {
-  uInt16 image;
+  uint16_t image;
 
   // Scan through all of the loads to see if we find the one we're looking for
   for(image = 0; image < myNumberOfLoadImages; ++image)
@@ -366,12 +366,12 @@ void CartridgeAR::loadIntoRAM(uInt8 load)
 
       // Load all of the pages from the load
       bool invalidPageChecksumSeen = false;
-      for(uInt32 j = 0; j < myHeader[3]; ++j)
+      for(uint32_t j = 0; j < myHeader[3]; ++j)
       {
-        uInt32 bank = myHeader[16 + j] & 0x03;
-        uInt32 page = (myHeader[16 + j] >> 2) & 0x07;
-        uInt8* src = myLoadImages + (image * 8448) + (j * 256);
-        uInt8 sum = checksum(src, 256) + myHeader[16 + j] + myHeader[64 + j];
+        uint32_t bank = myHeader[16 + j] & 0x03;
+        uint32_t page = (myHeader[16 + j] >> 2) & 0x07;
+        uint8_t* src = myLoadImages + (image * 8448) + (j * 256);
+        uint8_t sum = checksum(src, 256) + myHeader[16 + j] + myHeader[64 + j];
 
         if(!invalidPageChecksumSeen && (sum != 0x55))
           invalidPageChecksumSeen = true;
@@ -396,7 +396,7 @@ void CartridgeAR::loadIntoRAM(uInt8 load)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeAR::bank(uInt16 bank)
+bool CartridgeAR::bank(uint16_t bank)
 {
   if(!bankLocked())
     return bankConfiguration(bank);
@@ -404,26 +404,26 @@ bool CartridgeAR::bank(uInt16 bank)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt16 CartridgeAR::bank() const
+uint16_t CartridgeAR::bank() const
 {
   return myCurrentBank;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt16 CartridgeAR::bankCount() const
+uint16_t CartridgeAR::bankCount() const
 {
   return 32;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeAR::patch(uInt16 address, uInt8 value)
+bool CartridgeAR::patch(uint16_t address, uint8_t value)
 {
   // TODO - add support for debugger
   return false;
 } 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const uInt8* CartridgeAR::getImage(int& size) const
+const uint8_t* CartridgeAR::getImage(int& size) const
 {
   size = mySize;
   return myLoadImages;
@@ -500,7 +500,7 @@ bool CartridgeAR::load(Serializer& in)
    myPower = in.getBool();
 
    // Indicates when the power was last turned on
-   myPowerRomCycle = (Int32) in.getInt();
+   myPowerRomCycle = (int32_t) in.getInt();
 
    // Data hold register used for writing
    myDataHoldRegister = in.getByte();
@@ -515,7 +515,7 @@ bool CartridgeAR::load(Serializer& in)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt8 CartridgeAR::ourDummyROMCode[] = {
+uint8_t CartridgeAR::ourDummyROMCode[] = {
   0xa5, 0xfa, 0x85, 0x80, 0x4c, 0x18, 0xf8, 0xff,
   0xff, 0xff, 0x78, 0xd8, 0xa0, 0x00, 0xa2, 0x00,
   0x94, 0x00, 0xe8, 0xd0, 0xfb, 0x4c, 0x50, 0xf8,
@@ -556,7 +556,7 @@ uInt8 CartridgeAR::ourDummyROMCode[] = {
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const uInt8 CartridgeAR::ourDefaultHeader[256] = {
+const uint8_t CartridgeAR::ourDefaultHeader[256] = {
   0xac, 0xfa, 0x0f, 0x18, 0x62, 0x00, 0x24, 0x02,
   0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
   0x00, 0x04, 0x08, 0x0c, 0x10, 0x14, 0x18, 0x1c,

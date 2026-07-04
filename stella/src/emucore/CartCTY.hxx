@@ -119,7 +119,7 @@ class CartridgeCTY : public Cartridge
       @param size      The size of the ROM image
       @param osystem   A reference to the OSystem currently in use
     */
-    CartridgeCTY(const uInt8* image, uInt32 size, const OSystem& osystem);
+    CartridgeCTY(const uint8_t* image, uint32_t size, const OSystem& osystem);
  
     /**
       Destructor
@@ -152,17 +152,17 @@ class CartridgeCTY : public Cartridge
 
       @param bank The bank that should be installed in the system
     */
-    bool bank(uInt16 bank);
+    bool bank(uint16_t bank);
 
     /**
       Get the current bank.
     */
-    uInt16 bank() const;
+    uint16_t bank() const;
 
     /**
       Query the number of banks supported by the cartridge.
     */
-    uInt16 bankCount() const;
+    uint16_t bankCount() const;
 
     /**
       Patch the cartridge ROM.
@@ -171,7 +171,7 @@ class CartridgeCTY : public Cartridge
       @param value    The value to place into the address
       @return    Success or failure of the patch operation
     */
-    bool patch(uInt16 address, uInt8 value);
+    bool patch(uint16_t address, uint8_t value);
 
     /**
       Access the internal ROM image for this cartridge.
@@ -179,7 +179,7 @@ class CartridgeCTY : public Cartridge
       @param size  Set to the size of the internal ROM image data
       @return  A pointer to the internal ROM image data
     */
-    const uInt8* getImage(int& size) const;
+    const uint8_t* getImage(int& size) const;
 
     /**
       Save the current state of this cart to the given Serializer.
@@ -218,7 +218,7 @@ class CartridgeCTY : public Cartridge
 
       @return The byte at the specified address
     */
-    uInt8 peek(uInt16 address);
+    uint8_t peek(uint16_t address);
 
     /**
       Change the byte at the specified address to the given value
@@ -227,7 +227,7 @@ class CartridgeCTY : public Cartridge
       @param value The value to be stored at the address
       @return  True if the poke changed the device address space, else false
     */
-    bool poke(uInt16 address, uInt8 value);
+    bool poke(uint16_t address, uint8_t value);
 
   private:
     /**
@@ -237,14 +237,14 @@ class CartridgeCTY : public Cartridge
       @return  The value at $FF4 with bit 6 set or cleared (depending on
                whether the RAM access was busy or successful)
     */
-    uInt8 ramReadWrite();
+    uint8_t ramReadWrite();
 
     /**
       Actions initiated by accessing $FF4 hotspot.
     */
-    void loadTune(uInt8 index);
-    void loadScore(uInt8 index);
-    void saveScore(uInt8 index);
+    void loadTune(uint8_t index);
+    void loadScore(uint8_t index);
+    void saveScore(uint8_t index);
     void wipeAllScores();
 
     /** 
@@ -258,54 +258,54 @@ class CartridgeCTY : public Cartridge
     const OSystem& myOSystem;
 
     // Indicates which bank is currently active
-    uInt16 myCurrentBank;
+    uint16_t myCurrentBank;
 
     // The 32K ROM image of the cartridge
-    uInt8 myImage[32768];
+    uint8_t myImage[32768];
 
     // The 64 bytes of RAM accessible at $1000 - $1080
-    uInt8 myRAM[64];
+    uint8_t myRAM[64];
 
     // Operation type (written to $1000, used by hotspot $1FF4)
-    uInt8 myOperationType;
+    uint8_t myOperationType;
 
     // Pointer to the 28K frequency table (points to the start of one
     // of seven 4K tunes in CartCTYTunes)
-    const uInt8* myFrequencyImage;
+    const uint8_t* myFrequencyImage;
 
     // The counter register for the data fetcher
-    uInt16 myCounter;
+    uint16_t myCounter;
 
     // Flags that last byte peeked was A9 (LDA #)
     bool myLDAimmediate;
 
     // The random number generator register
-    uInt32 myRandomNumber;
+    uint32_t myRandomNumber;
 
     // The time after which the first request of a load/save operation
     // will actually be completed
     // Due to Harmony EEPROM constraints, a read/write isn't instantaneous,
     // so we need to emulate the delay as well
-    uInt64 myRamAccessTimeout;
+    uint64_t myRamAccessTimeout;
 
     // Full pathname of the file to use when emulating load/save
     // of internal RAM to Harmony cart EEPROM
     string myEEPROMFile;
 
     // System cycle count when the last update to music data fetchers occurred
-    Int32 mySystemCycles;
+    int32_t mySystemCycles;
 
     // Fractional DPC music OSC clocks unused during the last update,
     // as an integer remainder in units of 1/myDpcClockDen of an OSC clock
-    uInt32 myFractionalClocks;
+    uint32_t myFractionalClocks;
 
     // DPC music-oscillator clock rate as an exact integer ratio
     // (OSC clocks per CPU cycle = num/den), chosen from the TV format
-    uInt32 myDpcClockNum;
-    uInt32 myDpcClockDen;
+    uint32_t myDpcClockNum;
+    uint32_t myDpcClockDen;
 
   public:
-    void setDpcClockRate(uInt32 num, uInt32 den);
+    void setDpcClockRate(uint32_t num, uint32_t den);
 
   private:
 };

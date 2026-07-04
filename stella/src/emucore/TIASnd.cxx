@@ -22,7 +22,7 @@
 #include "TIASnd.hxx"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TIASound::TIASound(Int32 outputFrequency)
+TIASound::TIASound(int32_t outputFrequency)
   : myChannelMode(Hardware2Stereo),
     myOutputFrequency(outputFrequency),
     myOutputCounter(0),
@@ -63,13 +63,13 @@ void TIASound::reset()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void TIASound::outputFrequency(Int32 freq)
+void TIASound::outputFrequency(int32_t freq)
 {
   myOutputFrequency = freq;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void TIASound::channels(uInt32 hardware, bool stereo)
+void TIASound::channels(uint32_t hardware, bool stereo)
 {
   if(hardware == 1)
     myChannelMode = Hardware1;
@@ -78,7 +78,7 @@ void TIASound::channels(uInt32 hardware, bool stereo)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void TIASound::set(uInt16 address, uInt8 value)
+void TIASound::set(uint16_t address, uint8_t value)
 {
   int chan = ~address & 0x1;
   switch(address)
@@ -102,7 +102,7 @@ void TIASound::set(uInt16 address, uInt8 value)
       return;
   }
 
-  uInt16 newVal = 0;
+  uint16_t newVal = 0;
 
   // An AUDC value of 0 is a special case
   if (myAUDC[chan] == SET_TO_1 || myAUDC[chan] == POLY5_POLY5)
@@ -136,7 +136,7 @@ void TIASound::set(uInt16 address, uInt8 value)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt8 TIASound::get(uInt16 address) const
+uint8_t TIASound::get(uint16_t address) const
 {
   switch(address)
   {
@@ -164,23 +164,23 @@ uInt8 TIASound::get(uInt16 address) const
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void TIASound::volume(uInt32 percent)
+void TIASound::volume(uint32_t percent)
 {
   if(percent <= 100)
     myVolumePercentage = percent;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void TIASound::process(Int16* buffer, uInt32 samples)
+void TIASound::process(int16_t* buffer, uint32_t samples)
 {
   // Make temporary local copy
-  uInt8 audc0 = myAUDC[0], audc1 = myAUDC[1];
-  uInt8 p5_0 = myP5[0], p5_1 = myP5[1];
-  uInt8 div_n_cnt0 = myDivNCnt[0], div_n_cnt1 = myDivNCnt[1];
-  Int16 v0 = myVolume[0], v1 = myVolume[1];
+  uint8_t audc0 = myAUDC[0], audc1 = myAUDC[1];
+  uint8_t p5_0 = myP5[0], p5_1 = myP5[1];
+  uint8_t div_n_cnt0 = myDivNCnt[0], div_n_cnt1 = myDivNCnt[1];
+  int16_t v0 = myVolume[0], v1 = myVolume[1];
 
   // Take external volume into account
-  Int16 audv0 = (myAUDV[0] * myVolumePercentage) / 100,
+  int16_t audv0 = (myAUDV[0] * myVolumePercentage) / 100,
         audv1 = (myAUDV[1] * myVolumePercentage) / 100;
 
   // Loop until the sample buffer is full
@@ -340,7 +340,7 @@ void TIASound::process(Int16* buffer, uInt32 samples)
       case Hardware2Mono:  // mono sampling with 2 hardware channels
         while((samples > 0) && (myOutputCounter >= 31400))
         {
-          Int16 byte = v0 + v1;
+          int16_t byte = v0 + v1;
           *(buffer++) = byte;
           *(buffer++) = byte;
           myOutputCounter -= 31400;
@@ -379,7 +379,7 @@ void TIASound::process(Int16* buffer, uInt32 samples)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void TIASound::polyInit(uInt8* poly, int size, int f0, int f1)
+void TIASound::polyInit(uint8_t* poly, int size, int f0, int f1)
 {
   int mask = (1 << size) - 1, x = mask;
 
@@ -394,7 +394,7 @@ void TIASound::polyInit(uInt8* poly, int size, int f0, int f1)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const uInt8 TIASound::Div31[POLY5_SIZE] = {
+const uint8_t TIASound::Div31[POLY5_SIZE] = {
   0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
@@ -426,15 +426,15 @@ bool TIASound::load(Serializer& in)
   {
     myAUDC[i]    = in.getByte();
     myAUDF[i]    = in.getByte();
-    myAUDV[i]    = (Int16)in.getInt();
-    myVolume[i]  = (Int16)in.getInt();
+    myAUDV[i]    = (int16_t)in.getInt();
+    myVolume[i]  = (int16_t)in.getInt();
     myP4[i]      = in.getByte();
     myP5[i]      = in.getByte();
-    myP9[i]      = (uInt16)in.getInt();
+    myP9[i]      = (uint16_t)in.getInt();
     myDivNCnt[i] = in.getByte();
     myDivNMax[i] = in.getByte();
     myDiv3Cnt[i] = in.getByte();
   }
-  myOutputCounter = (Int32)in.getInt();
+  myOutputCounter = (int32_t)in.getInt();
   return true;
 }

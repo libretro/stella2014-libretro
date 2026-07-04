@@ -23,7 +23,7 @@
 #include "CartBF.hxx"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-CartridgeBF::CartridgeBF(const uInt8* image, uInt32 size, const Settings& settings)
+CartridgeBF::CartridgeBF(const uint8_t* image, uint32_t size, const Settings& settings)
   : Cartridge(settings)
 {
   // Copy the ROM image into my buffer
@@ -56,7 +56,7 @@ void CartridgeBF::install(System& system)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt8 CartridgeBF::peek(uInt16 address)
+uint8_t CartridgeBF::peek(uint16_t address)
 {
   address &= 0x0FFF;
 
@@ -68,7 +68,7 @@ uInt8 CartridgeBF::peek(uInt16 address)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeBF::poke(uInt16 address, uInt8)
+bool CartridgeBF::poke(uint16_t address, uint8_t)
 {
   address &= 0x0FFF;
 
@@ -80,27 +80,27 @@ bool CartridgeBF::poke(uInt16 address, uInt8)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeBF::bank(uInt16 bank)
+bool CartridgeBF::bank(uint16_t bank)
 {
   if(bankLocked()) return false;
 
   // Remember what bank we're in
   myCurrentBank = bank;
-  uInt32 offset = myCurrentBank << 12;
-  uInt16 shift = mySystem->pageShift();
-  uInt16 mask = mySystem->pageMask();
+  uint32_t offset = myCurrentBank << 12;
+  uint16_t shift = mySystem->pageShift();
+  uint16_t mask = mySystem->pageMask();
 
   System::PageAccess access(0, 0, 0, this, System::PA_READ);
 
   // Set the page accessing methods for the hot spots
-  for(uInt32 i = (0x1F80 & ~mask); i < 0x2000; i += (1 << shift))
+  for(uint32_t i = (0x1F80 & ~mask); i < 0x2000; i += (1 << shift))
   {
     access.codeAccessBase = &myCodeAccessBase[offset + (i & 0x0FFF)];
     mySystem->setPageAccess(i >> shift, access);
   }
 
   // Setup the page access methods for the current bank
-  for(uInt32 address = 0x1000; address < (0x1F80U & ~mask);
+  for(uint32_t address = 0x1000; address < (0x1F80U & ~mask);
       address += (1 << shift))
   {
     access.directPeekBase = &myImage[offset + (address & 0x0FFF)];
@@ -111,26 +111,26 @@ bool CartridgeBF::bank(uInt16 bank)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt16 CartridgeBF::bank() const
+uint16_t CartridgeBF::bank() const
 {
   return myCurrentBank;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt16 CartridgeBF::bankCount() const
+uint16_t CartridgeBF::bankCount() const
 {
   return 64;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeBF::patch(uInt16 address, uInt8 value)
+bool CartridgeBF::patch(uint16_t address, uint8_t value)
 {
   myImage[(myCurrentBank << 12) + (address & 0x0FFF)] = value;
   return myBankChanged = true;
 } 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const uInt8* CartridgeBF::getImage(int& size) const
+const uint8_t* CartridgeBF::getImage(int& size) const
 {
   size = 262144;
   return myImage;

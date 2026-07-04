@@ -61,7 +61,7 @@
 #include "Settings.hxx"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Cartridge* Cartridge::create(const uInt8* image, uInt32 size, string& md5,
+Cartridge* Cartridge::create(const uint8_t* image, uint32_t size, string& md5,
      string& dtype, string& id, const OSystem& osystem, Settings& settings)
 {
   Cartridge* cartridge = 0;
@@ -258,11 +258,11 @@ Cartridge* Cartridge::create(const uInt8* image, uInt32 size, string& md5,
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-string Cartridge::createFromMultiCart(const uInt8*& image, uInt32& size,
-    uInt32 numroms, string& md5, string& id, Settings& settings)
+string Cartridge::createFromMultiCart(const uint8_t*& image, uint32_t& size,
+    uint32_t numroms, string& md5, string& id, Settings& settings)
 {
   // Get a piece of the larger image
-  uInt32 i = settings.getInt("romloadcount");
+  uint32_t i = settings.getInt("romloadcount");
   size /= numroms;
   image += i*size;
 
@@ -303,7 +303,7 @@ bool Cartridge::save(ofstream& out)
 {
   int size = -1;
 
-  const uInt8* image = getImage(size);
+  const uint8_t* image = getImage(size);
   if(image == 0 || size <= 0)
     return false;
 
@@ -314,7 +314,7 @@ bool Cartridge::save(ofstream& out)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt16 Cartridge::startBank()
+uint16_t Cartridge::startBank()
 {
   return myStartBank;
 }
@@ -328,8 +328,8 @@ bool Cartridge::bankChanged()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Cartridge::registerRamArea(uInt16 start, uInt16 size,
-                                uInt16 roffset, uInt16 woffset)
+void Cartridge::registerRamArea(uint16_t start, uint16_t size,
+                                uint16_t roffset, uint16_t woffset)
 {
 #if 0
   RamArea area;
@@ -342,18 +342,18 @@ void Cartridge::registerRamArea(uInt16 start, uInt16 size,
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Cartridge::triggerReadFromWritePort(uInt16 address)
+void Cartridge::triggerReadFromWritePort(uint16_t address)
 {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Cartridge::createCodeAccessBase(uInt32 size)
+void Cartridge::createCodeAccessBase(uint32_t size)
 {
   myCodeAccessBase = NULL;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-string Cartridge::autodetectType(const uInt8* image, uInt32 size)
+string Cartridge::autodetectType(const uint8_t* image, uint32_t size)
 {
   // Guess type based on size
   const char* type = 0;
@@ -383,7 +383,7 @@ string Cartridge::autodetectType(const uInt8* image, uInt32 size)
   else if(size == 8*1024)  // 8K
   {
     // First check for *potential* F8
-    uInt8 signature[] = { 0x8D, 0xF9, 0x1F };  // STA $1FF9
+    uint8_t signature[] = { 0x8D, 0xF9, 0x1F };  // STA $1FF9
     bool f8 = searchForBytes(image, size, signature, 3, 2);
 
     if(isProbablySC(image, size))
@@ -511,15 +511,15 @@ string Cartridge::autodetectType(const uInt8* image, uInt32 size)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Cartridge::searchForBytes(const uInt8* image, uInt32 imagesize,
-                               const uInt8* signature, uInt32 sigsize,
-                               uInt32 minhits)
+bool Cartridge::searchForBytes(const uint8_t* image, uint32_t imagesize,
+                               const uint8_t* signature, uint32_t sigsize,
+                               uint32_t minhits)
 {
-  uInt32 count = 0;
-  for(uInt32 i = 0; i < imagesize - sigsize; ++i)
+  uint32_t count = 0;
+  for(uint32_t i = 0; i < imagesize - sigsize; ++i)
   {
-    uInt32 matches = 0;
-    for(uInt32 j = 0; j < sigsize; ++j)
+    uint32_t matches = 0;
+    for(uint32_t j = 0; j < sigsize; ++j)
     {
       if(image[i+j] == signature[j])
         ++matches;
@@ -539,16 +539,16 @@ bool Cartridge::searchForBytes(const uInt8* image, uInt32 imagesize,
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Cartridge::isProbablySC(const uInt8* image, uInt32 size)
+bool Cartridge::isProbablySC(const uint8_t* image, uint32_t size)
 {
   // We assume a Superchip cart contains the same bytes for its entire
   // RAM area; obviously this test will fail if it doesn't
   // The RAM area will be the first 256 bytes of each 4K bank
-  uInt32 banks = size / 4096;
-  for(uInt32 i = 0; i < banks; ++i)
+  uint32_t banks = size / 4096;
+  for(uint32_t i = 0; i < banks; ++i)
   {
-    uInt8 first = image[i*4096];
-    for(uInt32 j = 0; j < 256; ++j)
+    uint8_t first = image[i*4096];
+    for(uint32_t j = 0; j < 256; ++j)
     {
       if(image[i*4096+j] != first)
         return false;
@@ -557,13 +557,13 @@ bool Cartridge::isProbablySC(const uInt8* image, uInt32 size)
   return true;
 }
 
-bool Cartridge::isProbably4KSC(const uInt8* image, uInt32 size)
+bool Cartridge::isProbably4KSC(const uint8_t* image, uint32_t size)
 {
   // We check if the first 256 bytes are identical *and* if there's
   // an "SC" signature for one of our larger SC types at 1FFA.
 
-  uInt8 first = image[0];
-  for(uInt32 i = 1; i < 256; ++i)
+  uint8_t first = image[0];
+  for(uint32_t i = 1; i < 256; ++i)
       if(image[i] != first)
         return false;
 
@@ -575,11 +575,11 @@ bool Cartridge::isProbably4KSC(const uInt8* image, uInt32 size)
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Cartridge::isProbablyARM(const uInt8* image, uInt32 size)
+bool Cartridge::isProbablyARM(const uint8_t* image, uint32_t size)
 {
   // ARM code contains the following 'loader' patterns in the first 1K
   // Thanks to Thomas Jentzsch of AtariAge for this advice
-  uInt8 signature[2][4] = {
+  uint8_t signature[2][4] = {
     { 0xA0, 0xC1, 0x1F, 0xE0 },
     { 0x00, 0x80, 0x02, 0xE0 }
   };
@@ -590,24 +590,24 @@ bool Cartridge::isProbablyARM(const uInt8* image, uInt32 size)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Cartridge::isProbably0840(const uInt8* image, uInt32 size)
+bool Cartridge::isProbably0840(const uint8_t* image, uint32_t size)
 {
   // 0840 cart bankswitching is triggered by accessing addresses 0x0800
   // or 0x0840 at least twice
-  uInt8 signature1[3][3] = {
+  uint8_t signature1[3][3] = {
     { 0xAD, 0x00, 0x08 },  // LDA $0800
     { 0xAD, 0x40, 0x08 },  // LDA $0840
     { 0x2C, 0x00, 0x08 }   // BIT $0800
   };
-  for(uInt32 i = 0; i < 3; ++i)
+  for(uint32_t i = 0; i < 3; ++i)
     if(searchForBytes(image, size, signature1[i], 3, 2))
       return true;
 
-  uInt8 signature2[2][4] = {
+  uint8_t signature2[2][4] = {
     { 0x0C, 0x00, 0x08, 0x4C },  // NOP $0800; JMP ...
     { 0x0C, 0xFF, 0x0F, 0x4C }   // NOP $0FFF; JMP ...
   };
-  for(uInt32 i = 0; i < 2; ++i)
+  for(uint32_t i = 0; i < 2; ++i)
     if(searchForBytes(image, size, signature2[i], 4, 2))
       return true;
 
@@ -615,28 +615,28 @@ bool Cartridge::isProbably0840(const uInt8* image, uInt32 size)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Cartridge::isProbably3E(const uInt8* image, uInt32 size)
+bool Cartridge::isProbably3E(const uint8_t* image, uint32_t size)
 {
   // 3E cart bankswitching is triggered by storing the bank number
   // in address 3E using 'STA $3E', commonly followed by an
   // immediate mode LDA
-  uInt8 signature[] = { 0x85, 0x3E, 0xA9, 0x00 };  // STA $3E; LDA #$00
+  uint8_t signature[] = { 0x85, 0x3E, 0xA9, 0x00 };  // STA $3E; LDA #$00
   return searchForBytes(image, size, signature, 4, 1);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Cartridge::isProbably3F(const uInt8* image, uInt32 size)
+bool Cartridge::isProbably3F(const uint8_t* image, uint32_t size)
 {
   // 3F cart bankswitching is triggered by storing the bank number
   // in address 3F using 'STA $3F'
   // We expect it will be present at least 2 times, since there are
   // at least two banks
-  uInt8 signature[] = { 0x85, 0x3F };  // STA $3F
+  uint8_t signature[] = { 0x85, 0x3F };  // STA $3F
   return searchForBytes(image, size, signature, 2, 2);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Cartridge::isProbably4A50(const uInt8* image, uInt32 size)
+bool Cartridge::isProbably4A50(const uint8_t* image, uint32_t size)
 {
   // 4A50 carts store address $4A50 at the NMI vector, which
   // in this scheme is always in the last page of ROM at
@@ -654,17 +654,17 @@ bool Cartridge::isProbably4A50(const uInt8* image, uInt32 size)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Cartridge::isProbablyCTY(const uInt8* image, uInt32 size)
+bool Cartridge::isProbablyCTY(const uint8_t* image, uint32_t size)
 {
   return false;  // TODO - add autodetection
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Cartridge::isProbablyCV(const uInt8* image, uInt32 size)
+bool Cartridge::isProbablyCV(const uint8_t* image, uint32_t size)
 {
   // CV RAM access occurs at addresses $f3ff and $f400
   // These signatures are attributed to the MESS project
-  uInt8 signature[2][3] = {
+  uint8_t signature[2][3] = {
     { 0x9D, 0xFF, 0xF3 },  // STA $F3FF.X
     { 0x99, 0x00, 0xF4 }   // STA $F400.Y
   };
@@ -675,15 +675,15 @@ bool Cartridge::isProbablyCV(const uInt8* image, uInt32 size)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Cartridge::isProbablyDPCplus(const uInt8* image, uInt32 size)
+bool Cartridge::isProbablyDPCplus(const uint8_t* image, uint32_t size)
 {
   // DPC+ ARM code has 2 occurrences of the string DPC+
-  uInt8 signature[] = { 'D', 'P', 'C', '+' };
+  uint8_t signature[] = { 'D', 'P', 'C', '+' };
   return searchForBytes(image, size, signature, 4, 2);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Cartridge::isProbablyE0(const uInt8* image, uInt32 size)
+bool Cartridge::isProbablyE0(const uint8_t* image, uint32_t size)
 {
   // E0 cart bankswitching is triggered by accessing addresses
   // $FE0 to $FF9 using absolute non-indexed addressing
@@ -691,7 +691,7 @@ bool Cartridge::isProbablyE0(const uInt8* image, uInt32 size)
   // search for only certain known signatures
   // Thanks to "stella@casperkitty.com" for this advice
   // These signatures are attributed to the MESS project
-  uInt8 signature[8][3] = {
+  uint8_t signature[8][3] = {
    { 0x8D, 0xE0, 0x1F },  // STA $1FE0
    { 0x8D, 0xE0, 0x5F },  // STA $5FE0
    { 0x8D, 0xE9, 0xFF },  // STA $FFE9
@@ -701,7 +701,7 @@ bool Cartridge::isProbablyE0(const uInt8* image, uInt32 size)
    { 0xAD, 0xED, 0xFF },  // LDA $FFED
    { 0xAD, 0xF3, 0xBF }   // LDA $BFF3
   };
-  for(uInt32 i = 0; i < 8; ++i)
+  for(uint32_t i = 0; i < 8; ++i)
     if(searchForBytes(image, size, signature[i], 3, 1))
       return true;
 
@@ -709,7 +709,7 @@ bool Cartridge::isProbablyE0(const uInt8* image, uInt32 size)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Cartridge::isProbablyE7(const uInt8* image, uInt32 size)
+bool Cartridge::isProbablyE7(const uint8_t* image, uint32_t size)
 {
   // E7 cart bankswitching is triggered by accessing addresses
   // $FE0 to $FE6 using absolute non-indexed addressing
@@ -717,7 +717,7 @@ bool Cartridge::isProbablyE7(const uInt8* image, uInt32 size)
   // search for only certain known signatures
   // Thanks to "stella@casperkitty.com" for this advice
   // These signatures are attributed to the MESS project
-  uInt8 signature[7][3] = {
+  uint8_t signature[7][3] = {
    { 0xAD, 0xE2, 0xFF },  // LDA $FFE2
    { 0xAD, 0xE5, 0xFF },  // LDA $FFE5
    { 0xAD, 0xE5, 0x1F },  // LDA $1FE5
@@ -726,7 +726,7 @@ bool Cartridge::isProbablyE7(const uInt8* image, uInt32 size)
    { 0x8D, 0xE7, 0xFF },  // STA $FFE7
    { 0x8D, 0xE7, 0x1F }   // STA $1FE7
   };
-  for(uInt32 i = 0; i < 7; ++i)
+  for(uint32_t i = 0; i < 7; ++i)
     if(searchForBytes(image, size, signature[i], 3, 1))
       return true;
 
@@ -734,12 +734,12 @@ bool Cartridge::isProbablyE7(const uInt8* image, uInt32 size)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Cartridge::isProbablyEF(const uInt8* image, uInt32 size, const char*& type)
+bool Cartridge::isProbablyEF(const uint8_t* image, uint32_t size, const char*& type)
 {
   // Newer EF carts store strings 'EFEF' and 'EFSC' starting at address $FFF8
   // This signature is attributed to "RevEng" of AtariAge
-  uInt8 efef[] = { 'E', 'F', 'E', 'F' };
-  uInt8 efsc[] = { 'E', 'F', 'S', 'C' };
+  uint8_t efef[] = { 'E', 'F', 'E', 'F' };
+  uint8_t efsc[] = { 'E', 'F', 'S', 'C' };
   if(searchForBytes(image+size-8, 8, efef, 4, 1))
   {
     type = "EF";
@@ -755,13 +755,13 @@ bool Cartridge::isProbablyEF(const uInt8* image, uInt32 size, const char*& type)
   // 0xFE0 to 0xFEF, usually with either a NOP or LDA
   // It's likely that the code will switch to bank 0, so that's what is tested
   bool isEF = false;
-  uInt8 signature[4][3] = {
+  uint8_t signature[4][3] = {
     { 0x0C, 0xE0, 0xFF },  // NOP $FFE0
     { 0xAD, 0xE0, 0xFF },  // LDA $FFE0
     { 0x0C, 0xE0, 0x1F },  // NOP $1FE0
     { 0xAD, 0xE0, 0x1F }   // LDA $1FE0
   };
-  for(uInt32 i = 0; i < 4; ++i)
+  for(uint32_t i = 0; i < 4; ++i)
   {
     if(searchForBytes(image, size, signature[i], 3, 1))
     {
@@ -782,12 +782,12 @@ bool Cartridge::isProbablyEF(const uInt8* image, uInt32 size, const char*& type)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Cartridge::isProbablyBF(const uInt8* image, uInt32 size, const char*& type)
+bool Cartridge::isProbablyBF(const uint8_t* image, uint32_t size, const char*& type)
 {
   // BF carts store strings 'BFBF' and 'BFSC' starting at address $FFF8
   // This signature is attributed to "RevEng" of AtariAge
-  uInt8 bf[] = { 'B', 'F', 'B', 'F' };
-  uInt8 bfsc[] = { 'B', 'F', 'S', 'C' };
+  uint8_t bf[] = { 'B', 'F', 'B', 'F' };
+  uint8_t bfsc[] = { 'B', 'F', 'S', 'C' };
   if(searchForBytes(image+size-8, 8, bf, 4, 1))
   {
     type = "BF";
@@ -803,13 +803,13 @@ bool Cartridge::isProbablyBF(const uInt8* image, uInt32 size, const char*& type)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Cartridge::isProbablyDF(const uInt8* image, uInt32 size, const char*& type)
+bool Cartridge::isProbablyDF(const uint8_t* image, uint32_t size, const char*& type)
 {
 
   // BF carts store strings 'DFDF' and 'DFSC' starting at address $FFF8
   // This signature is attributed to "RevEng" of AtariAge
-  uInt8 df[] = { 'D', 'F', 'D', 'F' };
-  uInt8 dfsc[] = { 'D', 'F', 'S', 'C' };
+  uint8_t df[] = { 'D', 'F', 'D', 'F' };
+  uint8_t dfsc[] = { 'D', 'F', 'S', 'C' };
   if(searchForBytes(image+size-8, 8, df, 4, 1))
   {
     type = "DF";
@@ -826,14 +826,14 @@ bool Cartridge::isProbablyDF(const uInt8* image, uInt32 size, const char*& type)
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Cartridge::isProbablyFA2(const uInt8* image, uInt32 size)
+bool Cartridge::isProbablyFA2(const uint8_t* image, uint32_t size)
 {
   // This currently tests only the 32K version of FA2; the 24 and 28K
   // versions are easy, in that they're the only possibility with those
   // file sizes
 
   // 32K version has all zeros in 29K-32K area
-  for(uInt32 i = 29*1024; i < 32*1024; ++i)
+  for(uint32_t i = 29*1024; i < 32*1024; ++i)
     if(image[i] != 0)
       return false;
 
@@ -841,18 +841,18 @@ bool Cartridge::isProbablyFA2(const uInt8* image, uInt32 size)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Cartridge::isProbablyFE(const uInt8* image, uInt32 size)
+bool Cartridge::isProbablyFE(const uint8_t* image, uint32_t size)
 {
   // FE bankswitching is very weird, but always seems to include a
   // 'JSR $xxxx'
   // These signatures are attributed to the MESS project
-  uInt8 signature[4][5] = {
+  uint8_t signature[4][5] = {
     { 0x20, 0x00, 0xD0, 0xC6, 0xC5 },  // JSR $D000; DEC $C5
     { 0x20, 0xC3, 0xF8, 0xA5, 0x82 },  // JSR $F8C3; LDA $82
     { 0xD0, 0xFB, 0x20, 0x73, 0xFE },  // BNE $FB; JSR $FE73
     { 0x20, 0x00, 0xF0, 0x84, 0xD6 }   // JSR $F000; STY $D6
   };
-  for(uInt32 i = 0; i < 4; ++i)
+  for(uint32_t i = 0; i < 4; ++i)
     if(searchForBytes(image, size, signature[i], 5, 1))
       return true;
 
@@ -860,10 +860,10 @@ bool Cartridge::isProbablyFE(const uInt8* image, uInt32 size)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Cartridge::isProbablySB(const uInt8* image, uInt32 size)
+bool Cartridge::isProbablySB(const uint8_t* image, uint32_t size)
 {
   // SB cart bankswitching switches banks by accessing address 0x0800
-  uInt8 signature[2][3] = {
+  uint8_t signature[2][3] = {
     { 0xBD, 0x00, 0x08 },  // LDA $0800,x
     { 0xAD, 0x00, 0x08 }   // LDA $0800
   };
@@ -874,16 +874,16 @@ bool Cartridge::isProbablySB(const uInt8* image, uInt32 size)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Cartridge::isProbablyUA(const uInt8* image, uInt32 size)
+bool Cartridge::isProbablyUA(const uint8_t* image, uint32_t size)
 {
   // UA cart bankswitching switches to bank 1 by accessing address 0x240
   // using 'STA $240' or 'LDA $240'
-  uInt8 signature[3][3] = {
+  uint8_t signature[3][3] = {
     { 0x8D, 0x40, 0x02 },  // STA $240
     { 0xAD, 0x40, 0x02 },  // LDA $240
     { 0xBD, 0x1F, 0x02 }   // LDA $21F,X
   };
-  for(uInt32 i = 0; i < 3; ++i)
+  for(uint32_t i = 0; i < 3; ++i)
     if(searchForBytes(image, size, signature[i], 3, 1))
       return true;
 
@@ -891,10 +891,10 @@ bool Cartridge::isProbablyUA(const uInt8* image, uInt32 size)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Cartridge::isProbablyX07(const uInt8* image, uInt32 size)
+bool Cartridge::isProbablyX07(const uint8_t* image, uint32_t size)
 {
   // X07 bankswitching switches to bank 0, 1, 2, etc by accessing address 0x08xd
-  uInt8 signature[6][3] = {
+  uint8_t signature[6][3] = {
     { 0xAD, 0x0D, 0x08 },  // LDA $080D
     { 0xAD, 0x1D, 0x08 },  // LDA $081D
     { 0xAD, 0x2D, 0x08 },  // LDA $082D
@@ -902,7 +902,7 @@ bool Cartridge::isProbablyX07(const uInt8* image, uInt32 size)
     { 0x0C, 0x1D, 0x08 },  // NOP $081D
     { 0x0C, 0x2D, 0x08 }   // NOP $082D
   };
-  for(uInt32 i = 0; i < 6; ++i)
+  for(uint32_t i = 0; i < 6; ++i)
     if(searchForBytes(image, size, signature[i], 3, 1))
       return true;
 

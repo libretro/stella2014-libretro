@@ -49,7 +49,7 @@ class CartridgeDPC : public Cartridge
       @param size      The size of the ROM image
       @param settings  A reference to the various settings (read-only)
     */
-    CartridgeDPC(const uInt8* image, uInt32 size, const Settings& settings);
+    CartridgeDPC(const uint8_t* image, uint32_t size, const Settings& settings);
  
     /**
       Destructor
@@ -82,17 +82,17 @@ class CartridgeDPC : public Cartridge
 
       @param bank The bank that should be installed in the system
     */
-    bool bank(uInt16 bank);
+    bool bank(uint16_t bank);
 
     /**
       Get the current bank.
     */
-    uInt16 bank() const;
+    uint16_t bank() const;
 
     /**
       Query the number of banks supported by the cartridge.
     */
-    uInt16 bankCount() const;
+    uint16_t bankCount() const;
 
     /**
       Patch the cartridge ROM.
@@ -101,7 +101,7 @@ class CartridgeDPC : public Cartridge
       @param value    The value to place into the address
       @return    Success or failure of the patch operation
     */
-    bool patch(uInt16 address, uInt8 value);
+    bool patch(uint16_t address, uint8_t value);
 
     /**
       Access the internal ROM image for this cartridge.
@@ -109,7 +109,7 @@ class CartridgeDPC : public Cartridge
       @param size  Set to the size of the internal ROM image data
       @return  A pointer to the internal ROM image data
     */
-    const uInt8* getImage(int& size) const;
+    const uint8_t* getImage(int& size) const;
 
     /**
       Save the current state of this cart to the given Serializer.
@@ -140,7 +140,7 @@ class CartridgeDPC : public Cartridge
 
       @return The byte at the specified address
     */
-    uInt8 peek(uInt16 address);
+    uint8_t peek(uint16_t address);
 
     /**
       Change the byte at the specified address to the given value
@@ -149,7 +149,7 @@ class CartridgeDPC : public Cartridge
       @param value The value to be stored at the address
       @return  True if the poke changed the device address space, else false
     */
-    bool poke(uInt16 address, uInt8 value);
+    bool poke(uint16_t address, uint8_t value);
 
   private:
     /** 
@@ -165,52 +165,52 @@ class CartridgeDPC : public Cartridge
 
   private:
     // The ROM image
-    uInt8 myImage[8192 + 2048 + 256];
+    uint8_t myImage[8192 + 2048 + 256];
 
     // (Actual) Size of the ROM image
-    uInt32 mySize;
+    uint32_t mySize;
 
     // Pointer to the 8K program ROM image of the cartridge
-    uInt8* myProgramImage;
+    uint8_t* myProgramImage;
 
     // Pointer to the 2K display ROM image of the cartridge
-    uInt8* myDisplayImage;
+    uint8_t* myDisplayImage;
 
     // Indicates which bank is currently active
-    uInt16 myCurrentBank;
+    uint16_t myCurrentBank;
 
     // The top registers for the data fetchers
-    uInt8 myTops[8];
+    uint8_t myTops[8];
 
     // The bottom registers for the data fetchers
-    uInt8 myBottoms[8];
+    uint8_t myBottoms[8];
 
     // The counter registers for the data fetchers
-    uInt16 myCounters[8];
+    uint16_t myCounters[8];
 
     // The flag registers for the data fetchers
-    uInt8 myFlags[8];
+    uint8_t myFlags[8];
 
     // The music mode DF5, DF6, & DF7 enabled flags
     bool myMusicMode[3];
 
     // The random number generator register
-    uInt8 myRandomNumber;
+    uint8_t myRandomNumber;
 
     // System cycle count when the last update to music data fetchers occurred
-    Int32 mySystemCycles;
+    int32_t mySystemCycles;
 
     // Fractional DPC music OSC clocks unused during the last update,
     // as an integer remainder in units of 1/myDpcClockDen of an OSC clock
-    uInt32 myFractionalClocks;
+    uint32_t myFractionalClocks;
 
     // DPC music-oscillator clock rate as an exact integer ratio
     // (OSC clocks per CPU cycle = num/den), chosen from the TV format
-    uInt32 myDpcClockNum;
-    uInt32 myDpcClockDen;
+    uint32_t myDpcClockNum;
+    uint32_t myDpcClockDen;
 
   public:
-    void setDpcClockRate(uInt32 num, uInt32 den);
+    void setDpcClockRate(uint32_t num, uint32_t den);
 
   private:
 };

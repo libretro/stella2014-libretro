@@ -76,10 +76,10 @@ class Driving : public Controller
 
   private:
     // Counter to iterate through the gray codes
-    uInt32 myCounter;
+    uint32_t myCounter;
 
     // Index into the gray code table
-    uInt32 myGrayIndex;
+    uint32_t myGrayIndex;
 
     // Y axis value from last yaxis event that was used to generate a new
     // gray code

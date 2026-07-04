@@ -48,7 +48,7 @@ void CompuMate::enableKeyHandling(bool enable)
     myKeyTable = myEvent.getKeys();
   else
   {
-    for(uInt32 i = 0; i < KBDK_LAST; ++i)
+    for(uint32_t i = 0; i < KBDK_LAST; ++i)
       myInternalKeyTable[i] = false;
 
     myKeyTable = myInternalKeyTable;
@@ -58,7 +58,7 @@ void CompuMate::enableKeyHandling(bool enable)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void CompuMate::update()
 {
-  uInt32 cycle = mySystem.cycles();
+  uint32_t cycle = mySystem.cycles();
 
   // Only perform update once for both ports in the same cycle
   if(myCycleAtLastUpdate != cycle)

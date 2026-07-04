@@ -52,7 +52,7 @@ class CartridgeFA2 : public Cartridge
       @param size      The size of the ROM image
       @param osystem   A reference to the OSystem currently in use
     */
-    CartridgeFA2(const uInt8* image, uInt32 size, const OSystem& osystem);
+    CartridgeFA2(const uint8_t* image, uint32_t size, const OSystem& osystem);
  
     /**
       Destructor
@@ -78,17 +78,17 @@ class CartridgeFA2 : public Cartridge
 
       @param bank The bank that should be installed in the system
     */
-    bool bank(uInt16 bank);
+    bool bank(uint16_t bank);
 
     /**
       Get the current bank.
     */
-    uInt16 bank() const;
+    uint16_t bank() const;
 
     /**
       Query the number of banks supported by the cartridge.
     */
-    uInt16 bankCount() const;
+    uint16_t bankCount() const;
 
     /**
       Patch the cartridge ROM.
@@ -97,7 +97,7 @@ class CartridgeFA2 : public Cartridge
       @param value    The value to place into the address
       @return    Success or failure of the patch operation
     */
-    bool patch(uInt16 address, uInt8 value);
+    bool patch(uint16_t address, uint8_t value);
 
     /**
       Access the internal ROM image for this cartridge.
@@ -105,7 +105,7 @@ class CartridgeFA2 : public Cartridge
       @param size  Set to the size of the internal ROM image data
       @return  A pointer to the internal ROM image data
     */
-    const uInt8* getImage(int& size) const;
+    const uint8_t* getImage(int& size) const;
 
     /**
       Save the current state of this cart to the given Serializer.
@@ -144,7 +144,7 @@ class CartridgeFA2 : public Cartridge
 
       @return The byte at the specified address
     */
-    uInt8 peek(uInt16 address);
+    uint8_t peek(uint16_t address);
 
     /**
       Change the byte at the specified address to the given value
@@ -153,7 +153,7 @@ class CartridgeFA2 : public Cartridge
       @param value The value to be stored at the address
       @return  True if the poke changed the device address space, else false
     */
-    bool poke(uInt16 address, uInt8 value);
+    bool poke(uint16_t address, uint8_t value);
 
   private:
     /**
@@ -163,7 +163,7 @@ class CartridgeFA2 : public Cartridge
       @return  The value at $FF4 with bit 6 set or cleared (depending on
                whether the RAM access was busy or successful)
     */
-    uInt8 ramReadWrite();
+    uint8_t ramReadWrite();
 
     /**
       Modify Harmony flash directly (represented by a file in emulation),
@@ -172,33 +172,33 @@ class CartridgeFA2 : public Cartridge
 
       @param operation  0 for erase, 1 for read, 2 for write
     */
-    void flash(uInt8 operation);
+    void flash(uint8_t operation);
 
   private:
     // OSsytem currently in use
     const OSystem& myOSystem;
 
     // Indicates which bank is currently active
-    uInt16 myCurrentBank;
+    uint16_t myCurrentBank;
 
     // The 24K/28K ROM image of the cartridge
-    uInt8* myImage;
+    uint8_t* myImage;
 
     // The 256 bytes of RAM on the cartridge
-    uInt8 myRAM[256];
+    uint8_t myRAM[256];
 
     // The time after which the first request of a load/save operation
     // will actually be completed
     // Due to flash RAM constraints, a read/write isn't instantaneous,
     // so we need to emulate the delay as well
-    uInt64 myRamAccessTimeout;
+    uint64_t myRamAccessTimeout;
 
     // Full pathname of the file to use when emulating load/save
     // of internal RAM to Harmony cart flash
     string myFlashFile;
 
     // Size of the ROM image
-    uInt32 mySize;
+    uint32_t mySize;
 };
 
 #endif

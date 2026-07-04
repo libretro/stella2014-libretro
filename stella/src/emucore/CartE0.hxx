@@ -53,7 +53,7 @@ class CartridgeE0 : public Cartridge
       @param size      The size of the ROM image
       @param settings  A reference to the various settings (read-only)
     */
-    CartridgeE0(const uInt8* image, uInt32 size, const Settings& settings);
+    CartridgeE0(const uint8_t* image, uint32_t size, const Settings& settings);
  
     /**
       Destructor
@@ -79,17 +79,17 @@ class CartridgeE0 : public Cartridge
 
       @param bank The bank that should be installed in the system
     */
-    bool bank(uInt16 bank);
+    bool bank(uint16_t bank);
 
     /**
       Get the current bank.
     */
-    uInt16 bank() const;
+    uint16_t bank() const;
 
     /**
       Query the number of banks supported by the cartridge.
     */
-    uInt16 bankCount() const;
+    uint16_t bankCount() const;
 
     /**
       Patch the cartridge ROM.
@@ -98,7 +98,7 @@ class CartridgeE0 : public Cartridge
       @param value    The value to place into the address
       @return    Success or failure of the patch operation
     */
-    bool patch(uInt16 address, uInt8 value);
+    bool patch(uint16_t address, uint8_t value);
 
     /**
       Access the internal ROM image for this cartridge.
@@ -106,7 +106,7 @@ class CartridgeE0 : public Cartridge
       @param size  Set to the size of the internal ROM image data
       @return  A pointer to the internal ROM image data
     */
-    const uInt8* getImage(int& size) const;
+    const uint8_t* getImage(int& size) const;
 
     /**
       Save the current state of this cart to the given Serializer.
@@ -137,7 +137,7 @@ class CartridgeE0 : public Cartridge
 
       @return The byte at the specified address
     */
-    uInt8 peek(uInt16 address);
+    uint8_t peek(uint16_t address);
 
     /**
       Change the byte at the specified address to the given value
@@ -146,7 +146,7 @@ class CartridgeE0 : public Cartridge
       @param value The value to be stored at the address
       @return  True if the poke changed the device address space, else false
     */
-    bool poke(uInt16 address, uInt8 value);
+    bool poke(uint16_t address, uint8_t value);
 
   private:
     /**
@@ -154,28 +154,28 @@ class CartridgeE0 : public Cartridge
 
       @param slice The slice to map into the segment
     */
-    void segmentZero(uInt16 slice);
+    void segmentZero(uint16_t slice);
 
     /**
       Install the specified slice for segment one
 
       @param slice The slice to map into the segment
     */
-    void segmentOne(uInt16 slice);
+    void segmentOne(uint16_t slice);
 
     /**
       Install the specified slice for segment two
 
       @param slice The slice to map into the segment
     */
-    void segmentTwo(uInt16 slice);
+    void segmentTwo(uint16_t slice);
 
   private:
     // Indicates the slice mapped into each of the four segments
-    uInt16 myCurrentSlice[4];
+    uint16_t myCurrentSlice[4];
 
     // The 8K ROM image of the cartridge
-    uInt8 myImage[8192];
+    uint8_t myImage[8192];
 };
 
 #endif

@@ -30,7 +30,7 @@
   @param length The length of the message
   @return The message-digest
 */
-string MD5(const uInt8* buffer, uInt32 length);
+string MD5(const uint8_t* buffer, uint32_t length);
 
 
 #endif

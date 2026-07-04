@@ -138,7 +138,7 @@ void MT24LC256::systemCyclesReset()
 {
   // System cycles are being reset to zero so we need to adjust
   // the cycle counts we remembered
-  uInt32 cycles = mySystem.cycles();
+  uint32_t cycles = mySystem.cycles();
   myCyclesWhenSDASet -= cycles;
   myCyclesWhenSCLSet -= cycles;
   myCyclesWhenTimerSet -= cycles;
@@ -349,8 +349,8 @@ bool MT24LC256::jpee_timercheck(int mode)
   {
     if(myTimerActive)
     {
-      uInt32 elapsed = mySystem.cycles() - myCyclesWhenTimerSet;
-      myTimerActive = elapsed < (uInt32)(5000000.0 / 838.0);
+      uint32_t elapsed = mySystem.cycles() - myCyclesWhenTimerSet;
+      myTimerActive = elapsed < (uint32_t)(5000000.0 / 838.0);
     }
     return myTimerActive;
   }

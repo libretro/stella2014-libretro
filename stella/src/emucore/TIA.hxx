@@ -128,7 +128,7 @@ class TIA : public Device
 
       @return The byte at the specified address
     */
-    uInt8 peek(uInt16 address);
+    uint8_t peek(uint16_t address);
 
     /**
       Change the byte at the specified address to the given value
@@ -138,7 +138,7 @@ class TIA : public Device
 
       @return  True if the poke changed the device address space, else false
     */
-    bool poke(uInt16 address, uInt8 value);
+    bool poke(uint16_t address, uint8_t value);
 
     /**
       This method should be called at an interval corresponding to the 
@@ -152,7 +152,7 @@ class TIA : public Device
 
       @return Pointer to the current frame buffer
     */
-    uInt8* currentFrameBuffer() const
+    uint8_t* currentFrameBuffer() const
       { return myCurrentFrameBuffer + myFramePointerOffset; }
 
     /**
@@ -160,23 +160,23 @@ class TIA : public Device
 
       @return Pointer to the previous frame buffer
     */
-    uInt8* previousFrameBuffer() const
+    uint8_t* previousFrameBuffer() const
       { return myPreviousFrameBuffer + myFramePointerOffset; }
 
     /**
       Answers the width and height of the frame buffer
     */
-    inline uInt32 width() const  { return 160;           }
-    inline uInt32 height() const { return myFrameHeight; }
-    inline uInt32 ystart() const { return myFrameYStart; }
+    inline uint32_t width() const  { return 160;           }
+    inline uint32_t height() const { return myFrameHeight; }
+    inline uint32_t ystart() const { return myFrameYStart; }
 
     /**
       Changes the current Height/YStart properties.
       Note that calls to these method(s) must be eventually followed by
       ::frameReset() for the changes to take effect.
     */
-    void setHeight(uInt32 height) { myFrameHeight = height; }
-    void setYStart(uInt32 ystart) { myFrameYStart = ystart; }
+    void setHeight(uint32_t height) { myFrameHeight = height; }
+    void setYStart(uint32_t ystart) { myFrameYStart = ystart; }
 
     /**
       Enables/disables auto-frame calculation.  If enabled, the TIA
@@ -198,12 +198,12 @@ class TIA : public Device
       based on how many frames of out the total count are PAL frames.
     */
     bool isPAL()
-      { return (uInt64)myPALFrameCounter * 12 >= (uInt64)myFrameCounter * 5; }
+      { return (uint64_t)myPALFrameCounter * 12 >= (uint64_t)myFrameCounter * 5; }
 
-    uInt64 getMilliSeconds() const {
+    uint64_t getMilliSeconds() const {
         // NTSC frames at 60 fps last 1000/60 = 50/3 ms; PAL at 50 fps, 20 ms
-        uInt64 ntscFrames = myFrameCounter - myPALFrameCounter;
-        return (ntscFrames * 50) / 3 + (uInt64)myPALFrameCounter * 20;
+        uint64_t ntscFrames = myFrameCounter - myPALFrameCounter;
+        return (ntscFrames * 50) / 3 + (uint64_t)myPALFrameCounter * 20;
     }
 
     /**
@@ -211,7 +211,7 @@ class TIA : public Device
 
       @return The current color clock
     */
-    uInt32 clocksThisLine() const
+    uint32_t clocksThisLine() const
       { return ((mySystem->cycles() * 3) - myClockWhenFrameStarted) % 228; }
 
     /**
@@ -219,7 +219,7 @@ class TIA : public Device
 
       @return The starting scanline
     */
-    uInt32 startLine() const
+    uint32_t startLine() const
       { return myStartScanline; }
 
     /**
@@ -229,7 +229,7 @@ class TIA : public Device
 
       @return The total number of scanlines generated
     */
-    uInt32 scanlines() const
+    uint32_t scanlines() const
       { return ((mySystem->cycles() * 3) - myClockWhenFrameStarted) / 228; }
 
     /**
@@ -245,7 +245,7 @@ class TIA : public Device
 
       @return The starting scanline
     */
-    uInt32 startScanline() const { return myStartScanline; }
+    uint32_t startScanline() const { return myStartScanline; }
 
     /**
       Answers the current position of the virtual 'electron beam' used to
@@ -257,7 +257,7 @@ class TIA : public Device
       @return The x/y coordinates of the scanline electron beam, and whether
               it is in the visible/viewable area of the screen
     */
-    bool scanlinePos(uInt16& x, uInt16& y) const;
+    bool scanlinePos(uint16_t& x, uint16_t& y) const;
 
     /**
       Enables/disable/toggle the specified (or all) TIA bit(s).  Note that
@@ -268,7 +268,7 @@ class TIA : public Device
 
       @return  Whether the bit was enabled or disabled
     */
-    bool toggleBit(TIABit b, uInt8 mode = 2);
+    bool toggleBit(TIABit b, uint8_t mode = 2);
     bool toggleBits();
 
     /**
@@ -279,7 +279,7 @@ class TIA : public Device
 
       @return  Whether the collision was enabled or disabled
     */
-    bool toggleCollision(TIABit b, uInt8 mode = 2);
+    bool toggleCollision(TIABit b, uint8_t mode = 2);
     bool toggleCollisions();
 
     /**
@@ -297,7 +297,7 @@ class TIA : public Device
 
       @return  Whether the mode was enabled or disabled
     */
-    bool toggleFixedColors(uInt8 mode = 2);
+    bool toggleFixedColors(uint8_t mode = 2);
 
     /**
       Enable/disable/query state of 'undriven/floating TIA pins'.
@@ -306,7 +306,7 @@ class TIA : public Device
 
       @return  Whether the mode was enabled or disabled
     */
-    bool driveUnusedPinsRandom(uInt8 mode = 2);
+    bool driveUnusedPinsRandom(uint8_t mode = 2);
 
   private:
     /**
@@ -325,7 +325,7 @@ class TIA : public Device
     void enableCollisions(bool mode);
 
     // Update the current frame buffer to the specified color clock
-    void updateFrame(Int32 clock);
+    void updateFrame(int32_t clock);
 
     // Waste cycles until the current scanline is finished
     void waitHorizontalSync();
@@ -343,20 +343,20 @@ class TIA : public Device
     void endFrame();
 
     // Convert resistance from ports to dumped value
-    uInt8 dumpedInputPort(int resistance);
+    uint8_t dumpedInputPort(int resistance);
 
     // Write the specified value to the HMOVE registers at the given clock
-    void pokeHMP0(uInt8 value, Int32 clock);
-    void pokeHMP1(uInt8 value, Int32 clock);
-    void pokeHMM0(uInt8 value, Int32 clock);
-    void pokeHMM1(uInt8 value, Int32 clock);
-    void pokeHMBL(uInt8 value, Int32 clock);
+    void pokeHMP0(uint8_t value, int32_t clock);
+    void pokeHMP1(uint8_t value, int32_t clock);
+    void pokeHMM0(uint8_t value, int32_t clock);
+    void pokeHMM1(uint8_t value, int32_t clock);
+    void pokeHMBL(uint8_t value, int32_t clock);
 
     // Apply motion to registers when HMOVE is currently active
-    void applyActiveHMOVEMotion(int hpos, Int16& pos, Int32 motionClock);
+    void applyActiveHMOVEMotion(int hpos, int16_t& pos, int32_t motionClock);
 
     // Apply motion to registers when HMOVE was previously active
-    void applyPreviousHMOVEMotion(int hpos, Int16& pos, uInt8 motion);
+    void applyPreviousHMOVEMotion(int hpos, int16_t& pos, uint8_t motion);
 
   private:
     // Console the TIA is associated with
@@ -369,85 +369,85 @@ class TIA : public Device
     Settings& mySettings;
 
     // Pointer to the current frame buffer
-    uInt8* myCurrentFrameBuffer;
+    uint8_t* myCurrentFrameBuffer;
 
     // Pointer to the previous frame buffer
-    uInt8* myPreviousFrameBuffer;
+    uint8_t* myPreviousFrameBuffer;
 
     // Pointer to the next pixel that will be drawn in the current frame buffer
-    uInt8* myFramePointer;
+    uint8_t* myFramePointer;
 
     // Indicates offset used by the exported frame buffer
     // (the exported frame buffer is a vertical 'sliding window' of the actual buffer)
-    uInt32 myFramePointerOffset;
+    uint32_t myFramePointerOffset;
 
     // Indicates the number of 'colour clocks' offset from the base
     // frame buffer pointer
     // (this is used when loading state files with a 'partial' frame)
-    uInt32 myFramePointerClocks;
+    uint32_t myFramePointerClocks;
 
     // Indicated what scanline the frame should start being drawn at
-    uInt32 myFrameYStart;
+    uint32_t myFrameYStart;
 
     // Indicates the height of the frame in scanlines
-    uInt32 myFrameHeight;
+    uint32_t myFrameHeight;
 
     // Indicates offset in color clocks when display should stop
-    uInt32 myStopDisplayOffset;
+    uint32_t myStopDisplayOffset;
 
     // Indicates color clocks when the current frame began
-    Int32 myClockWhenFrameStarted;
+    int32_t myClockWhenFrameStarted;
 
     // Indicates color clocks when frame should begin to be drawn
-    Int32 myClockStartDisplay;
+    int32_t myClockStartDisplay;
 
     // Indicates color clocks when frame should stop being drawn
-    Int32 myClockStopDisplay;
+    int32_t myClockStopDisplay;
 
     // Indicates color clocks when the frame was last updated
-    Int32 myClockAtLastUpdate;
+    int32_t myClockAtLastUpdate;
 
     // Indicates how many color clocks remain until the end of 
     // current scanline.  This value is valid during the 
     // displayed portion of the frame.
-    Int32 myClocksToEndOfScanLine;
+    int32_t myClocksToEndOfScanLine;
 
     // Indicates the total number of scanlines generated by the last frame
-    uInt32 myScanlineCountForLastFrame;
+    uint32_t myScanlineCountForLastFrame;
 
     // Indicates the maximum number of scanlines to be generated for a frame
-    uInt32 myMaximumNumberOfScanlines;
+    uint32_t myMaximumNumberOfScanlines;
 
     // Indicates potentially the first scanline at which drawing occurs
-    uInt32 myStartScanline;
+    uint32_t myStartScanline;
 
     // Color clock when VSYNC ending causes a new frame to be started
-    Int32 myVSYNCFinishClock; 
+    int32_t myVSYNCFinishClock; 
 
-    uInt8 myVSYNC;        // Holds the VSYNC register value
-    uInt8 myVBLANK;       // Holds the VBLANK register value
+    uint8_t myVSYNC;        // Holds the VSYNC register value
+    uint8_t myVBLANK;       // Holds the VBLANK register value
 
-    uInt8 myNUSIZ0;       // Number and size of player 0 and missle 0
-    uInt8 myNUSIZ1;       // Number and size of player 1 and missle 1
+    uint8_t myNUSIZ0;       // Number and size of player 0 and missle 0
+    uint8_t myNUSIZ1;       // Number and size of player 1 and missle 1
 
-    uInt8 myPlayfieldPriorityAndScore;
-    uInt8 myPriorityEncoder[2][256];
-    uInt8 myColor[8];
-    uInt8 myFixedColor[8];
-    uInt8* myColorPtr;
+    uint8_t myPlayfieldPriorityAndScore;
+    uint8_t myPriorityEncoder[2][256];
+    uint8_t myColor[8];
+    uint8_t myFixedColor[8];
+    uint8_t* myColorPtr;
 
-    uInt8 myCTRLPF;       // Playfield control register
+    uint8_t myCTRLPF;       // Playfield control register
 
     bool myREFP0;         // Indicates if player 0 is being reflected
     bool myREFP1;         // Indicates if player 1 is being reflected
 
-    uInt32 myPF;          // Playfield graphics (19-12:PF2 11-4:PF1 3-0:PF0)
+    uint32_t myPF;          // Playfield graphics (19-12:PF2 11-4:PF1 3-0:PF0)
 
-    uInt8 myGRP0;         // Player 0 graphics register
-    uInt8 myGRP1;         // Player 1 graphics register
+    uint8_t myGRP0;         // Player 0 graphics register
+    uint8_t myGRP1;         // Player 1 graphics register
     
-    uInt8 myDGRP0;        // Player 0 delayed graphics register
-    uInt8 myDGRP1;        // Player 1 delayed graphics register
+    uint8_t myDGRP0;        // Player 0 delayed graphics register
+    uint8_t myDGRP1;        // Player 1 delayed graphics register
 
     bool myENAM0;         // Indicates if missle 0 is enabled
     bool myENAM1;         // Indicates if missle 1 is enabled
@@ -455,11 +455,11 @@ class TIA : public Device
     bool myENABL;         // Indicates if the ball is enabled
     bool myDENABL;        // Indicates if the vertically delayed ball is enabled
 
-    uInt8 myHMP0;         // Player 0 horizontal motion register
-    uInt8 myHMP1;         // Player 1 horizontal motion register
-    uInt8 myHMM0;         // Missle 0 horizontal motion register
-    uInt8 myHMM1;         // Missle 1 horizontal motion register
-    uInt8 myHMBL;         // Ball horizontal motion register
+    uint8_t myHMP0;         // Player 0 horizontal motion register
+    uint8_t myHMP1;         // Player 1 horizontal motion register
+    uint8_t myHMM0;         // Missle 0 horizontal motion register
+    uint8_t myHMM1;         // Missle 1 horizontal motion register
+    uint8_t myHMBL;         // Ball horizontal motion register
 
     bool myVDELP0;        // Indicates if player 0 is being vertically delayed
     bool myVDELP1;        // Indicates if player 1 is being vertically delayed
@@ -468,7 +468,7 @@ class TIA : public Device
     bool myRESMP0;        // Indicates if missle 0 is reset to player 0
     bool myRESMP1;        // Indicates if missle 1 is reset to player 1
 
-    uInt16 myCollision;     // Collision register
+    uint16_t myCollision;     // Collision register
 
     // Determines whether specified collisions are enabled or disabled
     // The lower 16 bits are and'ed with the collision register to mask out
@@ -477,35 +477,35 @@ class TIA : public Device
     // enabled or disabled
     // This is necessary since there are 15 collision combinations which
     // are controlled by 6 objects
-    uInt32 myCollisionEnabledMask;
+    uint32_t myCollisionEnabledMask;
 
     // Note that these position registers contain the color clock 
     // on which the object's serial output should begin (0 to 159)
-    Int16 myPOSP0;        // Player 0 position register
-    Int16 myPOSP1;        // Player 1 position register
-    Int16 myPOSM0;        // Missle 0 position register
-    Int16 myPOSM1;        // Missle 1 position register
-    Int16 myPOSBL;        // Ball position register
+    int16_t myPOSP0;        // Player 0 position register
+    int16_t myPOSP1;        // Player 1 position register
+    int16_t myPOSM0;        // Missle 0 position register
+    int16_t myPOSM1;        // Missle 1 position register
+    int16_t myPOSBL;        // Ball position register
 
     // The color clocks elapsed so far for each of the graphical objects,
     // as denoted by 'MOTCK' line described in A. Towers TIA Hardware Notes
-    Int32 myMotionClockP0;
-    Int32 myMotionClockP1;
-    Int32 myMotionClockM0;
-    Int32 myMotionClockM1;
-    Int32 myMotionClockBL;
+    int32_t myMotionClockP0;
+    int32_t myMotionClockP1;
+    int32_t myMotionClockM0;
+    int32_t myMotionClockM1;
+    int32_t myMotionClockBL;
 
     // Indicates 'start' signal for each of the graphical objects as
     // described in A. Towers TIA Hardware Notes
-    Int32 myStartP0;
-    Int32 myStartP1;
-    Int32 myStartM0;
-    Int32 myStartM1;
+    int32_t myStartP0;
+    int32_t myStartP1;
+    int32_t myStartM0;
+    int32_t myStartM1;
 
     // Index into the player mask arrays indicating whether display
     // of the first copy should be suppressed
-    uInt8 mySuppressP0;
-    uInt8 mySuppressP1;
+    uint8_t mySuppressP0;
+    uint8_t mySuppressP1;
 
     // Latches for 'more motion required' as described in A. Towers TIA
     // Hardware Notes
@@ -517,38 +517,38 @@ class TIA : public Device
 
     // Graphics for Player 0 that should be displayed.  This will be
     // reflected if the player is being reflected.
-    uInt8 myCurrentGRP0;
+    uint8_t myCurrentGRP0;
 
     // Graphics for Player 1 that should be displayed.  This will be
     // reflected if the player is being reflected.
-    uInt8 myCurrentGRP1;
+    uint8_t myCurrentGRP1;
 
     // It's VERY important that the BL, M0, M1, P0 and P1 current
-    // mask pointers are always on a uInt32 boundary.  Otherwise,
+    // mask pointers are always on a uint32_t boundary.  Otherwise,
     // the TIA code will fail on a good number of CPUs.
-    const uInt8* myP0Mask;
-    const uInt8* myM0Mask;
-    const uInt8* myM1Mask;
-    const uInt8* myP1Mask;
-    const uInt8* myBLMask;
-    const uInt32* myPFMask;
+    const uint8_t* myP0Mask;
+    const uint8_t* myM0Mask;
+    const uint8_t* myM1Mask;
+    const uint8_t* myP1Mask;
+    const uint8_t* myBLMask;
+    const uint32_t* myPFMask;
 
     // Audio values; only used by TIADebug
-    uInt8 myAUDV0, myAUDV1, myAUDC0, myAUDC1, myAUDF0, myAUDF1;
+    uint8_t myAUDV0, myAUDV1, myAUDC0, myAUDC1, myAUDF0, myAUDF1;
 
     // Indicates when the dump for paddles was last set
-    Int32 myDumpDisabledCycle;
+    int32_t myDumpDisabledCycle;
 
     // Indicates if the dump is current enabled for the paddles
     bool myDumpEnabled;
 
     // Latches for INPT4 and INPT5
-    uInt8 myINPT4, myINPT5;
+    uint8_t myINPT4, myINPT5;
 
     // Indicates if HMOVE blanks are currently or previously enabled,
     // and at which horizontal position the HMOVE was initiated
-    Int32 myCurrentHMOVEPos;
-    Int32 myPreviousHMOVEPos;
+    int32_t myCurrentHMOVEPos;
+    int32_t myPreviousHMOVEPos;
     bool myHMOVEBlankEnabled;
     bool myAllowHMOVEBlanks;
 
@@ -557,12 +557,12 @@ class TIA : public Device
     bool myTIAPinsDriven;
 
     // Bitmap of the objects that should be considered while drawing
-    uInt8 myEnabledObjects;
+    uint8_t myEnabledObjects;
 
     // Determines whether specified bits (from TIABit) are enabled or disabled
     // This is and'ed with the enabled objects each scanline to mask out any
     // objects we don't want to be processed
-    uInt8 myDisabledObjects;
+    uint8_t myDisabledObjects;
 
     // Indicates if color loss should be enabled or disabled.  Color loss
     // occurs on PAL (and maybe SECAM) systems when the previous frame
@@ -577,10 +577,10 @@ class TIA : public Device
     bool myAutoFrameEnabled;
 
     // Number of total frames displayed by this TIA
-    uInt32 myFrameCounter;
+    uint32_t myFrameCounter;
 
     // Number of PAL frames displayed by this TIA
-    uInt32 myPALFrameCounter;
+    uint32_t myPALFrameCounter;
 
     // The framerate currently in use by the Console
 

@@ -190,7 +190,7 @@ string Properties::readQuotedString(istream& in)
 void Properties::writeQuotedString(ostream& out, const string& s)
 {
   out.put('"');
-  for(uInt32 i = 0; i < s.length(); ++i)
+  for(uint32_t i = 0; i < s.length(); ++i)
   {
     if(s[i] == '\\')
     {

@@ -36,7 +36,7 @@ void TIATables::computeAllTables()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void TIATables::buildCollisionMaskTable()
 {
-  for(uInt8 i = 0; i < 64; ++i)
+  for(uint8_t i = 0; i < 64; ++i)
   { 
     CollisionMask[i] = 0;
 
@@ -93,7 +93,7 @@ void TIATables::buildCollisionMaskTable()
 // suppress=0: suppress off
 void TIATables::buildPxMaskTable()
 {
-  Int32 x, suppress, nusiz;
+  int32_t x, suppress, nusiz;
 
   // Set the player mask table to all zeros
   for(nusiz = 0; nusiz < 8; ++nusiz)
@@ -189,7 +189,7 @@ void TIATables::buildPxMaskTable()
 // [number:8][size:5][pixel:320]
 void TIATables::buildMxMaskTable()
 {
-  Int32 x, size, number;
+  int32_t x, size, number;
 
   // Clear the missle table to start with
   for(number = 0; number < 8; ++number)
@@ -337,9 +337,9 @@ void TIATables::buildMxMaskTable()
 // [size:4][pixel:320]
 void TIATables::buildBLMaskTable()
 {
-  for(Int32 size = 0; size < 4; ++size)
+  for(int32_t size = 0; size < 4; ++size)
   {
-    Int32 x;
+    int32_t x;
 
     // Set all of the masks to false to start with
     for(x = 0; x < 160; ++x)
@@ -362,7 +362,7 @@ void TIATables::buildBLMaskTable()
 // reflect=0: reflection off
 void TIATables::buildPFMaskTable()
 {
-  Int32 x;
+  int32_t x;
 
   // Compute playfield mask table for non-reflected mode
   for(x = 0; x < 160; ++x)
@@ -402,11 +402,11 @@ void TIATables::buildPFMaskTable()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void TIATables::buildGRPReflectTable()
 {
-  for(uInt16 i = 0; i < 256; ++i)
+  for(uint16_t i = 0; i < 256; ++i)
   {
-    uInt8 r = 0;
+    uint8_t r = 0;
 
-    for(uInt16 t = 1; t <= 128; t <<= 1)
+    for(uint16_t t = 1; t <= 128; t <<= 1)
       r = (r << 1) | ((i & t) ? 0x01 : 0x00);
 
     GRPReflect[i] = r;
@@ -417,7 +417,7 @@ void TIATables::buildGRPReflectTable()
 // [nusiz:8][old pixel:160][new pixel:160]
 void TIATables::buildPxPosResetWhenTable()
 {
-  uInt32 nusiz, oldx, newx;
+  uint32_t nusiz, oldx, newx;
 
   // Loop through all player nusizs, all old player positions, and all new
   // player positions and determine where the new position is located:
@@ -541,7 +541,7 @@ void TIATables::buildPxPosResetWhenTable()
       }
 
       // Let's do a sanity check on table entries
-      uInt32 s1 = 0, s2 = 0;
+      uint32_t s1 = 0, s2 = 0;
       for(newx = 0; newx < 160; ++newx)
       {
         if(PxPosResetWhen[nusiz][oldx][newx] == -1)
@@ -554,7 +554,7 @@ void TIATables::buildPxPosResetWhenTable()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const Int16 TIATables::PokeDelay[64] = {
+const int16_t TIATables::PokeDelay[64] = {
   0,  // VSYNC
   1,  // VBLANK (0) / 1
   0,  // WSYNC
@@ -618,7 +618,7 @@ const bool TIATables::HMOVEBlankEnableCycles[76] = {
 
 #if 0
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const Int32 TIATables::CompleteMotion[76][16] = {
+const int32_t TIATables::CompleteMotion[76][16] = {
   { 0, -1, -2, -3, -4, -5, -6, -7,  8,  7,  6,  5,  4,  3,  2,  1}, // HBLANK
   { 0, -1, -2, -3, -4, -5, -6, -7,  8,  7,  6,  5,  4,  3,  2,  1}, // HBLANK
   { 0, -1, -2, -3, -4, -5, -6, -7,  8,  7,  6,  5,  4,  3,  2,  1}, // HBLANK
@@ -699,25 +699,25 @@ const Int32 TIATables::CompleteMotion[76][16] = {
 #endif
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt8 TIATables::PxMask[2][8][320];
+uint8_t TIATables::PxMask[2][8][320];
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt8 TIATables::MxMask[8][5][320];
+uint8_t TIATables::MxMask[8][5][320];
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt8 TIATables::BLMask[4][320];
+uint8_t TIATables::BLMask[4][320];
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt32 TIATables::PFMask[2][160];
+uint32_t TIATables::PFMask[2][160];
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt8 TIATables::GRPReflect[256];
+uint8_t TIATables::GRPReflect[256];
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt16 TIATables::CollisionMask[64];
+uint16_t TIATables::CollisionMask[64];
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt8 TIATables::DisabledMask[640];
+uint8_t TIATables::DisabledMask[640];
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Int8 TIATables::PxPosResetWhen[8][160][160];
+int8_t TIATables::PxPosResetWhen[8][160][160];

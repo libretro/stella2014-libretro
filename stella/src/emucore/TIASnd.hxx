@@ -40,7 +40,7 @@ class TIASound
     /**
       Create a new TIA Sound object using the specified output frequency
     */
-    TIASound(Int32 outputFrequency = 31400);
+    TIASound(int32_t outputFrequency = 31400);
 
     /**
       Destructor
@@ -56,7 +56,7 @@ class TIASound
     /**
       Set the frequency output samples should be generated at
     */
-    void outputFrequency(Int32 freq);
+    void outputFrequency(int32_t freq);
 
     /**
       Selects the number of audio channels per sample.  There are two factors
@@ -66,7 +66,7 @@ class TIASound
       @param stereo    Whether to output the internal sound signals into 1
                        or 2 channels
     */
-    void channels(uInt32 hardware, bool stereo);
+    void channels(uint32_t hardware, bool stereo);
 
   public:
     /**
@@ -75,14 +75,14 @@ class TIASound
       @param address Register address
       @param value Value to store in the register
     */
-    void set(uInt16 address, uInt8 value);
+    void set(uint16_t address, uint8_t value);
 
     /**
       Gets the specified sound register's value
 
       @param address Register address
     */
-    uInt8 get(uInt16 address) const;
+    uint8_t get(uint16_t address) const;
 
     /**
       Create sound samples based on the current sound register settings
@@ -92,15 +92,15 @@ class TIASound
       @param buffer The location to store generated samples
       @param samples The number of samples to generate
     */
-    void process(Int16* buffer, uInt32 samples);
+    void process(int16_t* buffer, uint32_t samples);
 
     /**
       Set the volume of the samples created (0-100)
     */
-    void volume(uInt32 percent);
+    void volume(uint32_t percent);
 
   private:
-    void polyInit(uInt8* poly, int size, int f0, int f1);
+    void polyInit(uint8_t* poly, int size, int f0, int f1);
 
   public:
     /**
@@ -153,24 +153,24 @@ class TIASound
 
   private:
     // Structures to hold the 6 tia sound control bytes
-    uInt8 myAUDC[2];    // AUDCx (15, 16)
-    uInt8 myAUDF[2];    // AUDFx (17, 18)
-    Int16 myAUDV[2];    // AUDVx (19, 1A)
+    uint8_t myAUDC[2];    // AUDCx (15, 16)
+    uint8_t myAUDF[2];    // AUDFx (17, 18)
+    int16_t myAUDV[2];    // AUDVx (19, 1A)
 
-    Int16 myVolume[2];  // Last output volume for each channel
+    int16_t myVolume[2];  // Last output volume for each channel
 
-    uInt8 myP4[2];      // Position pointer for the 4-bit POLY array
-    uInt8 myP5[2];      // Position pointer for the 5-bit POLY array
-    uInt16 myP9[2];     // Position pointer for the 9-bit POLY array
+    uint8_t myP4[2];      // Position pointer for the 4-bit POLY array
+    uint8_t myP5[2];      // Position pointer for the 5-bit POLY array
+    uint16_t myP9[2];     // Position pointer for the 9-bit POLY array
 
-    uInt8 myDivNCnt[2]; // Divide by n counter. one for each channel
-    uInt8 myDivNMax[2]; // Divide by n maximum, one for each channel
-    uInt8 myDiv3Cnt[2]; // Div 3 counter, used for POLY5_DIV3 mode
+    uint8_t myDivNCnt[2]; // Divide by n counter. one for each channel
+    uint8_t myDivNMax[2]; // Divide by n maximum, one for each channel
+    uint8_t myDiv3Cnt[2]; // Div 3 counter, used for POLY5_DIV3 mode
 
     ChannelMode myChannelMode;
-    Int32  myOutputFrequency;
-    Int32  myOutputCounter;
-    uInt32 myVolumePercentage;
+    int32_t  myOutputFrequency;
+    int32_t  myOutputCounter;
+    uint32_t myVolumePercentage;
 
     /*
       Initialize the bit patterns for the polynomials (at runtime).
@@ -180,9 +180,9 @@ class TIASound
       single bit per byte keeps the math simple, which is important for
       efficient processing.
     */
-    uInt8 Bit4[POLY4_SIZE];
-    uInt8 Bit5[POLY5_SIZE];
-    uInt8 Bit9[POLY9_SIZE];
+    uint8_t Bit4[POLY4_SIZE];
+    uint8_t Bit5[POLY5_SIZE];
+    uint8_t Bit9[POLY9_SIZE];
 
     /*
       The 'Div by 31' counter is treated as another polynomial because of
@@ -190,7 +190,7 @@ class TIASound
       has a 13:18 ratio (of course, 13+18 = 31).  This could also be
       implemented by using counters.
     */
-    static const uInt8 Div31[POLY5_SIZE];
+    static const uint8_t Div31[POLY5_SIZE];
 };
 
 #endif

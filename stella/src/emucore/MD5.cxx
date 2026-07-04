@@ -47,8 +47,8 @@
 
 // Setup the types used by the MD5 routines
 typedef unsigned char* POINTER;
-typedef uInt16 UINT2;
-typedef uInt32 UINT4;
+typedef uint16_t UINT2;
+typedef uint32_t UINT4;
 
 // MD5 context.
 typedef struct 
@@ -326,7 +326,7 @@ static void MD5_memset(POINTER output, int value, unsigned int len)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-string MD5(const uInt8* buffer, uInt32 length)
+string MD5(const uint8_t* buffer, uint32_t length)
 {
   char hex[] = "0123456789abcdef";
   MD5_CTX context;

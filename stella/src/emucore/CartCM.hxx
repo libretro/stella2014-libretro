@@ -115,7 +115,7 @@ class CartridgeCM : public Cartridge
       @param size      The size of the ROM image
       @param settings  A reference to the various settings (read-only)
     */
-    CartridgeCM(const uInt8* image, uInt32 size, const Settings& settings);
+    CartridgeCM(const uint8_t* image, uint32_t size, const Settings& settings);
  
     /**
       Destructor
@@ -141,17 +141,17 @@ class CartridgeCM : public Cartridge
 
       @param bank The bank that should be installed in the system
     */
-    bool bank(uInt16 bank);
+    bool bank(uint16_t bank);
 
     /**
       Get the current bank.
     */
-    uInt16 bank() const;
+    uint16_t bank() const;
 
     /**
       Query the number of banks supported by the cartridge.
     */
-    uInt16 bankCount() const;
+    uint16_t bankCount() const;
 
     /**
       Patch the cartridge ROM.
@@ -160,7 +160,7 @@ class CartridgeCM : public Cartridge
       @param value    The value to place into the address
       @return    Success or failure of the patch operation
     */
-    bool patch(uInt16 address, uInt8 value);
+    bool patch(uint16_t address, uint8_t value);
 
     /**
       Access the internal ROM image for this cartridge.
@@ -168,7 +168,7 @@ class CartridgeCM : public Cartridge
       @param size  Set to the size of the internal ROM image data
       @return  A pointer to the internal ROM image data
     */
-    const uInt8* getImage(int& size) const;
+    const uint8_t* getImage(int& size) const;
 
     /**
       Save the current state of this cart to the given Serializer.
@@ -199,7 +199,7 @@ class CartridgeCM : public Cartridge
 
       @return The byte at the specified address
     */
-    uInt8 peek(uInt16 address);
+    uint8_t peek(uint16_t address);
 
     /**
       Change the byte at the specified address to the given value
@@ -208,30 +208,30 @@ class CartridgeCM : public Cartridge
       @param value The value to be stored at the address
       @return  True if the poke changed the device address space, else false
     */
-    bool poke(uInt16 address, uInt8 value);
+    bool poke(uint16_t address, uint8_t value);
 
     /**
       Get the current keybord column
 
       @return The column referenced by SWCHA D6 and D5
     */
-    uInt8 column() const { return myColumn; }
+    uint8_t column() const { return myColumn; }
 
   private:
     // Indicates which bank is currently active
-    uInt16 myCurrentBank;
+    uint16_t myCurrentBank;
 
     // The 16K ROM image of the cartridge
-    uInt8 myImage[16384];
+    uint8_t myImage[16384];
 
     // The 2K of RAM
-    uInt8 myRAM[2048];
+    uint8_t myRAM[2048];
 
     // Current copy of SWCHA (controls ROM/RAM accesses)
-    uInt8 mySWCHA;
+    uint8_t mySWCHA;
 
     // Column currently active
-    uInt8 myColumn;
+    uint8_t myColumn;
 };
 
 #endif

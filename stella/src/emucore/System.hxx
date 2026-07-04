@@ -55,7 +55,7 @@ class System : public Serializable
       @param n Log base 2 of the addressing space size
       @param m Log base 2 of the page size
     */
-    System(uInt16 n, uInt16 m);
+    System(uint16_t n, uint16_t m);
 
     /**
       Destructor
@@ -153,21 +153,21 @@ class System : public Serializable
 
       @return The total number of pages available
     */
-    uInt16 numberOfPages() const { return myNumberOfPages; }
+    uint16_t numberOfPages() const { return myNumberOfPages; }
 
     /**
       Get the amount to right shift an address by to obtain its page.
 
       @return The amount to right shift an address by to get its page
     */
-    uInt16 pageShift() const { return myPageShift; }
+    uint16_t pageShift() const { return myPageShift; }
 
     /**
       Get the mask to apply to an address to obtain its page offset.
 
       @return The mask to apply to an address to obtain its page offset
     */
-    uInt16 pageMask() const { return myPageMask; }
+    uint16_t pageMask() const { return myPageMask; }
  
   public:
     /**
@@ -176,14 +176,14 @@ class System : public Serializable
 
       @return The number of system cycles which have passed
     */
-    uInt32 cycles() const { return myCycles; }
+    uint32_t cycles() const { return myCycles; }
 
     /**
       Increment the system cycles by the specified number of cycles.
 
       @param amount The amount to add to the system cycles counter
     */
-    void incrementCycles(uInt32 amount) { myCycles += amount; }
+    void incrementCycles(uint32_t amount) { myCycles += amount; }
 
     /**
       Reset the system cycle count to zero.  The first thing that
@@ -205,7 +205,7 @@ class System : public Serializable
 
       @return  The data bus state
     */  
-    uInt8 getDataBusState() const { return myDataBusState; }
+    uint8_t getDataBusState() const { return myDataBusState; }
 
     /**
       Get the current state of the data bus in the system, taking into
@@ -222,7 +222,7 @@ class System : public Serializable
       @param hmask  The bits which should always be driven high
       @return  The data bus state
     */  
-    uInt8 getDataBusState(uInt8 zmask, uInt8 hmask = 0x00)
+    uint8_t getDataBusState(uint8_t zmask, uint8_t hmask = 0x00)
     {
       // For the pins that are floating, randomly decide which are high or low
       // Otherwise, they're specifically driven high
@@ -240,7 +240,7 @@ class System : public Serializable
 
       @return The byte at the specified address
     */
-    uInt8 peek(uInt16 address, uInt8 flags = 0);
+    uint8_t peek(uint16_t address, uint8_t flags = 0);
 
     /**
       Change the byte at the specified address to the given value.
@@ -255,7 +255,7 @@ class System : public Serializable
       @param address  The address where the value should be stored
       @param value    The value to be stored at the address
     */
-    void poke(uInt16 address, uInt8 value);
+    void poke(uint16_t address, uint8_t value);
 
     /**
       Lock/unlock the data bus. When the bus is locked, peek() and
@@ -290,7 +290,7 @@ class System : public Serializable
         to this page, while other values are the base address of an array 
         to directly access for reads to this page.
       */
-      uInt8* directPeekBase;
+      uint8_t* directPeekBase;
 
       /**
         Pointer to a block of memory or the null pointer.  The null pointer
@@ -298,7 +298,7 @@ class System : public Serializable
         to this page, while other values are the base address of an array 
         to directly access for pokes to this page.
       */
-      uInt8* directPokeBase;
+      uint8_t* directPokeBase;
 
       /**
         Pointer to a lookup table for marking an address as CODE.  A CODE
@@ -307,7 +307,7 @@ class System : public Serializable
         conclusively determine if a section of address space is CODE, even
         if the disassembler failed to mark it as such.
       */
-      uInt8* codeAccessBase;
+      uint8_t* codeAccessBase;
 
       /**
         Pointer to the device associated with this page or to the system's 
@@ -329,7 +329,7 @@ class System : public Serializable
           device(0),
           type(System::PA_READ) { }
 
-      PageAccess(uInt8* peek, uInt8* poke, uInt8* code, Device* dev,
+      PageAccess(uint8_t* peek, uint8_t* poke, uint8_t* code, Device* dev,
                  PageAccessType access)
         : directPeekBase(peek),
           directPokeBase(poke),
@@ -344,7 +344,7 @@ class System : public Serializable
       @param page The page accessing methods should be set for
       @param access The accessing methods to be used by the page
     */
-    void setPageAccess(uInt16 page, const PageAccess& access);
+    void setPageAccess(uint16_t page, const PageAccess& access);
 
     /**
       Get the page accessing method for the specified page.
@@ -352,7 +352,7 @@ class System : public Serializable
       @param page The page to get accessing methods for
       @return The accessing methods used by the page
     */
-    const PageAccess& getPageAccess(uInt16 page) const;
+    const PageAccess& getPageAccess(uint16_t page) const;
  
     /**
       Get the page type for the given address.
@@ -360,14 +360,14 @@ class System : public Serializable
       @param addr  The address contained in the page in questions
       @return  The type of page that contains the given address
     */
-    System::PageAccessType getPageAccessType(uInt16 addr) const;
+    System::PageAccessType getPageAccessType(uint16_t addr) const;
 
     /**
       Mark the page containing this address as being dirty.
 
       @param addr  Determines the page that is dirty
     */
-    void setDirtyPage(uInt16 addr);
+    void setDirtyPage(uint16_t addr);
 
     /**
       Answer whether any pages in given range of addresses have been
@@ -376,7 +376,7 @@ class System : public Serializable
       @param start_addr The start address; determines the start page
       @param end_addr   The end address; determines the end page
     */
-    bool isPageDirty(uInt16 start_addr, uInt16 end_addr) const;
+    bool isPageDirty(uint16_t start_addr, uint16_t end_addr) const;
 
     /**
       Mark all pages as clean (ie, turn off the dirty flag).
@@ -408,16 +408,16 @@ class System : public Serializable
 
   private:
     // Mask to apply to an address before accessing memory
-    const uInt16 myAddressMask;
+    const uint16_t myAddressMask;
 
     // Amount to shift an address by to determine what page it's on
-    const uInt16 myPageShift;
+    const uint16_t myPageShift;
 
     // Mask to apply to an address to obtain its page offset
-    const uInt16 myPageMask;
+    const uint16_t myPageMask;
  
     // Number of pages in the system
-    const uInt16 myNumberOfPages;
+    const uint16_t myNumberOfPages;
 
     // Pointer to a dynamically allocated array of PageAccess structures
     PageAccess* myPageAccessTable;
@@ -429,7 +429,7 @@ class System : public Serializable
     Device* myDevices[100];
 
     // Number of devices attached to the system
-    uInt32 myNumberOfDevices;
+    uint32_t myNumberOfDevices;
 
     // 6502 processor attached to the system or the null pointer
     M6502* myM6502;
@@ -445,13 +445,13 @@ class System : public Serializable
     Random* myRandom;
 
     // Number of system cycles executed since the last reset
-    uInt32 myCycles;
+    uint32_t myCycles;
 
     // Null device to use for page which are not installed
     NullDevice myNullDevice; 
 
     // The current state of the Data Bus
-    uInt8 myDataBusState;
+    uint8_t myDataBusState;
 
     // Whether or not peek() updates the data bus state. This
     // is true during normal emulation, and false when the

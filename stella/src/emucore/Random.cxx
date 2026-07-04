@@ -36,7 +36,7 @@ void Random::initSeed()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt32 Random::next()
+uint32_t Random::next()
 {
   return (myValue = (myValue * 2416 + 374441) % 1771875);
 }

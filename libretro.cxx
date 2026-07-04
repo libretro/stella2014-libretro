@@ -266,7 +266,7 @@ enum frame_blend_method
 {                                                                                                  \
    const uint32_t *palette32 = console->getPalette(0);                                             \
    uint16_t *palette16       = currentPalette16;                                                   \
-   uInt8 *in                 = stella_fb;                                                          \
+   uint8_t *in                 = stella_fb;                                                          \
    uint16_t *prev            = (uint16_t*)frameBufferPrev;                                         \
    uint16_t *out             = (uint16_t*)frameBuffer;                                             \
    int i;                                                                                          \
@@ -315,7 +315,7 @@ enum frame_blend_method
 #define BLEND_FRAMES_GHOST_32(persistence)                                                         \
 {                                                                                                  \
    const uint32_t *palette = console->getPalette(0);                                               \
-   uInt8 *in               = stella_fb;                                                            \
+   uint8_t *in               = stella_fb;                                                            \
    uint32_t *prev          = (uint32_t*)frameBufferPrev;                                           \
    uint32_t *out           = (uint32_t*)frameBuffer;                                               \
    int i;                                                                                          \
@@ -365,11 +365,11 @@ static void convert_palette(const uint32_t *palette32, uint16_t *palette16)
    }
 }
 
-static void blend_frames_null_16(uInt8 *stella_fb, int width, int height)
+static void blend_frames_null_16(uint8_t *stella_fb, int width, int height)
 {
    const uint32_t *palette32 = console->getPalette(0);
    uint16_t *palette16       = currentPalette16;
-   uInt8 *in                 = stella_fb;
+   uint8_t *in                 = stella_fb;
    uint16_t *out             = (uint16_t*)frameBuffer;
    int i;
 
@@ -385,10 +385,10 @@ static void blend_frames_null_16(uInt8 *stella_fb, int width, int height)
       *(out++) = *(palette16 + *(in++));
 }
 
-static void blend_frames_null_32(uInt8 *stella_fb, int width, int height)
+static void blend_frames_null_32(uint8_t *stella_fb, int width, int height)
 {
    const uint32_t *palette = console->getPalette(0);
-   uInt8 *in               = stella_fb;
+   uint8_t *in               = stella_fb;
    uint32_t *out           = (uint32_t*)frameBuffer;
    int i;
 
@@ -396,11 +396,11 @@ static void blend_frames_null_32(uInt8 *stella_fb, int width, int height)
       *(out++) = *(palette + *(in++));
 }
 
-static void blend_frames_mix_16(uInt8 *stella_fb, int width, int height)
+static void blend_frames_mix_16(uint8_t *stella_fb, int width, int height)
 {
    const uint32_t *palette32 = console->getPalette(0);
    uint16_t *palette16       = currentPalette16;
-   uInt8 *in                 = stella_fb;
+   uint8_t *in                 = stella_fb;
    uint16_t *prev            = (uint16_t*)frameBufferPrev;
    uint16_t *out             = (uint16_t*)frameBuffer;
    int i;
@@ -427,10 +427,10 @@ static void blend_frames_mix_16(uInt8 *stella_fb, int width, int height)
    }
 }
 
-static void blend_frames_mix_32(uInt8 *stella_fb, int width, int height)
+static void blend_frames_mix_32(uint8_t *stella_fb, int width, int height)
 {
    const uint32_t *palette = console->getPalette(0);
-   uInt8 *in               = stella_fb;
+   uint8_t *in               = stella_fb;
    uint32_t *prev          = (uint32_t*)frameBufferPrev;
    uint32_t *out           = (uint32_t*)frameBuffer;
    int i;
@@ -449,52 +449,52 @@ static void blend_frames_mix_32(uInt8 *stella_fb, int width, int height)
    }
 }
 
-static void blend_frames_ghost65_16(uInt8 *stella_fb, int width, int height)
+static void blend_frames_ghost65_16(uint8_t *stella_fb, int width, int height)
 {
    /* 65% = 83 / 128 */
    BLEND_FRAMES_GHOST_16(83);
 }
 
-static void blend_frames_ghost65_32(uInt8 *stella_fb, int width, int height)
+static void blend_frames_ghost65_32(uint8_t *stella_fb, int width, int height)
 {
    BLEND_FRAMES_GHOST_32(83);
 }
 
-static void blend_frames_ghost75_16(uInt8 *stella_fb, int width, int height)
+static void blend_frames_ghost75_16(uint8_t *stella_fb, int width, int height)
 {
    /* 75% = 95 / 128 */
    BLEND_FRAMES_GHOST_16(95);
 }
 
-static void blend_frames_ghost75_32(uInt8 *stella_fb, int width, int height)
+static void blend_frames_ghost75_32(uint8_t *stella_fb, int width, int height)
 {
    BLEND_FRAMES_GHOST_32(95);
 }
 
-static void blend_frames_ghost85_16(uInt8 *stella_fb, int width, int height)
+static void blend_frames_ghost85_16(uint8_t *stella_fb, int width, int height)
 {
    /* 85% ~= 109 / 128 */
    BLEND_FRAMES_GHOST_16(109);
 }
 
-static void blend_frames_ghost85_32(uInt8 *stella_fb, int width, int height)
+static void blend_frames_ghost85_32(uint8_t *stella_fb, int width, int height)
 {
    BLEND_FRAMES_GHOST_32(109);
 }
 
-static void blend_frames_ghost95_16(uInt8 *stella_fb, int width, int height)
+static void blend_frames_ghost95_16(uint8_t *stella_fb, int width, int height)
 {
    /* 95% ~= 122 / 128 */
    BLEND_FRAMES_GHOST_16(122);
 }
 
-static void blend_frames_ghost95_32(uInt8 *stella_fb, int width, int height)
+static void blend_frames_ghost95_32(uint8_t *stella_fb, int width, int height)
 {
    BLEND_FRAMES_GHOST_32(122);
 }
 
-static void (*blend_frames_16)(uInt8 *stella_fb, int width, int height) = blend_frames_null_16;
-static void (*blend_frames_32)(uInt8 *stella_fb, int width, int height) = blend_frames_null_32;
+static void (*blend_frames_16)(uint8_t *stella_fb, int width, int height) = blend_frames_null_16;
+static void (*blend_frames_32)(uint8_t *stella_fb, int width, int height) = blend_frames_null_32;
 
 static void init_frame_blending(enum frame_blend_method blend_method)
 {
@@ -1260,7 +1260,7 @@ bool retro_load_game(const struct retro_game_info *info)
    }
 
    // Get the game properties
-   string cartMD5 = MD5((const uInt8*)info->data, (uInt32)info->size);
+   string cartMD5 = MD5((const uint8_t*)info->data, (uint32_t)info->size);
    Properties props;
    osystem.propSet().getMD5(cartMD5, props);
 
@@ -1269,7 +1269,7 @@ bool retro_load_game(const struct retro_game_info *info)
    string cartId;//, romType("AUTO-DETECT");
    settings = new Settings(&osystem);
    settings->setValue("romloadcount", false);
-   cartridge = Cartridge::create((const uInt8*)info->data, (uInt32)info->size, cartMD5, cartType, cartId, osystem, *settings);
+   cartridge = Cartridge::create((const uint8_t*)info->data, (uint32_t)info->size, cartMD5, cartType, cartId, osystem, *settings);
 
    if(cartridge == 0)
    {

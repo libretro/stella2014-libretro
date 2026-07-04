@@ -111,7 +111,7 @@ void AtariVox::write(DigitalPin pin, bool value)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void AtariVox::clockDataIn(bool value)
 {
-  uInt32 cycle = mySystem.cycles();
+  uint32_t cycle = mySystem.cycles();
 
   if(value && (myShiftCount == 0))
     return;
@@ -143,7 +143,7 @@ void AtariVox::clockDataIn(bool value)
       else if((myShiftRegister & 1))  { /* bad stop  bit */ }
       else
       {
-        uInt8 data = ((myShiftRegister >> 1) & 0xff);
+        uint8_t data = ((myShiftRegister >> 1) & 0xff);
         mySerialPort.writeByte(&data);
       }
       myShiftRegister = 0;

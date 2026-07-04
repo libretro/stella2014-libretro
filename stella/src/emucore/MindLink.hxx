@@ -33,7 +33,7 @@
     http://www.atarimuseum.com/videogames/consoles/2600/mindlink.html
 
   This code was heavily borrowed from z26, and uses conventions defined
-  there.  Specifically, IOPortA is treated as a complete uInt8, whereas
+  there.  Specifically, IOPortA is treated as a complete uint8_t, whereas
   the Stella core actually stores this information in boolean arrays
   addressable by DigitalPin number.
 
@@ -73,7 +73,7 @@ class MindLink : public Controller
 
       @param value  The entire contents of the SWCHA register
     */
-    void controlWrite(uInt8) { nextMindlinkBit(); }
+    void controlWrite(uint8_t) { nextMindlinkBit(); }
 
     /**
       Update the entire digital and analog pin state according to the

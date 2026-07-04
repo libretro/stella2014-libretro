@@ -112,7 +112,7 @@ void Serializer::reset(void)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt8 Serializer::getByte(void)
+uint8_t Serializer::getByte(void)
 {
   char buf;
   myStream->read(&buf, 1);
@@ -121,39 +121,39 @@ uInt8 Serializer::getByte(void)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Serializer::getByteArray(uInt8* array, uInt32 size)
+void Serializer::getByteArray(uint8_t* array, uint32_t size)
 {
   myStream->read((char*)array, size);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt16 Serializer::getShort(void)
+uint16_t Serializer::getShort(void)
 {
-  uInt16 val = 0;
-  myStream->read((char*)&val, sizeof(uInt16));
+  uint16_t val = 0;
+  myStream->read((char*)&val, sizeof(uint16_t));
 
   return val;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Serializer::getShortArray(uInt16* array, uInt32 size)
+void Serializer::getShortArray(uint16_t* array, uint32_t size)
 {
-  myStream->read((char*)array, sizeof(uInt16)*size);
+  myStream->read((char*)array, sizeof(uint16_t)*size);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt32 Serializer::getInt(void)
+uint32_t Serializer::getInt(void)
 {
-  uInt32 val = 0;
-  myStream->read((char*)&val, sizeof(uInt32));
+  uint32_t val = 0;
+  myStream->read((char*)&val, sizeof(uint32_t));
 
   return val;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Serializer::getIntArray(uInt32* array, uInt32 size)
+void Serializer::getIntArray(uint32_t* array, uint32_t size)
 {
-  myStream->read((char*)array, sizeof(uInt32)*size);
+  myStream->read((char*)array, sizeof(uint32_t)*size);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -189,39 +189,39 @@ bool Serializer::getBool(void)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Serializer::putByte(uInt8 value)
+void Serializer::putByte(uint8_t value)
 {
   myStream->write((char*)&value, 1);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Serializer::putByteArray(const uInt8* array, uInt32 size)
+void Serializer::putByteArray(const uint8_t* array, uint32_t size)
 {
   myStream->write((char*)array, size);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Serializer::putShort(uInt16 value)
+void Serializer::putShort(uint16_t value)
 {
-  myStream->write((char*)&value, sizeof(uInt16));
+  myStream->write((char*)&value, sizeof(uint16_t));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Serializer::putShortArray(const uInt16* array, uInt32 size)
+void Serializer::putShortArray(const uint16_t* array, uint32_t size)
 {
-  myStream->write((char*)array, sizeof(uInt16)*size);
+  myStream->write((char*)array, sizeof(uint16_t)*size);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Serializer::putInt(uInt32 value)
+void Serializer::putInt(uint32_t value)
 {
-  myStream->write((char*)&value, sizeof(uInt32));
+  myStream->write((char*)&value, sizeof(uint32_t));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Serializer::putIntArray(const uInt32* array, uInt32 size)
+void Serializer::putIntArray(const uint32_t* array, uint32_t size)
 {
-  myStream->write((char*)array, sizeof(uInt32)*size);
+  myStream->write((char*)array, sizeof(uint32_t)*size);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

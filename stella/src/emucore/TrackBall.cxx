@@ -52,7 +52,7 @@ TrackBall::~TrackBall()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt8 TrackBall::read()
+uint8_t TrackBall::read()
 {
   int scanline = ((System&)mySystem).tia().scanlines();
 
@@ -83,7 +83,7 @@ uInt8 TrackBall::read()
   myCountV &= 0x03;
   myCountH &= 0x03;
 
-  uInt8 IOPortA = 0x00;
+  uint8_t IOPortA = 0x00;
   switch(myType)
   {
     case Controller::TrackBall80:
@@ -153,31 +153,31 @@ bool TrackBall::setMouseControl(
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const uInt32 TrackBall::ourTrakBallTableTB_H[2][2] = {
+const uint32_t TrackBall::ourTrakBallTableTB_H[2][2] = {
   { 0x40, 0x00 }, { 0xc0, 0x80 }
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const uInt32 TrackBall::ourTrakBallTableTB_V[2][2] = {
+const uint32_t TrackBall::ourTrakBallTableTB_V[2][2] = {
   { 0x00, 0x10 }, { 0x20, 0x30 }
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const uInt32 TrackBall::ourTrakBallTableST_H[4] = {
+const uint32_t TrackBall::ourTrakBallTableST_H[4] = {
   0x00, 0x80, 0xc0, 0x40
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const uInt32 TrackBall::ourTrakBallTableST_V[4] = {
+const uint32_t TrackBall::ourTrakBallTableST_V[4] = {
   0x00, 0x10, 0x30, 0x20
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const uInt32 TrackBall::ourTrakBallTableAM_H[4] = {
+const uint32_t TrackBall::ourTrakBallTableAM_H[4] = {
   0x00, 0x10, 0x50, 0x40
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const uInt32 TrackBall::ourTrakBallTableAM_V[4] = {
+const uint32_t TrackBall::ourTrakBallTableAM_V[4] = {
   0x00, 0x80, 0xa0, 0x20
 };

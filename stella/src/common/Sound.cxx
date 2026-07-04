@@ -107,7 +107,7 @@ void Sound::reset()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Sound::setVolume(Int32 percent)
+void Sound::setVolume(int32_t percent)
 {
   if(myIsInitializedFlag && (percent >= 0) && (percent <= 100))
   {
@@ -118,9 +118,9 @@ void Sound::setVolume(Int32 percent)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Sound::adjustVolume(Int8 direction)
+void Sound::adjustVolume(int8_t direction)
 {
-  Int32 percent = myVolume;
+  int32_t percent = myVolume;
 
   if(direction == -1)
     percent -= 2;
@@ -134,34 +134,34 @@ void Sound::adjustVolume(Int8 direction)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Sound::adjustCycleCounter(Int32 amount)
+void Sound::adjustCycleCounter(int32_t amount)
 {
   myLastRegisterSetCycle += amount;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Sound::setChannels(uInt32 channels)
+void Sound::setChannels(uint32_t channels)
 {
   if(channels == 1 || channels == 2)
     myNumChannels = channels;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Sound::set(uInt16 addr, uInt8 value, Int32 cycle)
+void Sound::set(uint16_t addr, uint8_t value, int32_t cycle)
 {
   // Record how many CPU cycles have passed since the last register write.
   // All queue timing is integer CPU cycles: the TIA emits exactly one
   // audio sample every 38 CPU cycles (2 samples per 76-cycle scanline,
   // per real hardware / MiSTer RTL), so no seconds conversion is needed
   // and the arithmetic is exact and deterministic.
-  Int32 delta = cycle - myLastRegisterSetCycle;
+  int32_t delta = cycle - myLastRegisterSetCycle;
   if(delta < 0)
     delta = 0;
 
   RegWrite info;
   info.addr = addr;
   info.value = value;
-  info.deltaCycles = (uInt32)delta;
+  info.deltaCycles = (uint32_t)delta;
   myRegWriteQueue.enqueue(info);
 
   // Update last cycle counter to the current cycle
@@ -169,22 +169,22 @@ void Sound::set(uInt16 addr, uInt8 value, Int32 cycle)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Sound::processFragment(Int16* stream, uInt32 length)
+void Sound::processFragment(int16_t* stream, uint32_t length)
 {
   // All timing below is in integer CPU cycles. The TIA produces exactly
   // one audio sample every 38 CPU cycles (2 samples per 76-cycle scanline,
   // as on real hardware and in the MiSTer FPGA implementation), so a
   // fragment of 'length' samples spans exactly length*38 cycles. This
   // arithmetic is exact and bit-for-bit deterministic on every platform.
-  const uInt32 channels = 2;
-  const uInt32 CYCLES_PER_SAMPLE = 38;
+  const uint32_t channels = 2;
+  const uint32_t CYCLES_PER_SAMPLE = 38;
 
-  uInt64 streamLengthCycles = (uInt64)length * CYCLES_PER_SAMPLE;
-  uInt64 queuedCycles = myRegWriteQueue.durationCycles();
+  uint64_t streamLengthCycles = (uint64_t)length * CYCLES_PER_SAMPLE;
+  uint64_t queuedCycles = myRegWriteQueue.durationCycles();
   if(queuedCycles > streamLengthCycles)
   {
-    uInt64 excessCycles = queuedCycles - streamLengthCycles;
-    uInt64 removedCycles = 0;
+    uint64_t excessCycles = queuedCycles - streamLengthCycles;
+    uint64_t removedCycles = 0;
     while(removedCycles < excessCycles)
     {
       RegWrite& info = myRegWriteQueue.front();
@@ -194,11 +194,11 @@ void Sound::processFragment(Int16* stream, uInt32 length)
     }
   }
 
-  uInt64 positionCycles = 0;   // elapsed time within this fragment
+  uint64_t positionCycles = 0;   // elapsed time within this fragment
 
   while(positionCycles < streamLengthCycles)
   {
-    uInt32 positionSamples = (uInt32)(positionCycles / CYCLES_PER_SAMPLE);
+    uint32_t positionSamples = (uint32_t)(positionCycles / CYCLES_PER_SAMPLE);
 
     if(myRegWriteQueue.size() == 0)
     {
@@ -221,10 +221,10 @@ void Sound::processFragment(Int16* stream, uInt32 length)
       RegWrite& info = myRegWriteQueue.front();
 
       // Cycles remaining until the end of this fragment
-      uInt64 remainingCycles = streamLengthCycles - positionCycles;
+      uint64_t remainingCycles = streamLengthCycles - positionCycles;
 
       // Does the register update occur before the end of the fragment?
-      if((uInt64)info.deltaCycles <= remainingCycles)
+      if((uint64_t)info.deltaCycles <= remainingCycles)
       {
         // If the register update time hasn't already passed then
         // process samples upto the point where it should occur
@@ -233,7 +233,7 @@ void Sound::processFragment(Int16* stream, uInt32 length)
           // Process the fragment up to the next TIA register write.
           // The sample count is the number of whole sample boundaries
           // crossed: floor((pos+delta)/38) - floor(pos/38).
-          uInt32 nextSamples = (uInt32)
+          uint32_t nextSamples = (uint32_t)
               ((positionCycles + info.deltaCycles) / CYCLES_PER_SAMPLE);
           myTIASound.process(stream + (positionSamples * channels),
               nextSamples - positionSamples);
@@ -250,7 +250,7 @@ void Sound::processFragment(Int16* stream, uInt32 length)
         // update delay by the corresponding amount of time
         myTIASound.process(stream + (positionSamples * channels),
             length - positionSamples);
-        info.deltaCycles -= (uInt32)remainingCycles;
+        info.deltaCycles -= (uint32_t)remainingCycles;
         break;
       }
     }
@@ -274,9 +274,9 @@ bool Sound::save(Serializer& out) const
    // Pending register writes that have been queued but not yet
    // consumed by processFragment(); dropping them on load loses
    // register updates entirely.
-   uInt32 n = myRegWriteQueue.size();
+   uint32_t n = myRegWriteQueue.size();
    out.putInt(n);
-   for(uInt32 i = 0; i < n; ++i)
+   for(uint32_t i = 0; i < n; ++i)
    {
       const RegWrite& r = myRegWriteQueue.peek(i);
       out.putInt(r.addr);
@@ -296,16 +296,16 @@ bool Sound::load(Serializer& in)
    if(!myTIASound.load(in))
       return false;
 
-   myLastRegisterSetCycle = (Int32) in.getInt();
+   myLastRegisterSetCycle = (int32_t) in.getInt();
 
    myRegWriteQueue.clear();
-   uInt32 n = (uInt32) in.getInt();
-   for(uInt32 i = 0; i < n; ++i)
+   uint32_t n = (uint32_t) in.getInt();
+   for(uint32_t i = 0; i < n; ++i)
    {
       RegWrite r;
-      r.addr        = (uInt16) in.getInt();
+      r.addr        = (uint16_t) in.getInt();
       r.value       = in.getByte();
-      r.deltaCycles = (uInt32) in.getInt();
+      r.deltaCycles = (uint32_t) in.getInt();
       myRegWriteQueue.enqueue(r);
    }
 
@@ -313,7 +313,7 @@ bool Sound::load(Serializer& in)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Sound::RegWriteQueue::RegWriteQueue(uInt32 capacity)
+Sound::RegWriteQueue::RegWriteQueue(uint32_t capacity)
   : myCapacity(capacity),
     myBuffer(0),
     mySize(0),
@@ -346,10 +346,10 @@ void Sound::RegWriteQueue::dequeue()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt64 Sound::RegWriteQueue::durationCycles()
+uint64_t Sound::RegWriteQueue::durationCycles()
 {
-  uInt64 duration = 0;
-  for(uInt32 i = 0; i < mySize; ++i)
+  uint64_t duration = 0;
+  for(uint32_t i = 0; i < mySize; ++i)
   {
     duration += myBuffer[(myHead + i) % myCapacity].deltaCycles;
   }
@@ -376,7 +376,7 @@ Sound::RegWrite& Sound::RegWriteQueue::front()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uInt32 Sound::RegWriteQueue::size() const
+uint32_t Sound::RegWriteQueue::size() const
 {
   return mySize;
 }
@@ -385,7 +385,7 @@ uInt32 Sound::RegWriteQueue::size() const
 void Sound::RegWriteQueue::grow()
 {
   RegWrite* buffer = new RegWrite[myCapacity * 2];
-  for(uInt32 i = 0; i < mySize; ++i)
+  for(uint32_t i = 0; i < mySize; ++i)
   {
     buffer[i] = myBuffer[(myHead + i) % myCapacity];
   }
