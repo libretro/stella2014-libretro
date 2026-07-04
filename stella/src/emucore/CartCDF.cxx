@@ -9,6 +9,9 @@
 #include "Serializer.hxx"
 #include "Settings.hxx"
 #include "CartCDF.hxx"
+#ifdef THUMB_SUPPORT
+#include "Thumbulator.h"
+#endif
 
 namespace {
   /* Mode helpers: fast-fetch and digital-audio enable bits. */
@@ -109,6 +112,8 @@ CartridgeCDF::CartridgeCDF(const uint8_t* image, uint32_t size,
                   ? THUMB_CONFIG_CDF : THUMB_CONFIG_CDF1;
       thumb_set_callback(myThumbEmulator, cfg, this, cdf_thumb_callback);
     }
+#else
+    (void)cBase; (void)cStart; (void)cStack;  /* only used with THUMB_SUPPORT */
 #endif
   }
 

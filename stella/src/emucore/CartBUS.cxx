@@ -11,6 +11,9 @@
 #include "Serializer.hxx"
 #include "Settings.hxx"
 #include "CartBUS.hxx"
+#ifdef THUMB_SUPPORT
+#include "Thumbulator.h"
+#endif
 
 namespace {
   inline bool BUS_STUFF_ON(uint8_t mode)     { return (mode & 0x0F) == 0; }
@@ -101,6 +104,8 @@ CartridgeBUS::CartridgeBUS(const uint8_t* image, uint32_t size,
                   cStart, cStack, cBase);
     thumb_set_callback(myThumbEmulator, THUMB_CONFIG_BUS, this,
                        bus_thumb_callback);
+#else
+    (void)cBase; (void)cStart; (void)cStack;  /* only used with THUMB_SUPPORT */
 #endif
   }
 

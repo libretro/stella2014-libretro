@@ -18,12 +18,17 @@
 #include "System.hxx"
 #include "Serializer.hxx"
 #include "CartARM.hxx"
+#ifdef THUMB_SUPPORT
+#include "Thumbulator.h"
+#endif
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 CartridgeARM::CartridgeARM(const Settings& settings)
-  : Cartridge(settings),
-    myThumbEmulator(0)
+  : Cartridge(settings)
 {
+#ifdef THUMB_SUPPORT
+  myThumbEmulator = 0;
+#endif
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

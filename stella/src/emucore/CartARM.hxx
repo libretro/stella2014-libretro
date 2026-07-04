@@ -19,10 +19,12 @@
 #define CARTRIDGE_ARM_HXX
 
 class System;
+#ifdef THUMB_SUPPORT
+struct Thumbulator;
+#endif
 
 #include "bspf.hxx"
 #include "Cart.hxx"
-#include "Thumbulator.h"
 
 /**
   Base class for cartridges that run ARM code through the Thumbulator
@@ -85,7 +87,9 @@ class CartridgeARM : public Cartridge
     bool loadArmState(Serializer& in);
 
   protected:
+#ifdef THUMB_SUPPORT
     Thumbulator* myThumbEmulator;
+#endif
 
   private:
     // Following constructors and assignment operators not supported
