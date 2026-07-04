@@ -23,7 +23,8 @@
 #include "Driving.hxx"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Driving::Driving(Jack jack, const Event& event, const System& system)
+Driving::Driving(Jack jack, const Event& event, const System& system,
+                 bool second)
   : Controller(jack, event, system, Controller::Driving),
     myCounter(0),
     myControlID(-1),
@@ -32,17 +33,37 @@ Driving::Driving(Jack jack, const Event& event, const System& system)
 {
   if(myJack == Left)
   {
-    myCCWEvent   = Event::JoystickZeroLeft;
-    myCWEvent    = Event::JoystickZeroRight;
-    myFireEvent  = Event::JoystickZeroFire;
+    if(!second)
+    {
+      myCCWEvent   = Event::JoystickZeroLeft;
+      myCWEvent    = Event::JoystickZeroRight;
+      myFireEvent  = Event::JoystickZeroFire;
+    }
+    else
+    {
+      /* QuadTari second driving controller on the left jack -> player 3 */
+      myCCWEvent   = Event::JoystickTwoLeft;
+      myCWEvent    = Event::JoystickTwoRight;
+      myFireEvent  = Event::JoystickTwoFire;
+    }
     myXAxisValue = Event::SALeftAxis0Value;
     myYAxisValue = Event::SALeftAxis1Value;
   }
   else
   {
-    myCCWEvent   = Event::JoystickOneLeft;
-    myCWEvent    = Event::JoystickOneRight;
-    myFireEvent  = Event::JoystickOneFire;
+    if(!second)
+    {
+      myCCWEvent   = Event::JoystickOneLeft;
+      myCWEvent    = Event::JoystickOneRight;
+      myFireEvent  = Event::JoystickOneFire;
+    }
+    else
+    {
+      /* QuadTari second driving controller on the right jack -> player 4 */
+      myCCWEvent   = Event::JoystickThreeLeft;
+      myCWEvent    = Event::JoystickThreeRight;
+      myFireEvent  = Event::JoystickThreeFire;
+    }
     myXAxisValue = Event::SARightAxis0Value;
     myYAxisValue = Event::SARightAxis1Value;
   }

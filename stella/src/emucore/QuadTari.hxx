@@ -40,8 +40,11 @@ class QuadTari : public Controller
       @param jack   The jack the controller is plugged into
       @param event  The event object to use for events
       @param system The system using this controller
+      @param type   The sub-controller type for both halves (Joystick or
+                    Driving). Defaults to Joystick, the common case.
     */
-    QuadTari(Jack jack, const Event& event, const System& system);
+    QuadTari(Jack jack, const Event& event, const System& system,
+             Controller::Type type = Controller::Joystick);
     virtual ~QuadTari();
 
   public:

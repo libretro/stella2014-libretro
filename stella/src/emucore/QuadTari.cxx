@@ -17,20 +17,31 @@
 
 #include "QuadTari.hxx"
 #include "Joystick.hxx"
+#include "Driving.hxx"
 #include "System.hxx"
 #include "TIA.hxx"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-QuadTari::QuadTari(Jack jack, const Event& event, const System& system)
+QuadTari::QuadTari(Jack jack, const Event& event, const System& system,
+                   Controller::Type type)
   : Controller(jack, event, system, Controller::QuadTari),
     myFirstController(0),
     mySecondController(0)
 {
-  // For now the sub-controllers are always Joysticks (the common
-  // four-player case). Both share this QuadTari's jack; the 'second' flag
-  // routes the second sub-controller to the player 3/4 events.
-  myFirstController  = new ::Joystick(jack, event, system, false);
-  mySecondController = new ::Joystick(jack, event, system, true);
+  // Both sub-controllers share this QuadTari's jack; the 'second' flag
+  // routes the second one to the player 3/4 events. The sub-controller
+  // type is the same for both halves (Joystick by default, or Driving);
+  // AtariVox/SaveKey sub-controllers are not supported in this core.
+  if(type == Controller::Driving)
+  {
+    myFirstController  = new ::Driving(jack, event, system, false);
+    mySecondController = new ::Driving(jack, event, system, true);
+  }
+  else
+  {
+    myFirstController  = new ::Joystick(jack, event, system, false);
+    mySecondController = new ::Joystick(jack, event, system, true);
+  }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

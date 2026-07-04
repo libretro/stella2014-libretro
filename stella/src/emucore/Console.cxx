@@ -588,9 +588,11 @@ void Console::setControllers(const string& rommd5)
   {
     myControllers[leftPort] = new MindLink(Controller::Left, myEvent, *mySystem);
   }
-  else if(left == "QUADTARI")
+  else if(BSPF_startsWithIgnoreCase(left, "QUADTARI"))
   {
-    myControllers[leftPort] = new QuadTari(Controller::Left, myEvent, *mySystem);
+    Controller::Type subType = (left == "QUADTARI_DRIVING")
+                                 ? Controller::Driving : Controller::Joystick;
+    myControllers[leftPort] = new QuadTari(Controller::Left, myEvent, *mySystem, subType);
   }
   else
   {
@@ -663,9 +665,11 @@ void Console::setControllers(const string& rommd5)
   {
     myControllers[rightPort] = new MindLink(Controller::Right, myEvent, *mySystem);
   }
-  else if(right == "QUADTARI")
+  else if(BSPF_startsWithIgnoreCase(right, "QUADTARI"))
   {
-    myControllers[rightPort] = new QuadTari(Controller::Right, myEvent, *mySystem);
+    Controller::Type subType = (right == "QUADTARI_DRIVING")
+                                 ? Controller::Driving : Controller::Joystick;
+    myControllers[rightPort] = new QuadTari(Controller::Right, myEvent, *mySystem, subType);
   }
   else
   {
