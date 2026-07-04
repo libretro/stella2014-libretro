@@ -849,6 +849,35 @@ static void set_keypad_events(Event& ev, int base, int16_t joy_bits)
       ev.set(Event::Type(base + k), joy_bits & (1 << btn[k]));
 }
 
+/* Set the five joystick events (up/down/left/right/fire) for a QuadTari
+ * sub-player from a RetroPad's button bits. 'up' is Event::JoystickTwoUp
+ * (player 3) or Event::JoystickThreeUp (player 4); the five events are
+ * contiguous from there. */
+static void set_quadtari_joystick_events(Event& ev, int up, int16_t joy_bits)
+{
+   ev.set(Event::Type(up + 0), joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_UP));
+   ev.set(Event::Type(up + 1), joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_DOWN));
+   ev.set(Event::Type(up + 2), joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_LEFT));
+   ev.set(Event::Type(up + 3), joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_RIGHT));
+   ev.set(Event::Type(up + 4), joy_bits & (1 << RETRO_DEVICE_ID_JOYPAD_B));
+}
+
+/* Read a RetroPad's button bitmask for the given port, using the negotiated
+ * bitmask fast path when available and the per-button fallback otherwise. */
+static int16_t read_joypad_bits(unsigned port)
+{
+   int16_t joy_bits = 0;
+   if (libretro_supports_bitmasks)
+      joy_bits = input_state_cb(port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_MASK);
+   else
+   {
+      unsigned j;
+      for (j = 0; j < (RETRO_DEVICE_ID_JOYPAD_R3+1); j++)
+         joy_bits |= input_state_cb(port, RETRO_DEVICE_JOYPAD, 0, j) ? (1 << j) : 0;
+   }
+   return joy_bits;
+}
+
 static void update_input()
 {
    unsigned i;
@@ -862,17 +891,7 @@ static void update_input()
    /* Loop over input devices */
    for (i = 0; i < MAX_RETROPAD_DEVICES; i++)
    {
-      int16_t joy_bits = 0;
-
-      /* Read button input (required in all cases) */
-      if (libretro_supports_bitmasks)
-         joy_bits = input_state_cb(i, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_MASK);
-      else
-      {
-         unsigned j;
-         for (j = 0; j < (RETRO_DEVICE_ID_JOYPAD_R3+1); j++)
-            joy_bits |= input_state_cb(i, RETRO_DEVICE_JOYPAD, 0, j) ? (1 << j) : 0;
-      }
+      int16_t joy_bits = read_joypad_bits(i);
 
       if (retropad_devices[i] == RETROPAD_STELLA_PADDLES)
       {
@@ -1032,6 +1051,22 @@ static void update_input()
             }
          }
       }
+   }
+
+   /* QuadTari: poll RetroPad ports 2 and 3 for the second controller on
+    * each jack (players 3 and 4). The QuadTari sub-controllers read the
+    * JoystickTwo* / JoystickThree* events; only read the ports for a jack
+    * that actually has a QuadTari, so ordinary two-player ROMs are
+    * unaffected. */
+   if (left_controller_type == Controller::QuadTari)
+   {
+      int16_t p3 = read_joypad_bits(2);
+      set_quadtari_joystick_events(ev, Event::JoystickTwoUp, p3);
+   }
+   if (right_controller_type == Controller::QuadTari)
+   {
+      int16_t p4 = read_joypad_bits(3);
+      set_quadtari_joystick_events(ev, Event::JoystickThreeUp, p4);
    }
 
    /* Tell all input devices to read their state from the event structure */
