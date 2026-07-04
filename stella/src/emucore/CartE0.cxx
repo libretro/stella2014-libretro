@@ -39,10 +39,27 @@ CartridgeE0::~CartridgeE0()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void CartridgeE0::reset()
 {
-  // Setup segments to some default slices
-  segmentZero(4);
-  segmentOne(5);
-  segmentTwo(6);
+  // Setup segments to some default slices.
+  //
+  // On real hardware the three switchable 1K segments power up pointing at
+  // indeterminate banks; a game that reads a segment before selecting it
+  // sees whatever was there. When power-up randomization is enabled, pick
+  // random start banks (as Stella 7 does) so this indeterminacy is modelled;
+  // otherwise fall back to the fixed 4/5/6 the core has always used. Gated
+  // on the same "ramrandom" setting that already controls RAM power-up
+  // randomization, and kept deterministic via the emulated RNG.
+  if(mySettings.getBool("ramrandom"))
+  {
+    segmentZero(mySystem->randGenerator().next() % 8);
+    segmentOne(mySystem->randGenerator().next() % 8);
+    segmentTwo(mySystem->randGenerator().next() % 8);
+  }
+  else
+  {
+    segmentZero(4);
+    segmentOne(5);
+    segmentTwo(6);
+  }
 
   myBankChanged = true;
 }

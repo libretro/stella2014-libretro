@@ -56,8 +56,16 @@ void CartridgeE7::reset()
   else
     memset(myRAM, 0, 2048);
 
-  // Install some default banks for the RAM and first segment
-  bankRAM(0);
+  // Install some default banks for the RAM and first segment.
+  //
+  // The RAM bank powers up indeterminate on real hardware; when power-up
+  // randomization is enabled, start at a random RAM bank (as Stella 7
+  // does) rather than always bank 0. Uses the same emulated RNG and the
+  // same "ramrandom" setting already checked above, so it stays
+  // deterministic and adds no new configuration.
+  uint16_t ramBank = mySettings.getBool("ramrandom") ?
+      (uint16_t)(mySystem->randGenerator().next() % 4) : 0;
+  bankRAM(ramBank);
   bank(myStartBank);
 
   myBankChanged = true;
