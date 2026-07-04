@@ -59,6 +59,7 @@
 #include "CartTVBoy.hxx"
 #include "Cart0FA0.hxx"
 #include "Cart03E0.hxx"
+#include "CartWD.hxx"
 #include "CartUA.hxx"
 #include "CartX07.hxx"
 #include "MD5.hxx"
@@ -251,6 +252,8 @@ Cartridge* Cartridge::create(const uint8_t* image, uint32_t size, string& md5,
     cartridge = new Cartridge0FA0(image, size, settings);
   else if(type == "03E0")
     cartridge = new Cartridge03E0(image, size, settings);
+  else if(type == "WD")
+    cartridge = new CartridgeWD(image, size, settings);
   else if(type == "X07")
     cartridge = new CartridgeX07(image, size, settings);
   else if(dtype == "WRONG_SIZE")
@@ -413,6 +416,8 @@ string Cartridge::autodetectType(const uint8_t* image, uint32_t size)
       type = "3F";
     else if(isProbablyUA(image, size))
       type = "UA";
+    else if(isProbablyWD(image, size))
+      type = "WD";
     else if(isProbably0FA0(image, size))
       type = "0FA0";
     else if(isProbably03E0(image, size))
@@ -1004,6 +1009,14 @@ bool Cartridge::isProbably03E0(const uint8_t* image, uint32_t size)
     if(searchForBytes(image, size, signature[i], 4, 1))
       return true;
   return false;
+}
+
+bool Cartridge::isProbablyWD(const uint8_t* image, uint32_t size)
+{
+  // WD (Wickstead Design) switches banks by accessing $30..$3F; the code
+  // does 'LDA $39' then 'JMP'.
+  static const uint8_t signature[3] = { 0xA5, 0x39, 0x4C };  // LDA $39, JMP
+  return searchForBytes(image, size, signature, 3, 1);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
