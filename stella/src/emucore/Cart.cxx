@@ -30,6 +30,7 @@
 #include "Cart4KSC.hxx"
 #include "CartAR.hxx"
 #include "CartCM.hxx"
+#include "CartBUS.hxx"
 #include "CartCDF.hxx"
 #include "CartCTY.hxx"
 #include "CartCV.hxx"
@@ -187,6 +188,8 @@ Cartridge* Cartridge::create(const uint8_t* image, uint32_t size, string& md5,
     cartridge = new CartridgeAR(image, size, settings);
   else if(type == "CM")
     cartridge = new CartridgeCM(image, size, settings);
+  else if(type == "BUS")
+    cartridge = new CartridgeBUS(image, size, settings);
   else if(type == "CDF")
     cartridge = new CartridgeCDF(image, size, settings);
   else if(type == "CTY")
@@ -446,6 +449,8 @@ string Cartridge::autodetectType(const uint8_t* image, uint32_t size)
   {
     if(isProbablyCDF(image, size))
       type = "CDF";
+    else if(isProbablyBUS(image, size))
+      type = "BUS";
     else if(isProbablySC(image, size))
       type = "F4SC";
     else if(isProbably3E(image, size))
@@ -693,6 +698,15 @@ bool Cartridge::isProbablyCDF(const uint8_t* image, uint32_t size)
   uint8_t cdfjplus[8] = { 'P', 'L', 'U', 'S', 'C', 'D', 'F', 'J' };
   return searchForBytes(image, size, cdf, 3, 3) ||
          searchForBytes(image, size, cdfjplus, 8, 1);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+bool Cartridge::isProbablyBUS(const uint8_t* image, uint32_t size)
+{
+  // BUS images embed the ASCII marker "BUS" in the driver (two or more
+  // occurrences). (Backported from Stella 7.)
+  uint8_t signature[3] = { 'B', 'U', 'S' };
+  return searchForBytes(image, size, signature, 3, 2);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

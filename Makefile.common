@@ -28,6 +28,7 @@ SOURCES_CXX := $(CORE_DIR)/src/common/Base.cxx \
 	       $(CORE_DIR)/src/emucore/CartAR.cxx \
 	       $(CORE_DIR)/src/emucore/CartBF.cxx \
 	       $(CORE_DIR)/src/emucore/CartBFSC.cxx \
+	       $(CORE_DIR)/src/emucore/CartBUS.cxx \
 	       $(CORE_DIR)/src/emucore/CartCDF.cxx \
 	       $(CORE_DIR)/src/emucore/CartCM.cxx \
 	       $(CORE_DIR)/src/emucore/CartCTY.cxx \

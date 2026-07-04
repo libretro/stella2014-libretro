@@ -326,6 +326,12 @@ class Cartridge : public Device
     static bool isProbablyCDF(const uint8_t* image, uint32_t size);
 
     /**
+      Returns true if the image is probably a BUS bankswitching cartridge
+      (it embeds a "BUS" driver signature at least twice).
+    */
+    static bool isProbablyBUS(const uint8_t* image, uint32_t size);
+
+    /**
       Returns true if the image is probably a CV bankswitching cartridge
     */
     static bool isProbablyCV(const uint8_t* image, uint32_t size);
