@@ -56,6 +56,7 @@
 #include "CartFE.hxx"
 #include "CartMC.hxx"
 #include "CartSB.hxx"
+#include "CartTVBoy.hxx"
 #include "CartUA.hxx"
 #include "CartX07.hxx"
 #include "MD5.hxx"
@@ -242,6 +243,8 @@ Cartridge* Cartridge::create(const uint8_t* image, uint32_t size, string& md5,
     cartridge = new CartridgeUA(image, size, settings);
   else if(type == "SB")
     cartridge = new CartridgeSB(image, size, settings);
+  else if(type == "TVBOY")
+    cartridge = new CartridgeTVBoy(image, size, settings);
   else if(type == "X07")
     cartridge = new CartridgeX07(image, size, settings);
   else if(dtype == "WRONG_SIZE")
@@ -447,7 +450,9 @@ string Cartridge::autodetectType(const uint8_t* image, uint32_t size)
   }
   else if(size == 32*1024)  // 32K
   {
-    if(isProbablyCDF(image, size))
+    if(isProbablyTVBoy(image, size))
+      type = "TVBOY";
+    else if(isProbablyCDF(image, size))
       type = "CDF";
     else if(isProbablyBUS(image, size))
       type = "BUS";
@@ -468,7 +473,9 @@ string Cartridge::autodetectType(const uint8_t* image, uint32_t size)
   }
   else if(size == 64*1024)  // 64K
   {
-    if(isProbablyCDF(image, size))
+    if(isProbablyTVBoy(image, size))
+      type = "TVBOY";
+    else if(isProbablyCDF(image, size))
       type = "CDF";
     else if(isProbably3E(image, size))
       type = "3E";
@@ -485,7 +492,9 @@ string Cartridge::autodetectType(const uint8_t* image, uint32_t size)
   }
   else if(size == 128*1024)  // 128K
   {
-    if(isProbablyCDF(image, size))
+    if(isProbablyTVBoy(image, size))
+      type = "TVBOY";
+    else if(isProbablyCDF(image, size))
       type = "CDF";
     else if(isProbably3E(image, size))
       type = "3E";
@@ -502,7 +511,9 @@ string Cartridge::autodetectType(const uint8_t* image, uint32_t size)
   }
   else if(size == 256*1024)  // 256K
   {
-    if(isProbablyCDF(image, size))
+    if(isProbablyTVBoy(image, size))
+      type = "TVBOY";
+    else if(isProbablyCDF(image, size))
       type = "CDF";
     else if(isProbably3E(image, size))
       type = "3E";
@@ -515,8 +526,10 @@ string Cartridge::autodetectType(const uint8_t* image, uint32_t size)
   }
   else if(size == 512*1024)  // 512K
   {
+    if(isProbablyTVBoy(image, size))
+      type = "TVBOY";
     // Only CDFJ+ reaches this size in the types this core supports.
-    if(isProbablyCDF(image, size))
+    else if(isProbablyCDF(image, size))
       type = "CDF";
     else if(isProbably3E(image, size))
       type = "3E";
@@ -943,6 +956,14 @@ bool Cartridge::isProbablySB(const uint8_t* image, uint32_t size)
     return true;
   else
     return searchForBytes(image, size, signature[1], 3, 1);
+}
+
+bool Cartridge::isProbablyTVBoy(const uint8_t* image, uint32_t size)
+{
+  // TV Boy cart bankswitching switches banks by accessing addresses
+  // 0x1800..0x187F; the menu code does "STA ($82),Y" then "JMP ($FFFC)".
+  static const uint8_t signature[5] = { 0x91, 0x82, 0x6c, 0xfc, 0xff };
+  return searchForBytes(image, size, signature, 5, 1);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
