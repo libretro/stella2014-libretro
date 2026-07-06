@@ -941,6 +941,13 @@ bool MovieCart::init(const string& path)
 
   myStream.swapField(true, myOdd);
 
+  // Lay out the title screen for NTSC. This matches the default in modern
+  // Stella (which only adjusts the title for PAL via a console-timing hook
+  // this core does not have) and is purely cosmetic: each movie field carries
+  // its own format in its header, so playback is correct for PAL content
+  // regardless of the title-screen layout.
+  setConsoleTiming(false);
+
   return true;
 }
 
@@ -1666,12 +1673,6 @@ void CartridgeMVC::install(System& system)
 void CartridgeMVC::reset()
 {
   myMovie->init(myPath);
-
-  // Set the title-screen layout for the display format. Defaults to NTSC;
-  // this only affects the title screen, not movie playback.
-  bool isPAL = mySettings.getString("region") == "pal" ||
-               mySettings.getString("region") == "PAL";
-  myMovie->setConsoleTiming(isPAL);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

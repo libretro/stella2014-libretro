@@ -1279,7 +1279,7 @@ void retro_get_system_info(struct retro_system_info *info)
 #endif
    info->library_version = STELLA_VERSION GIT_VERSION;
    info->need_fullpath = false;
-   info->valid_extensions = "a26|bin";
+   info->valid_extensions = "a26|bin|mvc";
 }
 
 void retro_get_system_av_info(struct retro_system_av_info *info)
