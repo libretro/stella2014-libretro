@@ -43,6 +43,7 @@ SOURCES_CXX := $(CORE_DIR)/src/common/Base.cxx \
 	       $(CORE_DIR)/src/emucore/CartE0.cxx \
 	       $(CORE_DIR)/src/emucore/CartE7.cxx \
 	       $(CORE_DIR)/src/emucore/CartEF.cxx \
+	       $(CORE_DIR)/src/emucore/CartEnhanced.cxx \
 	       $(CORE_DIR)/src/emucore/CartEFSC.cxx \
 	       $(CORE_DIR)/src/emucore/CartF0.cxx \
 	       $(CORE_DIR)/src/emucore/CartF4.cxx \

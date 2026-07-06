@@ -1,8 +1,8 @@
 //============================================================================
 //
-//   SSSS    tt          lll  lll       
-//  SS  SS   tt           ll   ll        
-//  SS     tttttt  eeee   ll   ll   aaaa 
+//   SSSS    tt          lll  lll
+//  SS  SS   tt           ll   ll
+//  SS     tttttt  eeee   ll   ll   aaaa
 //   SSSS    tt   ee  ee  ll   ll      aa
 //      SS   tt   eeeeee  ll   ll   aaaaa  --  "An Atari 2600 VCS Emulator"
 //  SS  SS   tt   ee      ll   ll  aa  aa
@@ -13,173 +13,62 @@
 //
 // See the file "License.txt" for information on usage and redistribution of
 // this file, and for a DISCLAIMER OF ALL WARRANTIES.
-//
-// $Id: Cart3E.hxx 2838 2014-01-17 23:34:03Z stephena $
 //============================================================================
 
 #ifndef CARTRIDGE3E_HXX
 #define CARTRIDGE3E_HXX
 
-class System;
-
 #include "bspf.hxx"
-#include "Cart.hxx"
+#include "CartEnhanced.hxx"
 
 /**
-  This is the cartridge class for Tigervision's bankswitched
-  games with RAM (basically, 3F plus up to 32K of RAM). This
-  code is basically Brad's Cart3F code plus 32K RAM support.
+  This is the cartridge class for Tigervision's bankswitched games with
+  RAM (3F plus up to 32K of RAM). Each 2K ROM bank, or a 1K RAM bank, can
+  be mapped into the lower half of the 4K address space ($F000-$F7FF); the
+  upper half ($F800-$FFFF) is fixed to the last 2K of ROM.
 
-  In this bankswitching scheme the 2600's 4K cartridge
-  address space is broken into two 2K segments.  The last 2K
-  segment always points to the last 2K of the ROM image.
+    - poke $3F with the bank number to map that 2K ROM bank low
+    - poke $3E with the bank number to map that 1K RAM bank low
+      (RAM read port at $F000-$F3FF, write port at $F400-$F7FF)
 
-  The lower 2K of address space maps to either one of the 2K ROM banks
-  (up to 256 of them, though only 240 are supposed to be used for
-  compatibility with the Kroko Cart and Cuttle Cart 2), or else one
-  of the 1K RAM banks (up to 32 of them). Like other carts with RAM,
-  this takes up twice the address space that it should: The lower 1K
-  is the read port, and the upper 1K is the write port (maps to the
-  same memory).
+  This is a thin wrapper over CartridgeEnhanced, which provides the generic
+  ROM/RAM segment-banking engine; only the $3E/$3F hotspot decoding and the
+  TIA chaining are specific to 3E.
 
-  To map ROM, the desired bank number of the first 2K segment is selected
-  by storing its value into $3F. To map RAM in the first 2K segment
-  instead, store the RAM bank number into $3E.
-
-  This implementation of 3E bankswitching numbers the ROM banks 0 to
-  255, and the RAM banks 256 to 287. This is done because the public
-  bankswitching interface requires us to use one bank number, not one
-  bank number plus the knowledge of whether it's RAM or ROM.
-
-  All 32K of potential RAM is available to a game using this class, even
-  though real cartridges might not have the full 32K: We have no way to
-  tell how much RAM the game expects. This may change in the future (we
-  may add a stella.pro property for this), but for now it shouldn't cause
-  any problems. (Famous last words...)
-
-  @author  B. Watson
-  @version $Id: Cart3E.hxx 2838 2014-01-17 23:34:03Z stephena $
+  @author  Bradford W. Mott, Thomas Jentzsch (original); reimplemented on
+           CartridgeEnhanced for the 2014 core
 */
-
-class Cartridge3E : public Cartridge
+class Cartridge3E : public CartridgeEnhanced
 {
   friend class Cartridge3EWidget;
 
   public:
-    /**
-      Create a new cartridge using the specified image and size
-
-      @param image     Pointer to the ROM image
-      @param size      The size of the ROM image
-      @param settings  A reference to the various settings (read-only)
-    */
     Cartridge3E(const uint8_t* image, uint32_t size, const Settings& settings);
- 
-    /**
-      Destructor
-    */
     virtual ~Cartridge3E();
 
   public:
-    /**
-      Reset device to its power-on state
-    */
-    void reset();
-
-    /**
-      Install cartridge in the specified system.  Invoked by the system
-      when the cartridge is attached to it.
-
-      @param system The system the device should install itself in
-    */
     void install(System& system);
 
-    /**
-      Install pages for the specified bank in the system.
-
-      @param bank The bank that should be installed in the system
-    */
-    bool bank(uint16_t bank);
-
-    /**
-      Get the current bank.
-    */
-    uint16_t bank() const;
-
-    /**
-      Query the number of banks supported by the cartridge.
-    */
-    uint16_t bankCount() const;
-
-    /**
-      Patch the cartridge ROM.
-
-      @param address  The ROM address to patch
-      @param value    The value to place into the address
-      @return    Success or failure of the patch operation
-    */
-    bool patch(uint16_t address, uint8_t value);
-
-    /**
-      Access the internal ROM image for this cartridge.
-
-      @param size  Set to the size of the internal ROM image data
-      @return  A pointer to the internal ROM image data
-    */
-    const uint8_t* getImage(int& size) const;
-
-    /**
-      Save the current state of this cart to the given Serializer.
-
-      @param out  The Serializer object to use
-      @return  False on any errors, else true
-    */
-    bool save(Serializer& out) const;
-
-    /**
-      Load the current state of this cart from the given Serializer.
-
-      @param in  The Serializer object to use
-      @return  False on any errors, else true
-    */
-    bool load(Serializer& in);
-
-    /**
-      Get a descriptor for the device name (used in error checking).
-
-      @return The name of the object
-    */
     string name() const { return "Cartridge3E"; }
 
-  public:
-    /**
-      Get the byte at the specified address
-
-      @return The byte at the specified address
-    */
     uint8_t peek(uint16_t address);
-
-    /**
-      Change the byte at the specified address to the given value
-
-      @param address The address where the value should be stored
-      @param value The value to be stored at the address
-      @return  True if the poke changed the device address space, else false
-    */
     bool poke(uint16_t address, uint8_t value);
 
+  protected:
+    bool checkSwitchBank(uint16_t address, uint8_t value);
+
+  protected:
+    // 2K ROM banks
+    static const uint16_t BANK_SHIFT_3E = 11;
+    // 32 x 1K RAM banks = 32K
+    static const uint16_t RAM_BANKS_3E = 32;
+    static const uint32_t RAM_SIZE_3E  = (uint32_t)RAM_BANKS_3E << (BANK_SHIFT_3E - 1);
+
   private:
-    // Indicates which bank is currently active for the first segment
-    uint16_t myCurrentBank;
-
-    // Pointer to a dynamically allocated ROM image of the cartridge
-    uint8_t* myImage;
-
-    // RAM contents. For now every ROM gets all 32K of potential RAM
-    uint8_t myRAM[32 * 1024];
-
-    // Size of the ROM image
-    uint32_t mySize;
+    // Following constructors and assignment operators not supported
+    Cartridge3E();
+    Cartridge3E(const Cartridge3E&);
+    Cartridge3E& operator=(const Cartridge3E&);
 };
 
 #endif
