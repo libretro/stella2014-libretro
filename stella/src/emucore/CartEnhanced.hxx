@@ -196,6 +196,14 @@ class CartridgeEnhanced : public Cartridge
     virtual uint16_t calcNumSegments() const;
 
     /**
+      Get the lowest hotspot address. If the hotspot lives in cartridge
+      space (bit 12 set), the page containing it is left routed through
+      peek()/poke() so that reads as well as writes can trigger banking.
+      The default of 0 means "no cartridge-space hotspot page to exclude".
+    */
+    virtual uint16_t hotspot() const { return 0; }
+
+    /**
       The power-on bank (default 0).
     */
     virtual uint16_t getStartBank() const { return 0; }

@@ -1,8 +1,8 @@
 //============================================================================
 //
-//   SSSS    tt          lll  lll       
-//  SS  SS   tt           ll   ll        
-//  SS     tttttt  eeee   ll   ll   aaaa 
+//   SSSS    tt          lll  lll
+//  SS  SS   tt           ll   ll
+//  SS     tttttt  eeee   ll   ll   aaaa
 //   SSSS    tt   ee  ee  ll   ll      aa
 //      SS   tt   eeeeee  ll   ll   aaaaa  --  "An Atari 2600 VCS Emulator"
 //  SS  SS   tt   ee      ll   ll  aa  aa
@@ -13,33 +13,24 @@
 //
 // See the file "License.txt" for information on usage and redistribution of
 // this file, and for a DISCLAIMER OF ALL WARRANTIES.
-//
-// $Id: CartF8.cxx 2838 2014-01-17 23:34:03Z stephena $
 //============================================================================
 
-#include <cstring>
-
-#include "System.hxx"
 #include "CartF8.hxx"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-CartridgeF8::CartridgeF8(const uint8_t* image, uint32_t size, const string& md5,
-                         const Settings& settings)
-  : Cartridge(settings)
+CartridgeF8::CartridgeF8(const uint8_t* image, uint32_t size,
+                         const string& md5, const Settings& settings)
+  : CartridgeEnhanced(image, size, settings, 8192),
+    myStartBankF8(1)
 {
-  // Copy the ROM image into my buffer
-  memcpy(myImage, image, MIN(8192u, size));
-  createCodeAccessBase(8192);
-
-  // Normally bank 1 is the reset bank, unless we're dealing with ROMs
-  // that have been incorrectly created with banks in the opposite order
-  myStartBank =
-    (md5 == "bc24440b59092559a1ec26055fd1270e" ||  // Private Eye [a]
+  // Most F8 games power on in bank 1, but a handful of titles rely on
+  // powering on in bank 0.
+  if(md5 == "bc24440b59092559a1ec26055fd1270e" ||  // Private Eye [a]
      md5 == "75ea60884c05ba496473c23a58edf12f" ||  // 8-in-1 Yars Revenge
      md5 == "75ee371ccfc4f43e7d9b8f24e1266b55" ||  // Snow White
      md5 == "74c8a6f20f8adaa7e05183f796eda796" ||  // Tricade Demo
-     md5 == "9905f9f4706223dadee84f6867ede8e3")    // Challenge
-    ? 0 : 1;
+     md5 == "9905f9f4706223dadee84f6867ede8e3")     // Challenge
+    myStartBankF8 = 0;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -48,146 +39,18 @@ CartridgeF8::~CartridgeF8()
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CartridgeF8::reset()
+bool CartridgeF8::checkSwitchBank(uint16_t address, uint8_t)
 {
-  // Upon reset we switch to the reset bank
-  bank(myStartBank);
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CartridgeF8::install(System& system)
-{
-  mySystem = &system;
-
-  // Install pages for the startup bank
-  bank(myStartBank);
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uint8_t CartridgeF8::peek(uint16_t address)
-{
-  address &= 0x0FFF;
-
-  // Switch banks if necessary
   switch(address)
   {
-    case 0x0FF8:
-      // Set the current bank to the lower 4k bank
+    case 0x1FF8:
       bank(0);
-      break;
-
-    case 0x0FF9:
-      // Set the current bank to the upper 4k bank
+      return true;
+    case 0x1FF9:
       bank(1);
-      break;
-
-    default:
-      break;
-  }
-
-  return myImage[(myCurrentBank << 12) + address];
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeF8::poke(uint16_t address, uint8_t)
-{
-  address &= 0x0FFF;
-
-  // Switch banks if necessary
-  switch(address)
-  {
-    case 0x0FF8:
-      // Set the current bank to the lower 4k bank
-      bank(0);
-      break;
-
-    case 0x0FF9:
-      // Set the current bank to the upper 4k bank
-      bank(1);
-      break;
-
+      return true;
     default:
       break;
   }
   return false;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeF8::bank(uint16_t bank)
-{ 
-  if(bankLocked()) return false;
-
-  // Remember what bank we're in
-  myCurrentBank = bank;
-  uint16_t offset = myCurrentBank << 12;
-  uint16_t shift = mySystem->pageShift();
-  uint16_t mask = mySystem->pageMask();
-
-  System::PageAccess access(0, 0, 0, this, System::PA_READ);
-
-  // Set the page accessing methods for the hot spots
-  for(uint32_t i = (0x1FF8 & ~mask); i < 0x2000; i += (1 << shift))
-  {
-    access.codeAccessBase = &myCodeAccessBase[offset + (i & 0x0FFF)];
-    mySystem->setPageAccess(i >> shift, access);
-  }
-
-  // Setup the page access methods for the current bank
-  for(uint32_t address = 0x1000; address < (0x1FF8U & ~mask);
-      address += (1 << shift))
-  {
-    access.directPeekBase = &myImage[offset + (address & 0x0FFF)];
-    access.codeAccessBase = &myCodeAccessBase[offset + (address & 0x0FFF)];
-    mySystem->setPageAccess(address >> shift, access);
-  }
-  return myBankChanged = true;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uint16_t CartridgeF8::bank() const
-{
-  return myCurrentBank;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uint16_t CartridgeF8::bankCount() const
-{
-  return 2;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeF8::patch(uint16_t address, uint8_t value)
-{
-  myImage[(myCurrentBank << 12) + (address & 0x0FFF)] = value;
-  return myBankChanged = true;
-} 
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const uint8_t* CartridgeF8::getImage(int& size) const
-{
-  size = 8192;
-  return myImage;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeF8::save(Serializer& out) const
-{
-   out.putString(name());
-   out.putShort(myCurrentBank);
-
-   return true;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeF8::load(Serializer& in)
-{
-   if(in.getString() != name())
-      return false;
-
-   myCurrentBank = in.getShort();
-
-   // Remember what bank we were in
-   bank(myCurrentBank);
-
-   return true;
 }

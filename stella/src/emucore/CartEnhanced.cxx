@@ -135,6 +135,7 @@ void CartridgeEnhanced::install(System& system)
   }
 
   // Install pages for the startup bank (first segment)
+  myStartBank = getStartBank();
   bank(myStartBank, 0);
   if(mySize >= 4096 && myBankSegs > 1)
     // Point the last segment at the last ROM bank
@@ -175,6 +176,12 @@ bool CartridgeEnhanced::bank(uint16_t bank, uint16_t segment)
     uint16_t romBank = (uint16_t)(bank % romBankCount());
     uint32_t bankOffset = myCurrentSegOffset[segment] = (uint32_t)romBank << myBankShift;
 
+    // The page containing the hotspot must not be direct-peeked, so that
+    // reads of the hotspot address are routed through peek() and can trigger
+    // a bankswitch (some ROMs switch banks via LDA, not just STA).
+    uint16_t hs = hotspot();
+    uint16_t hotSpotAddr = (uint16_t)((hs & 0x1000) ? (hs & ~pageMask) : 0xFFFF);
+
     uint16_t fromAddr = (uint16_t)((ROM_OFFSET + segmentOffset +
                           (segment == 0 ? myRomOffset : 0)) & ~pageMask);
     uint16_t toAddr   = (uint16_t)((ROM_OFFSET + segmentOffset +
@@ -184,7 +191,7 @@ bool CartridgeEnhanced::bank(uint16_t bank, uint16_t segment)
     for(uint16_t addr = fromAddr; addr < toAddr; addr += (1 << shift))
     {
       uint32_t offset = bankOffset + (addr & myBankMask);
-      if(myDirectPeek)
+      if(myDirectPeek && addr != hotSpotAddr)
         access.directPeekBase = &myImage[offset];
       else
         access.directPeekBase = 0;
