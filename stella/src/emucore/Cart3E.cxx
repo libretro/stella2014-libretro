@@ -31,6 +31,17 @@ Cartridge3E::Cartridge3E(const uint8_t* image, uint32_t size,
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Cartridge3E::Cartridge3E(const uint8_t* image, uint32_t size,
+                         const Settings& settings, uint32_t bsSize)
+  : CartridgeEnhanced(image, size, settings, bsSize)
+{
+  myBankShift    = BANK_SHIFT_3E;
+  myRamSize      = RAM_SIZE_3E;
+  myRamBankCount = RAM_BANKS_3E;
+  myRamWpHigh    = true;
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Cartridge3E::~Cartridge3E()
 {
 }

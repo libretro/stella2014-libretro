@@ -46,6 +46,12 @@ class Cartridge3E : public CartridgeEnhanced
     Cartridge3E(const uint8_t* image, uint32_t size, const Settings& settings);
     virtual ~Cartridge3E();
 
+  protected:
+    // Constructor allowing a subclass (e.g. 3E+) to specify its own
+    // bankswitch size, which may differ from the raw image size.
+    Cartridge3E(const uint8_t* image, uint32_t size, const Settings& settings,
+                uint32_t bsSize);
+
   public:
     void install(System& system);
 

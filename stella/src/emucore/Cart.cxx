@@ -25,6 +25,7 @@
 #include "Cart2K.hxx"
 #include "Cart3E.hxx"
 #include "Cart3EX.hxx"
+#include "Cart3EPlus.hxx"
 #include "Cart3F.hxx"
 #include "Cart4A50.hxx"
 #include "Cart4K.hxx"
@@ -185,6 +186,8 @@ Cartridge* Cartridge::create(const uint8_t* image, uint32_t size, string& md5,
     cartridge = new Cartridge3E(image, size, settings);
   else if(type == "3EX")
     cartridge = new Cartridge3EX(image, size, settings);
+  else if(type == "3E+")
+    cartridge = new Cartridge3EPlus(image, size, settings);
   else if(type == "3F")
     cartridge = new Cartridge3F(image, size, settings);
   else if(type == "4A50")
@@ -388,6 +391,13 @@ string Cartridge::autodetectType(const uint8_t* image, uint32_t size)
   if((size % 8448) == 0 || size == 6144)
   {
     type = "AR";
+  }
+  else if(isProbably3EPlus(image, size))
+  {
+    // 3E+ is identified by a definitive 'TJ3E' key and can be any size
+    // (a multiple of 1K); it is checked before the size-based dispatch,
+    // and before 3E, since a 3E+ image also matches the 3E signature.
+    type = "3E+";
   }
   else if(isProbablyMDM(image, size))
   {
@@ -738,6 +748,13 @@ bool Cartridge::isProbably3EX(const uint8_t* image, uint32_t size)
   // 3EX carts contain the string "3EX" at least twice
   static const uint8_t sig[3] = { '3', 'E', 'X' };
   return searchForBytes(image, size, sig, 3, 2);
+}
+
+bool Cartridge::isProbably3EPlus(const uint8_t* image, uint32_t size)
+{
+  // 3E+ cart is identified by the key 'TJ3E' in the ROM
+  static const uint8_t tj3e[4] = { 'T', 'J', '3', 'E' };
+  return searchForBytes(image, size, tj3e, 4, 1);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
