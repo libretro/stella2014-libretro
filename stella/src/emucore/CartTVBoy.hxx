@@ -19,136 +19,45 @@
 #define CARTRIDGE_TVBOY_HXX
 
 #include "bspf.hxx"
-#include "Cart.hxx"
+#include "CartEnhanced.hxx"
 
 /**
-  Cartridge class used for the "TV Boy" and "Super TV Boy" consoles, which
-  hold many games in one image. Up to 128 4K banks are selected by accessing
-  a hotspot in the range $1800-$187F (mirrored at $F800-$F87F); the low bits
-  of the address form the bank number. The first bank switch after power-on
-  locks any further bankswitching (so the built-in menu can start a game and
-  the game then runs from a fixed bank).
+  Cartridge class used for the "TV Boy" 128-in-1 (and similar) multicarts.
+  The image is a number of 4K banks; a write in $1800-$187F selects a bank
+  from the low bits of the address. After the first real bankswitch (to a
+  non-zero bank) further switching is locked out, which is how the built-in
+  menu hands control to the selected game.
 
-  @author  Thomas Jentzsch (original); backported for the 2014 core
+  Reimplemented on CartridgeEnhanced. To preserve the current core's exact
+  behaviour, this cart deliberately does NOT declare a hotspot(): the whole
+  ROM window stays direct-peeked, so the bankswitch is triggered by writes
+  only (matching the standalone version, whose read hotspot was likewise
+  masked by direct peek). checkSwitchBank() therefore runs only from poke().
+
+  @author  Fabio Spadaro
 */
-class CartridgeTVBoy : public Cartridge
+class CartridgeTVBoy : public CartridgeEnhanced
 {
   friend class CartridgeTVBoyWidget;
 
   public:
-    /**
-      Create a new cartridge using the specified image.
-
-      @param image     Pointer to the ROM image
-      @param size      The size of the ROM image
-      @param settings  A reference to the various settings (read-only)
-    */
     CartridgeTVBoy(const uint8_t* image, uint32_t size, const Settings& settings);
-
-    /**
-      Destructor
-    */
     virtual ~CartridgeTVBoy();
 
   public:
-    /**
-      Reset device to its power-on state.
-    */
-    void reset();
-
-    /**
-      Install cartridge in the specified system. Invoked by the system when
-      the cartridge is attached to it.
-
-      @param system The system the device should install itself in
-    */
-    void install(System& system);
-
-    /**
-      Install pages for the specified bank in the system.
-
-      @param bank The bank that should be installed in the system
-    */
-    bool bank(uint16_t bank);
-
-    /**
-      Get the current bank.
-    */
-    uint16_t bank() const;
-
-    /**
-      Query the number of banks supported by the cartridge.
-    */
-    uint16_t bankCount() const;
-
-    /**
-      Patch the cartridge ROM.
-
-      @param address  The ROM address to patch
-      @param value    The value to place into the address
-      @return    Success or failure of the patch operation
-    */
-    bool patch(uint16_t address, uint8_t value);
-
-    /**
-      Access the internal ROM image for this cartridge.
-
-      @param size  Set to the size of the internal ROM image data
-      @return  A pointer to the internal ROM image data
-    */
-    const uint8_t* getImage(int& size) const;
-
-    /**
-      Save the current state of this cart to the given Serializer.
-    */
     bool save(Serializer& out) const;
-
-    /**
-      Load the current state of this cart from the given Serializer.
-    */
     bool load(Serializer& in);
 
-    /**
-      Get a descriptor for the device name (used in error checking).
-    */
     string name() const { return "CartridgeTVBoy"; }
 
-  public:
-    /**
-      Get the byte at the specified address.
+  protected:
+    bool checkSwitchBank(uint16_t address, uint8_t value);
 
-      @return The byte at the specified address
-    */
-    uint8_t peek(uint16_t address);
-
-    /**
-      Change the byte at the specified address to the given value.
-
-      @param address The address where the value should be stored
-      @param value The value to be stored at the address
-      @return  True if the poke changed the device address space, else false
-    */
-    bool poke(uint16_t address, uint8_t value);
+    bool bank(uint16_t bank, uint16_t segment);
+    bool bank(uint16_t bank_) { return this->bank(bank_, 0); }
 
   private:
-    // Handle a hotspot access at the given (masked) address; switch bank
-    // if it selects one and bankswitching is still enabled.
-    void checkSwitchBank(uint16_t address);
-
-  private:
-    // Pointer to a copy of the entire ROM image
-    uint8_t* myImage;
-
-    // Size of the ROM image
-    uint32_t mySize;
-
-    // Number of 4K banks in the image
-    uint16_t myNumBanks;
-
-    // Indicates which bank is currently active
-    uint16_t myCurrentBank;
-
-    // Once true, all further bankswitching is ignored
+    // After the first non-zero bankswitch, all further switching is disabled
     bool myBankingDisabled;
 
   private:

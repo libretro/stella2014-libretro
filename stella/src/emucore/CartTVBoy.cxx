@@ -15,182 +15,58 @@
 // this file, and for a DISCLAIMER OF ALL WARRANTIES.
 //============================================================================
 
-#include <cstring>
-
-#include "System.hxx"
 #include "CartTVBoy.hxx"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 CartridgeTVBoy::CartridgeTVBoy(const uint8_t* image, uint32_t size,
                                const Settings& settings)
-  : Cartridge(settings),
-    mySize(size),
-    myCurrentBank(0),
+  : CartridgeEnhanced(image, size, settings, size),
     myBankingDisabled(false)
 {
-  // Allocate array for the ROM image
-  myImage = new uint8_t[mySize];
-
-  // Copy the ROM image into my buffer
-  memcpy(myImage, image, mySize);
-  createCodeAccessBase(mySize);
-
-  myNumBanks = (uint16_t)(mySize >> 12);
-
-  // The menu is in bank 0 at power-on
-  myStartBank = 0;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 CartridgeTVBoy::~CartridgeTVBoy()
 {
-  delete[] myImage;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CartridgeTVBoy::reset()
+bool CartridgeTVBoy::checkSwitchBank(uint16_t address, uint8_t)
 {
-  myBankingDisabled = false;
-  bank(myStartBank);
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CartridgeTVBoy::install(System& system)
-{
-  mySystem = &system;
-
-  // Install pages for the startup bank
-  bank(myStartBank);
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CartridgeTVBoy::checkSwitchBank(uint16_t address)
-{
-  // Hotspots are $1800-$187F (masked here to $800-$87F). The low bits of
-  // the address form the bank number.
-  if(address >= 0x0800 && address <= 0x087F)
-    bank(address & (myNumBanks - 1));
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uint8_t CartridgeTVBoy::peek(uint16_t address)
-{
-  address &= 0x0FFF;
-
-  checkSwitchBank(address);
-
-  return myImage[(myCurrentBank << 12) + address];
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeTVBoy::poke(uint16_t address, uint8_t)
-{
-  checkSwitchBank(address & 0x0FFF);
+  if((address & ADDR_MASK) >= 0x1800 && (address & ADDR_MASK) <= 0x187F)
+  {
+    bank(address & (romBankCount() - 1));
+    return true;
+  }
   return false;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeTVBoy::bank(uint16_t bank)
+bool CartridgeTVBoy::bank(uint16_t bank, uint16_t segment)
 {
-  // Any bankswitching after the first one is locked out; the check for
-  // bank 0 avoids locking on the power-on install.
   if(myBankingDisabled) return false;
 
-  if(bank >= myNumBanks) return false;
+  bool banked = CartridgeEnhanced::bank(bank, segment);
 
-  // Remember what bank we're in
-  myCurrentBank = bank;
-  uint32_t offset = myCurrentBank << 12;
-  uint16_t shift = mySystem->pageShift();
-
-  // Setup the page access methods for the current bank
-  System::PageAccess access(0, 0, 0, this, System::PA_READ);
-
-  // Map ROM image into the system
-  for(uint32_t address = 0x1000; address < 0x2000; address += (1 << shift))
-  {
-    access.directPeekBase = &myImage[offset + (address & 0x0FFF)];
-    access.codeAccessBase = &myCodeAccessBase[offset + (address & 0x0FFF)];
-    mySystem->setPageAccess(address >> shift, access);
-  }
-
-  // Any bankswitching locks further bankswitching (but not the initial
-  // power-on selection of bank 0)
-  if(bank != 0)
+  // The first switch to a non-zero bank locks all further switching
+  if(banked && bank != 0)
     myBankingDisabled = true;
 
-  return myBankChanged = true;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uint16_t CartridgeTVBoy::bank() const
-{
-  return myCurrentBank;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uint16_t CartridgeTVBoy::bankCount() const
-{
-  return myNumBanks;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeTVBoy::patch(uint16_t address, uint8_t value)
-{
-  myImage[(myCurrentBank << 12) + (address & 0x0FFF)] = value;
-  return true;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const uint8_t* CartridgeTVBoy::getImage(int& size) const
-{
-  size = mySize;
-  return myImage;
+  return banked;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeTVBoy::save(Serializer& out) const
 {
-  try
-  {
-    out.putString(name());
-    out.putShort(myCurrentBank);
-    out.putBool(myBankingDisabled);
-  }
-  catch(...)
-  {
-    return false;
-  }
-
+  CartridgeEnhanced::save(out);
+  out.putBool(myBankingDisabled);
   return true;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool CartridgeTVBoy::load(Serializer& in)
 {
-  try
-  {
-    if(in.getString() != name())
-      return false;
-
-    myCurrentBank = in.getShort();
-    myBankingDisabled = in.getBool();
-  }
-  catch(...)
-  {
-    return false;
-  }
-
-  // Remember what bank we were in (force the mapping, bypassing the lock)
-  uint32_t offset = myCurrentBank << 12;
-  uint16_t shift = mySystem->pageShift();
-  System::PageAccess access(0, 0, 0, this, System::PA_READ);
-  for(uint32_t address = 0x1000; address < 0x2000; address += (1 << shift))
-  {
-    access.directPeekBase = &myImage[offset + (address & 0x0FFF)];
-    access.codeAccessBase = &myCodeAccessBase[offset + (address & 0x0FFF)];
-    mySystem->setPageAccess(address >> shift, access);
-  }
-
+  CartridgeEnhanced::load(in);
+  myBankingDisabled = in.getBool();
   return true;
 }
