@@ -43,6 +43,11 @@ static Settings *settings = 0;
 static OSystem osystem;
 static StateManager stateManager(&osystem);
 
+/* Selected color palette ("standard" or "z26"), driven by the
+ * stella2014_palette core option. Built-in palettes only, so applying it
+ * is pure computation with no file I/O. */
+static char core_palette[16] = "standard";
+
 static int videoWidth, videoHeight;
 
 /* Sized to the TIA's internal frame buffer (160 x 320 lines), not the
@@ -1218,6 +1223,28 @@ static void check_variables(bool first_run)
    stelladaptor_analog_center =
          get_stelladaptor_analog_center(
                stelladaptor_center);
+
+   /* Read color palette option. Both choices are built-in palettes, so
+    * this involves no file I/O and never blocks. On first run the console
+    * does not exist yet; the value is stashed in core_palette and pushed
+    * into Settings before the Console is created (retro_load_game). For a
+    * live change the console exists, so apply it immediately. */
+   var.key   = "stella2014_palette";
+   var.value = NULL;
+
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+   {
+      if (!strcmp(var.value, "z26"))
+         strcpy(core_palette, "z26");
+      else
+         strcpy(core_palette, "standard");
+   }
+
+   if (console && settings)
+   {
+      settings->setValue("palette", core_palette);
+      console->setPalette(core_palette);
+   }
 }
 
 /************************************
@@ -1532,6 +1559,10 @@ bool retro_load_game(const struct retro_game_info *info)
    string cartId;//, romType("AUTO-DETECT");
    settings = new Settings(&osystem);
    settings->setValue("romloadcount", false);
+   /* Apply the selected palette before the Console is created, since the
+    * Console reads settings("palette") during construction. This is a
+    * built-in palette selection: no file is read. */
+   settings->setValue("palette", core_palette);
    cartridge = Cartridge::create((const uint8_t*)info->data, (uint32_t)info->size, cartMD5, cartType, cartId, osystem, *settings);
 
    if(cartridge == 0)

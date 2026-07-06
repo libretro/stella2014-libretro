@@ -61,6 +61,17 @@ struct retro_core_option_definition option_defs_us[] = {
       "16bit"
    },
    {
+      "stella2014_palette",
+      "Color Palette",
+      "Selects the color palette used to render games. 'Standard' is Stella's own calibrated palette; 'Z26' matches the palette from the z26 emulator. Both are built in, so switching takes effect immediately.",
+      {
+         { "standard", "Standard" },
+         { "z26",      "Z26" },
+         { NULL, NULL },
+      },
+      "standard"
+   },
+   {
       "stella2014_mix_frames",
       "Interframe Blending",
       "Simulates CRT phosphor ghosting effects. 'Simple' performs a 50:50 mix of the current and previous frames. 'Ghosting' accumulates pixels from multiple successive frames. May be used to alleviate screen flicker when games display large numbers of simultaneous objects by toggling sprites on alternate frames.",
