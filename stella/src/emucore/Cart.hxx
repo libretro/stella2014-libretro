@@ -315,6 +315,11 @@ class Cartridge : public Device
     static bool isProbably3EPlus(const uint8_t* image, uint32_t size);
 
     /**
+      Returns true if the image is probably a GameLine Master Module cartridge.
+    */
+    static bool isProbablyGL(const uint8_t* image, uint32_t size);
+
+    /**
       Returns true if the image is probably a 3F bankswitching cartridge
     */
     static bool isProbably3F(const uint8_t* image, uint32_t size);

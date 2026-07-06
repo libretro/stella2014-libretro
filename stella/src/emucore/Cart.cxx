@@ -57,6 +57,7 @@
 #include "CartFA2.hxx"
 #include "CartFC.hxx"
 #include "CartFE.hxx"
+#include "CartGL.hxx"
 #include "CartMC.hxx"
 #include "CartMDM.hxx"
 #include "CartSB.hxx"
@@ -250,6 +251,8 @@ Cartridge* Cartridge::create(const uint8_t* image, uint32_t size, string& md5,
     cartridge = new CartridgeFC(image, size, settings);
   else if(type == "FE")
     cartridge = new CartridgeFE(image, size, settings);
+  else if(type == "GL")
+    cartridge = new CartridgeGL(image, size, settings);
   else if(type == "MC")
     cartridge = new CartridgeMC(image, size, settings);
   else if(type == "MDM")
@@ -416,7 +419,9 @@ string Cartridge::autodetectType(const uint8_t* image, uint32_t size)
   }
   else if(size == 4096)
   {
-    if(isProbablyFC(image, size))
+    if(isProbablyGL(image, size))
+      type = "GL";
+    else if(isProbablyFC(image, size))
       type = "FC";
     else if(isProbablyCV(image,size))
       type = "CV";
@@ -755,6 +760,13 @@ bool Cartridge::isProbably3EPlus(const uint8_t* image, uint32_t size)
   // 3E+ cart is identified by the key 'TJ3E' in the ROM
   static const uint8_t tj3e[4] = { 'T', 'J', '3', 'E' };
   return searchForBytes(image, size, tj3e, 4, 1);
+}
+
+bool Cartridge::isProbablyGL(const uint8_t* image, uint32_t size)
+{
+  // GameLine Master Module contains the signature 'LDA $0CB8'
+  static const uint8_t sig[3] = { 0xAD, 0xB8, 0x0C };
+  return searchForBytes(image, size, sig, 3, 1);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
