@@ -1,8 +1,8 @@
 //============================================================================
 //
-//   SSSS    tt          lll  lll       
-//  SS  SS   tt           ll   ll        
-//  SS     tttttt  eeee   ll   ll   aaaa 
+//   SSSS    tt          lll  lll
+//  SS  SS   tt           ll   ll
+//  SS     tttttt  eeee   ll   ll   aaaa
 //   SSSS    tt   ee  ee  ll   ll      aa
 //      SS   tt   eeeeee  ll   ll   aaaaa  --  "An Atari 2600 VCS Emulator"
 //  SS  SS   tt   ee      ll   ll  aa  aa
@@ -13,257 +13,22 @@
 //
 // See the file "License.txt" for information on usage and redistribution of
 // this file, and for a DISCLAIMER OF ALL WARRANTIES.
-//
-// $Id: CartF6SC.cxx 2838 2014-01-17 23:34:03Z stephena $
 //============================================================================
 
-#include <cstring>
-
-#include "System.hxx"
 #include "CartF6SC.hxx"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-CartridgeF6SC::CartridgeF6SC(const uint8_t* image, uint32_t size, const Settings& settings)
-  : Cartridge(settings)
+CartridgeF6SC::CartridgeF6SC(const uint8_t* image, uint32_t size,
+                             const Settings& settings)
+  : CartridgeF6(image, size, settings)
 {
-  // Copy the ROM image into my buffer
-  memcpy(myImage, image, MIN(16384u, size));
-  createCodeAccessBase(16384);
-
-  // This cart contains 128 bytes extended RAM @ 0x1000
-  registerRamArea(0x1000, 128, 0x80, 0x00);
-
-  // Remember startup bank
-  myStartBank = 0;
+  // The only difference from plain F6 is 128 bytes of superchip RAM; the
+  // base class installs the write port ($1000-$107F) and read port
+  // ($1080-$10FF) from myRamSize.
+  myRamSize = 128;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 CartridgeF6SC::~CartridgeF6SC()
 {
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CartridgeF6SC::reset()
-{
-  // Initialize RAM
-  if(mySettings.getBool("ramrandom"))
-    for(uint32_t i = 0; i < 128; ++i)
-      myRAM[i] = mySystem->randGenerator().next();
-  else
-    memset(myRAM, 0, 128);
-
-  // Upon reset we switch to the startup bank
-  bank(myStartBank);
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CartridgeF6SC::install(System& system)
-{
-  mySystem     = &system;
-  uint16_t shift = mySystem->pageShift();
-
-  System::PageAccess access(0, 0, 0, this, System::PA_READ);
-
-  // Set the page accessing method for the RAM writing pages
-  access.type = System::PA_WRITE;
-  for(uint32_t j = 0x1000; j < 0x1080; j += (1 << shift))
-  {
-    access.directPokeBase = &myRAM[j & 0x007F];
-    access.codeAccessBase = &myCodeAccessBase[j & 0x007F];
-    mySystem->setPageAccess(j >> shift, access);
-  }
-
-  // Set the page accessing method for the RAM reading pages
-  access.directPokeBase = 0;
-  access.type = System::PA_READ;
-  for(uint32_t k = 0x1080; k < 0x1100; k += (1 << shift))
-  {
-    access.directPeekBase = &myRAM[k & 0x007F];
-    access.codeAccessBase = &myCodeAccessBase[0x80 + (k & 0x007F)];
-    mySystem->setPageAccess(k >> shift, access);
-  }
-
-  // Install pages for the startup bank
-  bank(myStartBank);
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uint8_t CartridgeF6SC::peek(uint16_t address)
-{
-  uint16_t peekAddress = address;
-  address &= 0x0FFF;
-
-  // Switch banks if necessary
-  switch(address)
-  {
-    case 0x0FF6:
-      // Set the current bank to the first 4k bank
-      bank(0);
-      break;
-
-    case 0x0FF7:
-      // Set the current bank to the second 4k bank
-      bank(1);
-      break;
-
-    case 0x0FF8:
-      // Set the current bank to the third 4k bank
-      bank(2);
-      break;
-
-    case 0x0FF9:
-      // Set the current bank to the forth 4k bank
-      bank(3);
-      break;
-
-    default:
-      break;
-  }
-  
-  if(address < 0x0080)  // Write port is at 0xF000 - 0xF080 (128 bytes)
-  {
-    // Reading from the write port triggers an unwanted write
-    uint8_t value = mySystem->getDataBusState(0xFF);
-
-    if(bankLocked())
-      return value;
-    else
-    {
-      triggerReadFromWritePort(peekAddress);
-      return myRAM[address] = value;
-    }
-  }  
-  else
-    return myImage[(myCurrentBank << 12) + address];
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeF6SC::poke(uint16_t address, uint8_t)
-{
-  address &= 0x0FFF;
-
-  // Switch banks if necessary
-  switch(address)
-  {
-    case 0x0FF6:
-      // Set the current bank to the first 4k bank
-      bank(0);
-      break;
-
-    case 0x0FF7:
-      // Set the current bank to the second 4k bank
-      bank(1);
-      break;
-
-    case 0x0FF8:
-      // Set the current bank to the third 4k bank
-      bank(2);
-      break;
-
-    case 0x0FF9:
-      // Set the current bank to the forth 4k bank
-      bank(3);
-      break;
-
-    default:
-      break;
-  }
-
-  // NOTE: This does not handle accessing RAM, however, this function
-  // should never be called for RAM because of the way page accessing
-  // has been setup
-  return false;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeF6SC::bank(uint16_t bank)
-{ 
-  if(bankLocked()) return false;
-
-  // Remember what bank we're in
-  myCurrentBank = bank;
-  uint16_t offset = myCurrentBank << 12;
-  uint16_t shift = mySystem->pageShift();
-  uint16_t mask = mySystem->pageMask();
-
-  System::PageAccess access(0, 0, 0, this, System::PA_READ);
-
-  // Set the page accessing methods for the hot spots
-  for(uint32_t i = (0x1FF6 & ~mask); i < 0x2000; i += (1 << shift))
-  {
-    access.codeAccessBase = &myCodeAccessBase[offset + (i & 0x0FFF)];
-    mySystem->setPageAccess(i >> shift, access);
-  }
-
-  // Setup the page access methods for the current bank
-  for(uint32_t address = 0x1100; address < (0x1FF6U & ~mask);
-      address += (1 << shift))
-  {
-    access.directPeekBase = &myImage[offset + (address & 0x0FFF)];
-    access.codeAccessBase = &myCodeAccessBase[offset + (address & 0x0FFF)];
-    mySystem->setPageAccess(address >> shift, access);
-  }
-  return myBankChanged = true;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uint16_t CartridgeF6SC::bank() const
-{
-  return myCurrentBank;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-uint16_t CartridgeF6SC::bankCount() const
-{
-  return 4;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeF6SC::patch(uint16_t address, uint8_t value)
-{
-  address &= 0x0FFF;
-
-  if(address < 0x0100)
-  {
-    // Normally, a write to the read port won't do anything
-    // However, the patch command is special in that ignores such
-    // cart restrictions
-    myRAM[address & 0x007F] = value;
-  }
-  else
-    myImage[(myCurrentBank << 12) + address] = value;
-
-  return myBankChanged = true;
-} 
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const uint8_t* CartridgeF6SC::getImage(int& size) const
-{
-  size = 16384;
-  return myImage;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeF6SC::save(Serializer& out) const
-{
-   out.putString(name());
-   out.putShort(myCurrentBank);
-   out.putByteArray(myRAM, 128);
-
-   return true;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool CartridgeF6SC::load(Serializer& in)
-{
-   if(in.getString() != name())
-      return false;
-
-   myCurrentBank = in.getShort();
-   in.getByteArray(myRAM, 128);
-
-   // Remember what bank we were in
-   bank(myCurrentBank);
-
-   return true;
 }
