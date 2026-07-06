@@ -19,139 +19,54 @@
 #define CARTRIDGE_MDM_HXX
 
 #include "bspf.hxx"
-#include "Cart.hxx"
-#include "System.hxx"
+#include "CartEnhanced.hxx"
 
 /**
-  Cartridge class for the "Menu Driven Megacart" (Edwin Blink). In this
-  (modified) scheme the hotspots are read/write at $0800-$0BFF, where the
-  low byte selects the 4K bank to switch to. Up to 128 banks (512K) are
-  supported; selecting bank 128 or above locks all further bankswitching
-  until a reset. Because the hotspots overlap the TIA/RIOT region, accesses
-  there are forwarded to the underlying device.
+  Cartridge class used for "Menu Driven Megacart" (Edwin Blink). The image is
+  a number of 4K banks; a read or write in $0800-$0BFF selects a bank from the
+  low byte of the address. Selecting a bank above 127 permanently disables
+  further switching (this is how the menu hands control to the chosen game).
 
-  @author  Stephen Anthony, Thomas Jentzsch (original), based on the 0840
-           scheme by Fred X. Quimby; backported for the 2014 core
+  Reimplemented on CartridgeEnhanced. The hotspots live in the low mirror
+  region and forward their underlying access, so (as in the previous
+  standalone version) switching happens on both reads and writes.
+
+  @author  Stephen Anthony (original); 2014 port
 */
-class CartridgeMDM : public Cartridge
+class CartridgeMDM : public CartridgeEnhanced
 {
   friend class CartridgeMDMWidget;
 
   public:
-    /**
-      Create a new cartridge using the specified image.
-
-      @param image     Pointer to the ROM image
-      @param size      The size of the ROM image
-      @param settings  A reference to the various settings (read-only)
-    */
     CartridgeMDM(const uint8_t* image, uint32_t size, const Settings& settings);
-
-    /**
-      Destructor
-    */
     virtual ~CartridgeMDM();
 
   public:
-    /**
-      Reset device to its power-on state.
-    */
-    void reset();
-
-    /**
-      Install cartridge in the specified system.
-
-      @param system The system the device should install itself in
-    */
     void install(System& system);
 
-    /**
-      Install pages for the specified bank in the system.
-
-      @param bank The bank that should be installed in the system
-    */
-    bool bank(uint16_t bank);
-
-    /**
-      Get the current bank.
-    */
-    uint16_t bank() const;
-
-    /**
-      Query the number of banks supported by the cartridge.
-    */
-    uint16_t bankCount() const;
-
-    /**
-      Patch the cartridge ROM.
-
-      @param address  The ROM address to patch
-      @param value    The value to place into the address
-      @return    Success or failure of the patch operation
-    */
-    bool patch(uint16_t address, uint8_t value);
-
-    /**
-      Access the internal ROM image for this cartridge.
-
-      @param size  Set to the size of the internal ROM image data
-      @return  A pointer to the internal ROM image data
-    */
-    const uint8_t* getImage(int& size) const;
-
-    /**
-      Save the current state of this cart to the given Serializer.
-    */
-    bool save(Serializer& out) const;
-
-    /**
-      Load the current state of this cart from the given Serializer.
-    */
-    bool load(Serializer& in);
-
-    /**
-      Get a descriptor for the device name (used in error checking).
-    */
-    string name() const { return "CartridgeMDM"; }
-
-  public:
-    /**
-      Get the byte at the specified address.
-
-      @return The byte at the specified address
-    */
     uint8_t peek(uint16_t address);
-
-    /**
-      Change the byte at the specified address to the given value.
-
-      @return  True if the poke changed the device address space, else false
-    */
     bool poke(uint16_t address, uint8_t value);
 
-  private:
-    // Switch bank if the address hits a hotspot.
-    void checkSwitchBank(uint16_t address);
+    bool save(Serializer& out) const;
+    bool load(Serializer& in);
+
+    string name() const { return "CartridgeMDM"; }
+
+  protected:
+    bool checkSwitchBank(uint16_t address, uint8_t value);
+
+    uint16_t hotspot() const { return 0x0800; }
+
+    bool bank(uint16_t bank, uint16_t segment);
+    bool bank(uint16_t bank_) { return this->bank(bank_, 0); }
 
   private:
-    // Pointer to a copy of the entire ROM image
-    uint8_t* myImage;
-
-    // Size of the ROM image
-    uint32_t mySize;
-
-    // Number of 4K banks in the image
-    uint16_t myNumBanks;
-
-    // Indicates which bank is currently active
-    uint16_t myCurrentBank;
-
-    // Whether banking has been disabled (by selecting bank 128+)
-    bool myBankingDisabled;
-
-    // Saved page access for the hotspot region (TIA/RIOT), so accesses
-    // there can be forwarded to the underlying device
+    // The pages containing the hotspots ($800-$F00); accesses are forwarded
+    // to the devices that originally owned them.
     System::PageAccess myHotSpotPageAccess[8];
+
+    // After a bank above 127 is selected, all further switching is disabled
+    bool myBankingDisabled;
 
   private:
     // Following constructors and assignment operators not supported
