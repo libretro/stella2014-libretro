@@ -75,6 +75,20 @@ class Serializer
     void reset(void);
 
     /**
+      Returns the total size of the underlying stream, in bytes.
+
+      @result  The size of the stream, or 0 if it isn't valid.
+    */
+    uint32_t size(void);
+
+    /**
+      Sets the read/write location to the given absolute byte offset.
+
+      @param pos  The byte offset to seek to (from the start of the stream)
+    */
+    void setPosition(uint32_t pos);
+
+    /**
       Reads a byte value (unsigned 8-bit) from the current input stream.
 
       @result The byte value which has been read from the stream.

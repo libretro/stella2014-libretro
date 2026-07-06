@@ -111,6 +111,35 @@ void Serializer::reset(void)
   myStream->seekp(ios_base::beg);
 }
 
+uint32_t Serializer::size(void)
+{
+  if(myStream == NULL)
+    return 0;
+
+  // Temporarily disable exceptions so seeking to the end (and the
+  // implicit EOF handling) doesn't throw
+  ios_base::iostate mask = myStream->exceptions();
+  myStream->exceptions(ios_base::goodbit);
+
+  myStream->clear();
+  streampos cur = myStream->tellg();
+  myStream->seekg(0, ios_base::end);
+  streampos end = myStream->tellg();
+  myStream->clear();
+  myStream->seekg(cur);
+
+  myStream->exceptions(mask);
+
+  return (end > 0) ? (uint32_t)end : 0;
+}
+
+void Serializer::setPosition(uint32_t pos)
+{
+  myStream->clear();
+  myStream->seekg((streampos)pos);
+  myStream->seekp((streampos)pos);
+}
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 uint8_t Serializer::getByte(void)
 {
