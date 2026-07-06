@@ -1505,6 +1505,16 @@ bool retro_load_game(const struct retro_game_info *info)
 {
    enum retro_pixel_format fmt;
 
+   /* MovieCart (MVC) images are streamed from disk and can be many MB in
+    * size; they are identified by a 'M','V','C',0 signature at the start of
+    * the file. Detect this up front so the normal upper size limit (which
+    * targets ordinary bankswitched ROMs) doesn't reject them. */
+   bool isMVC = info && info->data && info->size >= 4 &&
+                ((const uint8_t*)info->data)[0] == 'M' &&
+                ((const uint8_t*)info->data)[1] == 'V' &&
+                ((const uint8_t*)info->data)[2] == 'C' &&
+                ((const uint8_t*)info->data)[3] == 0;
+
    /* Reject empty images and anything larger than the largest supported
     * cartridge. The historical limit was 96K, which predates the CDF/CDFJ
     * ARM mappers: CDF images run to 128K/256K and CDFJ+ up to 512K. The
@@ -1513,7 +1523,7 @@ bool retro_load_game(const struct retro_game_info *info)
     * buffer bound. Also reject anything below the smallest real cartridge
     * (2K): the size-based detectors index near the end of the image
     * (image[size-8] etc.), so a too-small image would read out of bounds. */
-   if (!info || info->size < 2*1024 || info->size > 512*1024)
+   if (!info || info->size < 2*1024 || (!isMVC && info->size > 512*1024))
       return false;
 
    /* Release any state from a previous load (repeat retro_load_game
@@ -1563,7 +1573,10 @@ bool retro_load_game(const struct retro_game_info *info)
     * Console reads settings("palette") during construction. This is a
     * built-in palette selection: no file is read. */
    settings->setValue("palette", core_palette);
-   cartridge = Cartridge::create((const uint8_t*)info->data, (uint32_t)info->size, cartMD5, cartType, cartId, osystem, *settings);
+   /* Pass the on-disk path through as well: streaming carts (MovieCart)
+    * reopen the file by path rather than using the in-memory image. */
+   string cartPath = (info->path != 0) ? string(info->path) : string("");
+   cartridge = Cartridge::create((const uint8_t*)info->data, (uint32_t)info->size, cartMD5, cartType, cartId, osystem, *settings, cartPath);
 
    if(cartridge == 0)
    {

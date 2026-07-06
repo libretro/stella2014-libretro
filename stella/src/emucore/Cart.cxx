@@ -60,6 +60,7 @@
 #include "CartGL.hxx"
 #include "CartMC.hxx"
 #include "CartMDM.hxx"
+#include "CartMVC.hxx"
 #include "CartSB.hxx"
 #include "CartTVBoy.hxx"
 #include "Cart0FA0.hxx"
@@ -73,7 +74,8 @@
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Cartridge* Cartridge::create(const uint8_t* image, uint32_t size, string& md5,
-     string& dtype, string& id, const OSystem& osystem, Settings& settings)
+     string& dtype, string& id, const OSystem& osystem, Settings& settings,
+     const string& path)
 {
   Cartridge* cartridge = 0;
   string type = dtype;
@@ -257,6 +259,8 @@ Cartridge* Cartridge::create(const uint8_t* image, uint32_t size, string& md5,
     cartridge = new CartridgeMC(image, size, settings);
   else if(type == "MDM")
     cartridge = new CartridgeMDM(image, size, settings);
+  else if(type == "MVC")
+    cartridge = new CartridgeMVC(path, size, md5, settings);
   else if(type == "UA")
     cartridge = new CartridgeUA(image, size, settings);
   else if(type == "SB")
@@ -391,7 +395,11 @@ string Cartridge::autodetectType(const uint8_t* image, uint32_t size)
   // Guess type based on size
   const char* type = 0;
 
-  if((size % 8448) == 0 || size == 6144)
+  if(isProbablyMVC(image, size))
+  {
+    type = "MVC";
+  }
+  else if((size % 8448) == 0 || size == 6144)
   {
     type = "AR";
   }
@@ -1107,6 +1115,14 @@ bool Cartridge::isProbablyFC(const uint8_t* image, uint32_t size)
     if(searchForBytes(image, size, signature[i], 6, 1))
       return true;
   return false;
+}
+
+bool Cartridge::isProbablyMVC(const uint8_t* image, uint32_t size)
+{
+  // MovieCart image files begin with the signature 'M','V','C',0
+  static const uint8_t signature[4] = { 'M', 'V', 'C', 0 };
+  uint32_t searchSize = (size < 5) ? size : 5;
+  return searchForBytes(image, searchSize, signature, 4, 1);
 }
 
 bool Cartridge::isProbablyMDM(const uint8_t* image, uint32_t size)

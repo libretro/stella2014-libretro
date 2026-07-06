@@ -61,6 +61,7 @@ SOURCES_CXX := $(CORE_DIR)/src/common/Base.cxx \
 	       $(CORE_DIR)/src/emucore/CartGL.cxx \
 	       $(CORE_DIR)/src/emucore/CartMC.cxx \
 	       $(CORE_DIR)/src/emucore/CartMDM.cxx \
+	       $(CORE_DIR)/src/emucore/CartMVC.cxx \
 	       $(CORE_DIR)/src/emucore/CartSB.cxx \
 	       $(CORE_DIR)/src/emucore/CartTVBoy.cxx \
 	       $(CORE_DIR)/src/emucore/CartUA.cxx \

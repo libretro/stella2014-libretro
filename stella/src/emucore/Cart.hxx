@@ -64,7 +64,8 @@ class Cartridge : public Device
     */
     static Cartridge* create(const uint8_t* image, uint32_t size, string& md5,
                              string& dtype, string& id,
-                             const OSystem& system, Settings& settings);
+                             const OSystem& system, Settings& settings,
+                             const string& path = "");
 
     /**
       Create a new cartridge
@@ -447,6 +448,8 @@ class Cartridge : public Device
       @param size   The size of the ROM image
     */
     static bool isProbablyMDM(const uint8_t* image, uint32_t size);
+
+    static bool isProbablyMVC(const uint8_t* image, uint32_t size);
 
     /**
       Returns true if the image is probably a UA bankswitching cartridge
