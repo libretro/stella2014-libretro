@@ -38,7 +38,6 @@ Settings::Settings(OSystem* osystem)
   setInternal("grabmouse", "true");
   setInternal("palette", "standard");
   setInternal("colorloss", "true");
-  setInternal("timing", "sleep");
 
   // Sound options
   setInternal("sound", "true");
