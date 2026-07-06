@@ -24,6 +24,7 @@
 #include "Cart0840.hxx"
 #include "Cart2K.hxx"
 #include "Cart3E.hxx"
+#include "Cart3EX.hxx"
 #include "Cart3F.hxx"
 #include "Cart4A50.hxx"
 #include "Cart4K.hxx"
@@ -182,6 +183,8 @@ Cartridge* Cartridge::create(const uint8_t* image, uint32_t size, string& md5,
     cartridge = new Cartridge2K(image, size, settings);
   else if(type == "3E")
     cartridge = new Cartridge3E(image, size, settings);
+  else if(type == "3EX")
+    cartridge = new Cartridge3EX(image, size, settings);
   else if(type == "3F")
     cartridge = new Cartridge3F(image, size, settings);
   else if(type == "4A50")
@@ -424,6 +427,8 @@ string Cartridge::autodetectType(const uint8_t* image, uint32_t size)
       type = "4K";
     else if(isProbablyE0(image, size))
       type = "E0";
+    else if(isProbably3EX(image, size))
+      type = "3EX";
     else if(isProbably3E(image, size))
       type = "3E";
     else if(isProbably3F(image, size))
@@ -461,6 +466,8 @@ string Cartridge::autodetectType(const uint8_t* image, uint32_t size)
       type = "F6SC";
     else if(isProbablyE7(image, size))
       type = "E7";
+    else if(isProbably3EX(image, size))
+      type = "3EX";
     else if(isProbably3E(image, size))
       type = "3E";
   /* no known 16K 3F ROMS
@@ -493,6 +500,8 @@ string Cartridge::autodetectType(const uint8_t* image, uint32_t size)
       type = "BUS";
     else if(isProbablySC(image, size))
       type = "F4SC";
+    else if(isProbably3EX(image, size))
+      type = "3EX";
     else if(isProbably3E(image, size))
       type = "3E";
     else if(isProbably3F(image, size))
@@ -512,6 +521,8 @@ string Cartridge::autodetectType(const uint8_t* image, uint32_t size)
       type = "TVBOY";
     else if(isProbablyCDF(image, size))
       type = "CDF";
+    else if(isProbably3EX(image, size))
+      type = "3EX";
     else if(isProbably3E(image, size))
       type = "3E";
     else if(isProbably3F(image, size))
@@ -531,6 +542,8 @@ string Cartridge::autodetectType(const uint8_t* image, uint32_t size)
       type = "TVBOY";
     else if(isProbablyCDF(image, size))
       type = "CDF";
+    else if(isProbably3EX(image, size))
+      type = "3EX";
     else if(isProbably3E(image, size))
       type = "3E";
     else if(isProbablyDF(image, size, type))
@@ -550,6 +563,8 @@ string Cartridge::autodetectType(const uint8_t* image, uint32_t size)
       type = "TVBOY";
     else if(isProbablyCDF(image, size))
       type = "CDF";
+    else if(isProbably3EX(image, size))
+      type = "3EX";
     else if(isProbably3E(image, size))
       type = "3E";
     else if(isProbablyBF(image, size, type))
@@ -566,6 +581,8 @@ string Cartridge::autodetectType(const uint8_t* image, uint32_t size)
     // Only CDFJ+ reaches this size in the types this core supports.
     else if(isProbablyCDF(image, size))
       type = "CDF";
+    else if(isProbably3EX(image, size))
+      type = "3EX";
     else if(isProbably3E(image, size))
       type = "3E";
     else if(isProbably3F(image, size))
@@ -575,7 +592,9 @@ string Cartridge::autodetectType(const uint8_t* image, uint32_t size)
   }
   else  // what else can we do?
   {
-    if(isProbably3E(image, size))
+    if(isProbably3EX(image, size))
+      type = "3EX";
+    else if(isProbably3E(image, size))
       type = "3E";
     else if(isProbably3F(image, size))
       type = "3F";
@@ -712,6 +731,13 @@ bool Cartridge::isProbably3E(const uint8_t* image, uint32_t size)
   // immediate mode LDA
   uint8_t signature[] = { 0x85, 0x3E, 0xA9, 0x00 };  // STA $3E; LDA #$00
   return searchForBytes(image, size, signature, 4, 1);
+}
+
+bool Cartridge::isProbably3EX(const uint8_t* image, uint32_t size)
+{
+  // 3EX carts contain the string "3EX" at least twice
+  static const uint8_t sig[3] = { '3', 'E', 'X' };
+  return searchForBytes(image, size, sig, 3, 2);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
